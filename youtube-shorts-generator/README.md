@@ -93,6 +93,51 @@ youtube-shorts-generator/
 └── README.md
 ```
 
+## Troubleshooting
+
+### Health check failures
+
+Run `python -m src.cli.main health` to get a JSON report. Common causes:
+
+- **Missing or invalid API keys**: One or more checks show `ok: false`. Ensure `.env` exists (copy from `.env.example`) and all required keys are set. See **Configuration reference** below for the list.
+- **Insufficient disk space**: The `disk_space` check fails if free space is below the configured minimum (default 10GB). Free space or increase `resources.min_disk_gb` in `config.yaml`.
+- **Low RAM**: The `system_resources` check can fail if available RAM is below the minimum (default 8GB). Close other applications or adjust `resources.min_ram_gb`.
+- **Database/SQLite errors**: Ensure the project directory is writable and the path in `paths.database` (default `youtube_shorts.db`) is valid.
+- **API connectivity**: OpenAI, ElevenLabs, RunwayML, or YouTube checks can fail due to invalid keys, network issues, or rate limits. Verify keys in the provider dashboards and retry.
+
+### Common errors
+
+- **ModuleNotFoundError or import errors**: Activate the venv (`source venv/bin/activate` or `venv\Scripts\activate`) and ensure `pip install -r requirements.txt` was run from the project root.
+- **Permission denied on .env or config.yaml**: Ensure the files exist and are readable; do not commit `.env` or a `config.yaml` that contains secrets.
+- **FFmpeg not found**: Install FFmpeg and ensure it is on your PATH (required for video processing).
+
+## Configuration reference
+
+### Environment variables (.env)
+
+| Variable | Purpose |
+|----------|---------|
+| `OPENAI_API_KEY` | OpenAI API (GPT-4, embeddings) |
+| `ELEVENLABS_API_KEY` | ElevenLabs text-to-speech |
+| `RUNWAYML_API_KEY` | RunwayML video generation |
+| `YOUTUBE_CLIENT_ID` | YouTube Data API v3 OAuth |
+| `YOUTUBE_CLIENT_SECRET` | YouTube OAuth |
+| `YOUTUBE_REFRESH_TOKEN` | YouTube OAuth refresh token (after first auth) |
+
+Copy `.env.example` to `.env` and fill in values. Never commit `.env`.
+
+### config.yaml (main sections)
+
+- **timeouts**: Per-component and pipeline time limits (seconds).
+- **retry**: `max_retries` and `backoff_seconds` for retries.
+- **quality**: Script coherence, uniqueness similarity, duration, resolution, FPS, file size limits.
+- **cost**: Target/warning/critical per-video and monthly alerts (USD).
+- **content**: Topic categories, relevance score, optional fallback topics.
+- **resources**: `min_disk_gb`, `min_ram_gb`, `temp_storage_gb` (used by health check and local runs).
+- **paths**: `database`, `temp_dir`, `output_dir`.
+
+Copy `config.example.yaml` to `config.yaml` and adjust as needed.
+
 ## Development
 
 ### Code Quality

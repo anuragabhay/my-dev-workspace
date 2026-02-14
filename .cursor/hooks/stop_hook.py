@@ -51,6 +51,37 @@ def _has_pending_approvals(dashboard: str) -> bool:
     return int(match.group(1)) > 0
 
 
+# Regex to detect delegation slash commands in the last assistant message
+_DELEGATION_PATTERN = re.compile(
+    r"/(?:lead-engineer|architect|intern|pm|cto|cfo)(?:\s|$)",
+    re.IGNORECASE,
+)
+
+# Pattern to extract the full delegation line (slash command + task text)
+_DELEGATION_EXTRACT_PATTERN = re.compile(
+    r"(?:^|\n)(/(?:lead-engineer|architect|intern|pm|cto|cfo)\s+[^\n]+)",
+    re.MULTILINE | re.IGNORECASE,
+)
+
+
+def _extract_delegation_command(transcript_content: str) -> str | None:
+    """
+    Extract the slash command line from the last assistant message.
+    Returns e.g. "/lead-engineer Add README Troubleshooting/Configuration section to ..."
+    or None if no delegation line found.
+    """
+    recent = transcript_content[-4000:] if len(transcript_content) > 4000 else transcript_content
+    matches = _DELEGATION_EXTRACT_PATTERN.findall(recent)
+    if matches:
+        return matches[-1].strip()
+    return None
+
+
+def _last_response_contains_delegation(transcript_content: str) -> bool:
+    """True if the last response contains a delegation."""
+    return _extract_delegation_command(transcript_content) is not None
+
+
 def main() -> None:
     try:
         payload = json.load(sys.stdin)
@@ -103,6 +134,12 @@ def main() -> None:
     if not _next_actions_has_continue(dashboard) and not _has_pending_approvals(dashboard):
         print(json.dumps({}))
         return
+
+    if _last_response_contains_delegation(transcript_content):
+        delegation_cmd = _extract_delegation_command(transcript_content)
+        if delegation_cmd:
+            print(json.dumps({"followup_message": delegation_cmd}))
+            return
 
     followup = (
         "Run one cycle: get_workspace_status, check_my_pending_tasks(Lead Engineer), "

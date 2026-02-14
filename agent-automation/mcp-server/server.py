@@ -22,6 +22,7 @@ from tools.task_checker import check_my_pending_tasks
 from tools.workspace_status import get_workspace_status
 from tools.task_complete import mark_task_complete
 from tools.role_tasks import get_my_role_tasks
+from tools.pending_prompt import get_pending_orchestrator_prompt
 
 
 # Initialize MCP server
@@ -86,6 +87,15 @@ async def list_tools() -> list[Tool]:
                 },
                 "required": ["role"]
             }
+        ),
+        Tool(
+            name="get_pending_orchestrator_prompt",
+            description="Read the pending orchestrator run-cycle prompt (written by the stop hook when a subagent chat stops). Returns the prompt and clears the file. Call this at the start of an Orchestrator cycle; if prompt is non-empty, treat it as the run-cycle instruction so the loop continues without the user pasting.",
+            inputSchema={
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
         )
     ]
 
@@ -147,6 +157,14 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> Sequence[TextConten
             return [TextContent(
                 type="text",
                 text=json.dumps(result, indent=2, default=str)
+            )]
+        
+        elif name == "get_pending_orchestrator_prompt":
+            result = get_pending_orchestrator_prompt()
+            import json
+            return [TextContent(
+                type="text",
+                text=json.dumps(result, indent=2)
             )]
         
         else:

@@ -38,6 +38,9 @@ state_backup.json
 *.log
 tmp/
 temp/
+
+# Orchestrator handoff (runtime only)
+agent-automation/orchestrator_pending_prompt.txt
 .cache/
 
 # Video/output artifacts (if generated under repo)

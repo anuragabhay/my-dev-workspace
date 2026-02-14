@@ -84,7 +84,26 @@ For each **custom subagent** created in the UI (if file-based subagents are not 
 
 ---
 
-## 5. Optional: Explicit CONTINUE
+## 5. After subagent completes (trigger next Orchestrator cycle)
+
+When a **subagent** chat (Lead Engineer, Architect, Intern, etc.) stops, the stop hook detects it and returns:
+
+- `followup_message`: the **orchestrator run-cycle prompt** (same text as in `agent-automation/prompts/orchestrator_run_cycle.md`).
+- `orchestrator_cycle`: `true` (so the runner can route this to the Orchestrator chat if supported).
+
+**Canonical prompt file**: `agent-automation/prompts/orchestrator_run_cycle.md` — single line:
+
+`Run one cycle: get_workspace_status, read PROJECT_WORKSPACE.md (Dashboard, Next Actions, Role Status). Determine which role the next action is for from Next Actions; call check_my_pending_tasks(role="<that role>") — e.g. Lead Engineer, Architect, Intern, PM, CTO, CFO. Then decide next step, delegate if needed, update PROJECT_WORKSPACE.md.`
+
+**Runner behavior**: Cursor injects the followup into the chat that stopped (often the subagent chat), so the next cycle does not start in the Orchestrator automatically. To close the loop:
+
+1. **Hook** also writes `followup_message` to `agent-automation/orchestrator_pending_prompt.txt` when it returns `orchestrator_cycle: true`.
+2. **Orchestrator** calls MCP tool `get_pending_orchestrator_prompt` at the start of each cycle. If it returns a non-empty `prompt`, the Orchestrator executes it (run one cycle). The tool reads and then deletes the file.
+3. **User**: After a subagent finishes, switch to the Orchestrator chat and say **"continue"** (or "run one cycle"). The Orchestrator will call `get_pending_orchestrator_prompt`, get the prompt from the file, and run the cycle—no need to paste the long prompt.
+
+---
+
+## 6. Optional: Explicit CONTINUE
 
 To trigger the hook’s follow-up even when there are no pending approvals, set **Next Actions** in PROJECT_WORKSPACE.md to include the word **CONTINUE**, e.g.:
 
@@ -94,7 +113,7 @@ The stop hook treats this as a signal to return a `followup_message` (subject to
 
 ---
 
-## 6. Work log (external store)
+## 7. Work log (external store)
 
 - **Full log**: `agent-automation/work_log.json` (JSON array, one object per entry: `timestamp`, `role`, `task`, `status`, `content`).
 - **In PROJECT_WORKSPACE.md**: Only the last 10 entries are kept under "## 📝 Recent Work Log (last 10)" plus a line "Full log: agent-automation/work_log.json".
@@ -105,7 +124,7 @@ The stop hook treats this as a signal to return a `followup_message` (subject to
 
 ---
 
-## 7. Summary
+## 8. Summary
 
 - **Orchestrator**: `.cursor/rules/orchestrator.mdc` — one parent agent in one chat.  
 - **Subagents**: `.cursor/agents/{lead-engineer,architect,cto,intern,cfo,pm}.md` — invoked via `/lead-engineer`, `/architect`, etc.  

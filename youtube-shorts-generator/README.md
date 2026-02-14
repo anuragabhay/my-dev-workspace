@@ -148,6 +148,18 @@ This project uses Claude Pilot for automated code quality:
 - TDD enforcement
 - Spec-driven development
 
+### Pilot (code quality)
+
+Project-specific rules live in `.claude/rules/`:
+
+- **agent-guidelines.mdc** — References PROJECT_WORKSPACE.md for agent coordination and work log.
+- **python-development.mdc** — PEP 8, type hints, pytest layout, `src/` structure (applies to `**/*.py`).
+- **content-generation.mdc** — Standards for script/research/uniqueness agents and services.
+- **video-quality.mdc** — Standards for video pipeline and composition (config, service layer).
+- **mcp-framework.mdc** — Message queue, state manager, and agent communication.
+
+**Using Pilot:** Run `/sync` in the project to generate or refresh project-specific rules. Pilot then provides formatting, linting, and type-checking (e.g. on save or on demand). Activate the project venv before running tests or tools that Pilot may invoke.
+
 ### Testing
 
 ```bash
@@ -160,7 +172,7 @@ pytest --cov=src --cov-report=html
 
 ### Project Status
 
-See `PROJECT_WORKSPACE.md` for:
+See `PROJECT_WORKSPACE.md` (at the workspace root) for:
 - Current implementation status
 - Agent coordination
 - Approval workflows
@@ -183,5 +195,5 @@ Part of the Multi-Agent Autonomous Development Workspace system.
 
 ## Support
 
-For issues, questions, or contributions, refer to `PROJECT_WORKSPACE.md` for agent coordination protocols.
+For issues, questions, or contributions, refer to `PROJECT_WORKSPACE.md` (at the workspace root) for agent coordination protocols, current status, and next actions.
 

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
-Cursor stop hook. Returns followup_message only when the conversation that stopped
-is the Orchestrator chat (detected via transcript content). Other chats get {}.
+Cursor stop hook. followup_message is injected into the SAME chat that stopped.
+- Subagent chat stopped: return {} so nothing is injected; control returns to Orchestrator automatically.
+- Orchestrator chat stopped: return followup to continue the loop (delegation slash command or run-cycle
+  prompt), unless Orchestrator wrote ORCHESTRATION_COMPLETE or we hit User Intervention / loop limit.
 """
 import json
 import re
@@ -39,8 +41,9 @@ def _user_intervention_required(dashboard: str) -> bool:
 
 
 def _next_actions_has_continue(dashboard: str) -> bool:
-    """True if Next Actions line contains the word CONTINUE."""
-    return "CONTINUE" in dashboard
+    """True if Next Actions suggests another cycle: contains CONTINUE or 'next cycle'."""
+    d = dashboard.upper()
+    return "CONTINUE" in d or "NEXT CYCLE" in d
 
 
 def _has_pending_approvals(dashboard: str) -> bool:
@@ -57,29 +60,87 @@ _DELEGATION_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
-# Pattern to extract the full delegation line (slash command + task text)
+# Pattern to extract the full delegation line (slash command + task text).
+# Allows "/intern ..." or "/intern: ..." or "/intern: \"...\"" so prose formats still match.
 _DELEGATION_EXTRACT_PATTERN = re.compile(
-    r"(?:^|\n)(/(?:lead-engineer|architect|intern|pm|cto|cfo)\s+[^\n]+)",
+    r"(?:^|\n)(/(?:lead-engineer|architect|intern|pm|cto|cfo)\s*:?\s*[^\n]+)",
     re.MULTILINE | re.IGNORECASE,
 )
+
+
+def _normalize_delegation_command(raw: str) -> str:
+    """Remove optional colon after role and strip surrounding quotes so runner gets /role task."""
+    s = raw.strip()
+    # "/intern: \"task\"" or "/intern: task" -> "/intern task"
+    role_end = re.search(r"/(?:lead-engineer|architect|intern|pm|cto|cfo)\s*:?\s*", s, re.I)
+    if role_end:
+        prefix = role_end.group(0).replace(":", " ").replace("  ", " ")
+        rest = s[role_end.end() :].strip()
+        if rest.startswith('"') and rest.endswith('"'):
+            rest = rest[1:-1]
+        s = prefix + rest
+    return s
 
 
 def _extract_delegation_command(transcript_content: str) -> str | None:
     """
     Extract the slash command line from the last assistant message.
-    Returns e.g. "/lead-engineer Add README Troubleshooting/Configuration section to ..."
+    Returns e.g. "/lead-engineer Add README ..." or "/intern Commit and push ..."
     or None if no delegation line found.
     """
     recent = transcript_content[-4000:] if len(transcript_content) > 4000 else transcript_content
     matches = _DELEGATION_EXTRACT_PATTERN.findall(recent)
     if matches:
-        return matches[-1].strip()
+        return _normalize_delegation_command(matches[-1])
     return None
 
 
 def _last_response_contains_delegation(transcript_content: str) -> bool:
     """True if the last response contains a delegation."""
     return _extract_delegation_command(transcript_content) is not None
+
+
+def _orchestrator_marked_complete(transcript_content: str) -> bool:
+    """True if Orchestrator wrote ORCHESTRATION_COMPLETE (or similar) in recent output."""
+    recent = transcript_content[-3000:] if len(transcript_content) > 3000 else transcript_content
+    return "orchestration_complete" in recent.lower() or "orchestration complete" in recent.lower()
+
+
+# Subagent role markers in transcript (first 3000 chars)
+_SUBAGENT_MARKERS = (
+    "You are the **Intern**",
+    "You are the **Lead Engineer**",
+    "You are the **Architect**",
+    "You are the **CTO**",
+    "You are the **CFO**",
+    "You are the **Product Manager**",
+    "name: lead-engineer",
+    "name: architect",
+    "name: intern",
+    "name: cto",
+    "name: cfo",
+    "name: pm",
+)
+
+
+def _is_subagent_chat(transcript_head: str) -> bool:
+    """True if the transcript appears to be from a workspace subagent (Intern, Lead Engineer, etc.)."""
+    return any(marker in transcript_head for marker in _SUBAGENT_MARKERS)
+
+
+def _orchestrator_run_cycle_prompt(root: Path) -> str:
+    """Read the canonical orchestrator run-cycle prompt from agent-automation/prompts."""
+    path = root / "agent-automation" / "prompts" / "orchestrator_run_cycle.md"
+    if path.exists():
+        try:
+            return path.read_text(encoding="utf-8", errors="replace").strip()
+        except OSError:
+            pass
+    return (
+        "Run one cycle: get_workspace_status, read PROJECT_WORKSPACE.md (Dashboard, Next Actions, Role Status). "
+        "Determine which role the next action is for from Next Actions; call check_my_pending_tasks(role=\"<that role>\") — e.g. Lead Engineer, Architect, Intern, PM, CTO, CFO. "
+        "Then decide next step, delegate if needed, update PROJECT_WORKSPACE.md."
+    )
 
 
 def main() -> None:
@@ -108,12 +169,20 @@ def main() -> None:
         print(json.dumps({}))
         return
     head = transcript_content[:3000]
+    root = _workspace_root(payload)
+
+    # 2a) Subagent chat stopped → return {} only. Followup goes to the same chat; we don't want it in subagent.
+    #     Control returns to Orchestrator automatically; when Orchestrator stops, hook runs again with Orchestrator transcript.
     if "parent Orchestrator" not in head and "orchestrator.mdc" not in head:
         print(json.dumps({}))
         return
 
-    # 3) CONTINUE logic (only for Orchestrator)
-    root = _workspace_root(payload)
+    # 3) Orchestrator marked complete → stop loop
+    if _orchestrator_marked_complete(transcript_content):
+        print(json.dumps({}))
+        return
+
+    # 4) CONTINUE logic (only for Orchestrator)
     workspace_md = root / "PROJECT_WORKSPACE.md"
     if not workspace_md.exists():
         print(json.dumps({}))
@@ -131,20 +200,20 @@ def main() -> None:
     if loop_count >= 5:
         print(json.dumps({}))
         return
-    if not _next_actions_has_continue(dashboard) and not _has_pending_approvals(dashboard):
+    # Continue when: Next Actions says continue, or there are pending approvals, or Orchestrator just delegated (inject that command).
+    has_continue = _next_actions_has_continue(dashboard) or _has_pending_approvals(dashboard)
+    has_delegation = _last_response_contains_delegation(transcript_content)
+    if not has_continue and not has_delegation:
         print(json.dumps({}))
         return
 
-    if _last_response_contains_delegation(transcript_content):
+    if has_delegation:
         delegation_cmd = _extract_delegation_command(transcript_content)
         if delegation_cmd:
             print(json.dumps({"followup_message": delegation_cmd}))
             return
 
-    followup = (
-        "Run one cycle: get_workspace_status, check_my_pending_tasks(Lead Engineer), "
-        "read PROJECT_WORKSPACE.md, decide next step, delegate if needed, update PROJECT_WORKSPACE.md."
-    )
+    followup = _orchestrator_run_cycle_prompt(root)
     print(json.dumps({"followup_message": followup}))
 
 

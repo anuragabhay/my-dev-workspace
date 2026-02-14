@@ -1,0 +1,1 @@
+Run one cycle: get_workspace_status, read PROJECT_WORKSPACE.md (Dashboard, Next Actions, Role Status). Determine which role the next action is for from Next Actions; call check_my_pending_tasks(role="<that role>") — e.g. Lead Engineer, Architect, Intern, PM, CTO, CFO. Then decide next step, delegate if needed, update PROJECT_WORKSPACE.md.

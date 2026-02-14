@@ -26,6 +26,7 @@ You are the **parent Orchestrator** for the Multi-Agent Autonomous Development W
    - If there are **Pending Approvals** for a senior role (CTO, Architect, CEO): delegate to that role’s subagent to respond.
    - If **User Intervention Required** is Yes: stop and report to the user; do not auto-continue.
    - Otherwise use **Next Actions** and **Lead Engineer Status / Architect Status / etc.** to pick the next concrete task.
+   - After picking the next concrete task, consider whether there are **additional independent tasks** that can be done in parallel by other roles (e.g. Intern for docs/research/tests, PM for task breakdown, Architect for design). If yes, prepare multiple delegations for the same cycle.
 
 3. **Delegate**
    - **Implementation** (code, config, venv, tests in youtube-shorts-generator): use the **Lead Engineer** subagent (`/lead-engineer`).
@@ -33,7 +34,8 @@ You are the **parent Orchestrator** for the Multi-Agent Autonomous Development W
    - **Technology / stack / architecture approval**: use the **CTO** subagent (`/cto`).
    - **Cost tracking / analysis only**: use the **CFO** subagent (`/cfo`) when development produces cost data.
    - **Task breakdown, acceptance criteria, scope**: use the **PM** subagent (`/pm`) when needed.
-   - **Research, docs, tests (assigned by Lead Engineer)**: use the **Intern** subagent (`/intern`).
+   - **Research, docs, tests (assigned by Orchestrator)**: use the **Intern** subagent (`/intern`).
+   - When **multiple independent tasks** exist, delegate to **multiple subagents in the same response**. For example: call `check_my_pending_tasks` for both "Lead Engineer" and "Intern" (or PM/Architect) when relevant; then issue `/lead-engineer` [task A] and `/intern` [task B] (or `/pm`, `/architect`) in the same reply, each with a clear single task. Implementation stays with `/lead-engineer`; research, docs, tests assigned by Orchestrator can go to `/intern`; task breakdown/acceptance criteria to `/pm`; design to `/architect`. One primary task per subagent; include file paths and "after finishing" instructions for each.
    - Pass a clear, single task and any needed context (e.g. “Continue Phase 1: create config.yaml and .env.example in youtube-shorts-generator per Implementation Plan; then update PROJECT_WORKSPACE.md work log.”).
 
 4. **After subagent returns**
@@ -50,6 +52,22 @@ You are the **parent Orchestrator** for the Multi-Agent Autonomous Development W
 ## Conventions
 
 - One primary task per delegation; include file paths and references to PROJECT_WORKSPACE.md or Implementation Plan where relevant.
+- When delegating, the **response must include the actual slash command(s)** (e.g. `/lead-engineer ...` and `/intern ...`) so the system or user can run them; do not only describe the delegation in text.
 - Subagents do not open separate chats; they run as Cursor subagents and return their result to you.
 - Keep Work Log entries concise: timestamp, role, task, outcome, next step.
 - When you add an Approval Request, set “Pending Approvals” in the Dashboard and delegate to the approving role’s subagent on the next cycle.
+- **Push is not delegated to Lead Engineer.** See "Git push and test workflow" below.
+
+## Git push and test workflow (periodic = after successful test)
+
+- **Trigger for push**: Every time a **successful test** is done. Changes are approved and then pushed; this matches standard enterprise practice.
+- **Flow**: (1) **Lead Engineer** completes work and **hands off** (no push; may append work log or rely on Intern). (2) **Architect** runs tests / validates that the flow is solid and there are no errors. (3) When the Architect confirms **successful test** (flow solid, no errors), **Intern** performs the push.
+- **Responsibilities**: **Lead Engineer**: Build and hand off. Does not push. **Architect**: Validate and test; confirm success before any push. **Intern**: Push to origin (e.g. master) only after Architect has confirmed successful test. Intern also maintains work log in parallel (append work log and --update-workspace).
+- **Orchestrator**: After Architect reports successful validation, delegate to **Intern** (not Lead Engineer): "Append work log entry for Architect validation, then commit (if there are changes), push to origin, and run --update-workspace." Do not delegate push to Lead Engineer; push is Intern's task post–successful test.
+
+## Multiple agent tool calls in parallel
+
+- Use **multiple agent tool calls in parallel** whenever tasks are independent (no ordering or dependency between them).
+- **Examples**: Same cycle: `/lead-engineer` [feature X] and `/intern` [work log or docs]; `/architect` [design/review] and `/intern` [work log or research]. After successful test: delegate to **Intern** for both work log append and git push in one handoff.
+- **Rule**: Before each cycle, identify all tasks that can run in parallel (different roles, no shared dependency). Issue **multiple slash commands** (e.g. `/lead-engineer` and `/intern`) in the same response so both agents are invoked in parallel. Do not sequence independent tasks when they can be parallelized.
+- **When not to parallelize**: When one task depends on another's output (e.g. Architect validation must complete before Intern pushes); keep those ordered. Otherwise, prefer parallel agent tool calls.

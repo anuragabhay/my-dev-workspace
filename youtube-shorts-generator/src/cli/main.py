@@ -15,26 +15,13 @@ def _project_root() -> Path:
 
 
 def cmd_health() -> int:
-    """Health check: config, DB, disk. Return 0 ok, 1 fail."""
+    """Health check: MVP checks (API keys, disk, resources, DB, API connectivity, YouTube). Return 0 ok, 1 fail."""
     root = _project_root()
     sys.path.insert(0, str(root))
-    from src.utils.config import get_config
-    config, errors = get_config()
-    if errors:
-        print(json.dumps({"ok": False, "errors": errors}))
-        return 1
-    from src.database.migrations import run_migrations
-    run_migrations()
-    disk = (root / "tmp").parent
-    free_gb = 0
-    try:
-        import shutil
-        free_gb = shutil.disk_usage(str(disk)).free / (1024**3)
-    except Exception:
-        pass
-    out = {"ok": True, "config_loaded": True, "disk_free_gb": round(free_gb, 2)}
-    print(json.dumps(out))
-    return 0
+    from src.utils.health import run_all_checks
+    result = run_all_checks(root)
+    print(json.dumps(result, indent=2))
+    return 0 if result.get("ok") else 1
 
 
 def cmd_status() -> int:

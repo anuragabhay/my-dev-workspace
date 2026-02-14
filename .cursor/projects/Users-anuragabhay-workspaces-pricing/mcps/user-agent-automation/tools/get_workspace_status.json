@@ -1,0 +1,9 @@
+{
+  "name": "get_workspace_status",
+  "description": "Get current workspace status including pending approvals, blockers, project phase, and recent work log entries.",
+  "arguments": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  }
+}

@@ -1,0 +1,765 @@
+[Terminal output truncated: ~746KB dropped from beginning]
+orp.adobe.com/artifactory/maven-asr-release/org/ow2/asm/asm-util/8.0/asm-util-8.0.jar (85 kB at 28 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-lang3/3.7/commons-lang3-3.7.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/checkerframework/checker-compat-qual/2.5.5/checker-compat-qual-2.5.5.jar (5.9 kB at 1.9 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar (14 kB at 4.5 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar (8.8 kB at 2.8 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-lang3/3.7/commons-lang3-3.7.jar (500 kB at 146 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/google/guava/guava/28.2-android/guava-28.2-android.jar (2.6 MB at 517 kB/s)
+[INFO] 
+[INFO] -------------------< com.adobe.unifiedquote:webapp >--------------------
+[INFO] Building webapp 0.1                                                [2/2]
+[INFO]   from webapp/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-resources-plugin/3.2.0/maven-resources-plugin-3.2.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-resources-plugin/3.2.0/maven-resources-plugin-3.2.0.pom (8.1 kB at 25 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-resources-plugin/3.2.0/maven-resources-plugin-3.2.0.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-resources-plugin/3.2.0/maven-resources-plugin-3.2.0.jar (33 kB at 100 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-compiler-plugin/3.10.1/maven-compiler-plugin-3.10.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-compiler-plugin/3.10.1/maven-compiler-plugin-3.10.1.pom (13 kB at 39 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-compiler-plugin/3.10.1/maven-compiler-plugin-3.10.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-compiler-plugin/3.10.1/maven-compiler-plugin-3.10.1.jar (62 kB at 179 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-surefire-plugin/2.22.2/maven-surefire-plugin-2.22.2.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-surefire-plugin/2.22.2/maven-surefire-plugin-2.22.2.pom (5.0 kB at 16 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire/2.22.2/surefire-2.22.2.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire/2.22.2/surefire-2.22.2.pom (26 kB at 81 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-surefire-plugin/2.22.2/maven-surefire-plugin-2.22.2.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-surefire-plugin/2.22.2/maven-surefire-plugin-2.22.2.jar (41 kB at 121 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-jar-plugin/3.2.0/maven-jar-plugin-3.2.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-jar-plugin/3.2.0/maven-jar-plugin-3.2.0.pom (7.3 kB at 22 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-plugins/33/maven-plugins-33.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-plugins/33/maven-plugins-33.pom (11 kB at 34 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-jar-plugin/3.2.0/maven-jar-plugin-3.2.0.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugins/maven-jar-plugin/3.2.0/maven-jar-plugin-3.2.0.jar (29 kB at 87 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/junit/junit/4.12/junit-4.12.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/junit/junit/4.12/junit-4.12.jar (315 kB at 656 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/hamcrest/hamcrest-core/2.2/hamcrest-core-2.2.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/net/minidev/asm/1.0.2/asm-1.0.2.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/asm/asm/3.3.1/asm-3.3.1.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/net/minidev/json-smart/2.2.1/json-smart-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/hamcrest/hamcrest-core/2.2/hamcrest-core-2.2.jar (1.5 kB at 4.6 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/net/minidev/accessors-smart/1.1/accessors-smart-1.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/asm/asm/3.3.1/asm-3.3.1.jar (44 kB at 131 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/ow2/asm/asm/5.0.3/asm-5.0.3.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar (123 kB at 366 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/jayway/jsonpath/json-path/2.2.0/json-path-2.2.0.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/net/minidev/asm/1.0.2/asm-1.0.2.jar (72 kB at 194 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/junit/vintage/junit-vintage-engine/5.8.2/junit-vintage-engine-5.8.2.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/net/minidev/json-smart/2.2.1/json-smart-2.2.1.jar (121 kB at 293 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/junit/platform/junit-platform-engine/1.8.2/junit-platform-engine-1.8.2.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/ow2/asm/asm/5.0.3/asm-5.0.3.jar (53 kB at 80 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/net/minidev/accessors-smart/1.1/accessors-smart-1.1.jar (81 kB at 116 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/junit/platform/junit-platform-commons/1.8.2/junit-platform-commons-1.8.2.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/junit/vintage/junit-vintage-engine/5.8.2/junit-vintage-engine-5.8.2.jar (67 kB at 93 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/jayway/jsonpath/json-path/2.2.0/json-path-2.2.0.jar (207 kB at 289 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/junit/platform/junit-platform-engine/1.8.2/junit-platform-engine-1.8.2.jar (186 kB at 214 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar (7.7 kB at 7.7 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar (6.8 kB at 6.6 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/junit/platform/junit-platform-commons/1.8.2/junit-platform-commons-1.8.2.jar (100 kB at 94 kB/s)
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ webapp ---
+[INFO] Deleting /build/webapp/target
+[INFO] 
+[INFO] --- enforcer:3.0.0:enforce (enforce-versions) @ webapp ---
+[INFO] 
+[INFO] --- git-commit-id:4.9.10:revision (default) @ webapp ---
+[WARNING] Thread[JGit-FileStoreAttributeReader-1,5,main]: got smaller file timestamp on /build (/run/host_mark/Users), /build/.git: 2026-02-04T09:47:26Z < 2026-02-04T09:47:26.290423Z. Aborting measurement at resolution PT0.709577S.
+[INFO] 
+[INFO] --- resources:3.2.0:resources (default-resources) @ webapp ---
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-api/3.1.0/maven-plugin-api-3.1.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-api/3.1.0/maven-plugin-api-3.1.0.pom (3.0 kB at 9.5 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven/3.1.0/maven-3.1.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven/3.1.0/maven-3.1.0.pom (22 kB at 56 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-model/3.1.0/maven-model-3.1.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-model/3.1.0/maven-model-3.1.0.pom (3.8 kB at 9.3 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/3.0.10/plexus-utils-3.0.10.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/3.0.10/plexus-utils-3.0.10.pom (3.1 kB at 9.9 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus/3.3/plexus-3.3.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus/3.3/plexus-3.3.pom (20 kB at 63 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-artifact/3.1.0/maven-artifact-3.1.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-artifact/3.1.0/maven-artifact-3.1.0.pom (1.6 kB at 5.1 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/eclipse/sisu/org.eclipse.sisu.plexus/0.0.0.M2a/org.eclipse.sisu.plexus-0.0.0.M2a.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/eclipse/sisu/org.eclipse.sisu.plexus/0.0.0.M2a/org.eclipse.sisu.plexus-0.0.0.M2a.pom (5.9 kB at 19 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/eclipse/sisu/sisu-plexus/0.0.0.M2a/sisu-plexus-0.0.0.M2a.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/eclipse/sisu/sisu-plexus/0.0.0.M2a/sisu-plexus-0.0.0.M2a.pom (7.9 kB at 25 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/eclipse/sisu/org.eclipse.sisu.inject/0.0.0.M2a/org.eclipse.sisu.inject-0.0.0.M2a.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/eclipse/sisu/org.eclipse.sisu.inject/0.0.0.M2a/org.eclipse.sisu.inject-0.0.0.M2a.pom (5.0 kB at 16 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/eclipse/sisu/sisu-inject/0.0.0.M2a/sisu-inject-0.0.0.M2a.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/eclipse/sisu/sisu-inject/0.0.0.M2a/sisu-inject-0.0.0.M2a.pom (7.8 kB at 25 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/2.1/plexus-utils-2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/2.1/plexus-utils-2.1.pom (4.0 kB at 12 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/sonatype/spice/spice-parent/16/spice-parent-16.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/sonatype/spice/spice-parent/16/spice-parent-16.pom (8.4 kB at 26 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-core/3.1.0/maven-core-3.1.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-core/3.1.0/maven-core-3.1.0.pom (6.9 kB at 22 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-settings/3.1.0/maven-settings-3.1.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-settings/3.1.0/maven-settings-3.1.0.pom (1.8 kB at 5.6 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-settings-builder/3.1.0/maven-settings-builder-3.1.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-settings-builder/3.1.0/maven-settings-builder-3.1.0.pom (2.3 kB at 6.9 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-interpolation/1.16/plexus-interpolation-1.16.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-interpolation/1.16/plexus-interpolation-1.16.pom (1.0 kB at 3.3 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-components/1.3/plexus-components-1.3.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-components/1.3/plexus-components-1.3.pom (3.1 kB at 9.5 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-repository-metadata/3.1.0/maven-repository-metadata-3.1.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-repository-metadata/3.1.0/maven-repository-metadata-3.1.0.pom (1.9 kB at 5.9 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-model-builder/3.1.0/maven-model-builder-3.1.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-model-builder/3.1.0/maven-model-builder-3.1.0.pom (2.5 kB at 7.3 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-aether-provider/3.1.0/maven-aether-provider-3.1.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-aether-provider/3.1.0/maven-aether-provider-3.1.0.pom (3.5 kB at 11 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-classworlds/2.4.2/plexus-classworlds-2.4.2.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-classworlds/2.4.2/plexus-classworlds-2.4.2.pom (3.5 kB at 11 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus/3.0.1/plexus-3.0.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus/3.0.1/plexus-3.0.1.pom (19 kB at 56 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-interpolation/1.26/plexus-interpolation-1.26.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-interpolation/1.26/plexus-interpolation-1.26.pom (2.7 kB at 8.2 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-filtering/3.2.0/maven-filtering-3.2.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-filtering/3.2.0/maven-filtering-3.2.0.pom (6.8 kB at 21 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1.pom (28 kB at 84 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-parent/47/commons-parent-47.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-parent/47/commons-parent-47.pom (78 kB at 220 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/apache/19/apache-19.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/apache/19/apache-19.pom (15 kB at 48 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-api/3.1.0/maven-plugin-api-3.1.0.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-api/3.1.0/maven-plugin-api-3.1.0.jar (50 kB at 137 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-artifact/3.1.0/maven-artifact-3.1.0.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-core/3.1.0/maven-core-3.1.0.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-settings/3.1.0/maven-settings-3.1.0.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-settings-builder/3.1.0/maven-settings-builder-3.1.0.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-repository-metadata/3.1.0/maven-repository-metadata-3.1.0.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-settings/3.1.0/maven-settings-3.1.0.jar (47 kB at 131 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-model-builder/3.1.0/maven-model-builder-3.1.0.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-settings-builder/3.1.0/maven-settings-builder-3.1.0.jar (41 kB at 107 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-artifact/3.1.0/maven-artifact-3.1.0.jar (52 kB at 134 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-aether-provider/3.1.0/maven-aether-provider-3.1.0.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/3.0.10/plexus-utils-3.0.10.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-repository-metadata/3.1.0/maven-repository-metadata-3.1.0.jar (30 kB at 77 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-classworlds/2.4.2/plexus-classworlds-2.4.2.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-core/3.1.0/maven-core-3.1.0.jar (563 kB at 880 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-model/3.1.0/maven-model-3.1.0.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-classworlds/2.4.2/plexus-classworlds-2.4.2.jar (47 kB at 65 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-interpolation/1.26/plexus-interpolation-1.26.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-aether-provider/3.1.0/maven-aether-provider-3.1.0.jar (60 kB at 83 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/eclipse/sisu/org.eclipse.sisu.plexus/0.0.0.M2a/org.eclipse.sisu.plexus-0.0.0.M2a.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-model-builder/3.1.0/maven-model-builder-3.1.0.jar (159 kB at 213 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/eclipse/sisu/org.eclipse.sisu.inject/0.0.0.M2a/org.eclipse.sisu.inject-0.0.0.M2a.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/3.0.10/plexus-utils-3.0.10.jar (231 kB at 267 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-filtering/3.2.0/maven-filtering-3.2.0.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-model/3.1.0/maven-model-3.1.0.jar (164 kB at 159 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-interpolation/1.26/plexus-interpolation-1.26.jar (85 kB at 81 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/eclipse/sisu/org.eclipse.sisu.inject/0.0.0.M2a/org.eclipse.sisu.inject-0.0.0.M2a.jar (202 kB at 178 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/eclipse/sisu/org.eclipse.sisu.plexus/0.0.0.M2a/org.eclipse.sisu.plexus-0.0.0.M2a.jar (202 kB at 178 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-filtering/3.2.0/maven-filtering-3.2.0.jar (52 kB at 43 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1.jar (502 kB at 315 kB/s)
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] Copying 31 resources
+[INFO] 
+[INFO] --- compiler:3.10.1:compile (default-compile) @ webapp ---
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-incremental/1.1/maven-shared-incremental-1.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-incremental/1.1/maven-shared-incremental-1.1.pom (4.7 kB at 15 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-components/19/maven-shared-components-19.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-components/19/maven-shared-components-19.pom (6.4 kB at 17 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-java/1.1.1/plexus-java-1.1.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-java/1.1.1/plexus-java-1.1.1.pom (5.0 kB at 13 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-languages/1.1.1/plexus-languages-1.1.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-languages/1.1.1/plexus-languages-1.1.1.pom (4.6 kB at 15 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus/8/plexus-8.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus/8/plexus-8.pom (25 kB at 79 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/ow2/asm/asm/9.2/asm-9.2.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/ow2/asm/asm/9.2/asm-9.2.pom (2.4 kB at 7.5 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/thoughtworks/qdox/qdox/2.0.1/qdox-2.0.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/thoughtworks/qdox/qdox/2.0.1/qdox-2.0.1.pom (16 kB at 50 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler-api/2.11.1/plexus-compiler-api-2.11.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler-api/2.11.1/plexus-compiler-api-2.11.1.pom (1.1 kB at 3.4 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler/2.11.1/plexus-compiler-2.11.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler/2.11.1/plexus-compiler-2.11.1.pom (8.1 kB at 26 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-components/6.6/plexus-components-6.6.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-components/6.6/plexus-components-6.6.pom (2.7 kB at 8.3 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/3.4.1/plexus-utils-3.4.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/3.4.1/plexus-utils-3.4.1.pom (8.0 kB at 25 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler-manager/2.11.1/plexus-compiler-manager-2.11.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler-manager/2.11.1/plexus-compiler-manager-2.11.1.pom (1.1 kB at 3.5 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler-javac/2.11.1/plexus-compiler-javac-2.11.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler-javac/2.11.1/plexus-compiler-javac-2.11.1.pom (1.2 kB at 3.6 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compilers/2.11.1/plexus-compilers-2.11.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compilers/2.11.1/plexus-compilers-2.11.1.pom (1.3 kB at 4.0 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-incremental/1.1/maven-shared-incremental-1.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-incremental/1.1/maven-shared-incremental-1.1.jar (14 kB at 41 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-java/1.1.1/plexus-java-1.1.1.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/ow2/asm/asm/9.2/asm-9.2.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/thoughtworks/qdox/qdox/2.0.1/qdox-2.0.1.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler-api/2.11.1/plexus-compiler-api-2.11.1.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/3.4.1/plexus-utils-3.4.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler-api/2.11.1/plexus-compiler-api-2.11.1.jar (27 kB at 79 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler-manager/2.11.1/plexus-compiler-manager-2.11.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-java/1.1.1/plexus-java-1.1.1.jar (54 kB at 152 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler-javac/2.11.1/plexus-compiler-javac-2.11.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/3.4.1/plexus-utils-3.4.1.jar (264 kB at 691 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/ow2/asm/asm/9.2/asm-9.2.jar (122 kB at 306 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/thoughtworks/qdox/qdox/2.0.1/qdox-2.0.1.jar (334 kB at 707 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler-manager/2.11.1/plexus-compiler-manager-2.11.1.jar (4.7 kB at 7.1 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-compiler-javac/2.11.1/plexus-compiler-javac-2.11.1.jar (23 kB at 34 kB/s)
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 40 source files to /build/webapp/target/classes
+[INFO] 
+[INFO] --- resources:3.2.0:testResources (default-testResources) @ webapp ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- compiler:3.10.1:testCompile (default-testCompile) @ webapp ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:2.22.2:test (default-test) @ webapp ---
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/maven-surefire-common/2.22.2/maven-surefire-common-2.22.2.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/maven-surefire-common/2.22.2/maven-surefire-common-2.22.2.pom (11 kB at 36 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-api/2.2.1/maven-plugin-api-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-api/2.2.1/maven-plugin-api-2.2.1.pom (1.5 kB at 4.6 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven/2.2.1/maven-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven/2.2.1/maven-2.2.1.pom (22 kB at 70 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-parent/11/maven-parent-11.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-parent/11/maven-parent-11.pom (32 kB at 99 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/apache/5/apache-5.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/apache/5/apache-5.pom (4.1 kB at 12 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugin-tools/maven-plugin-annotations/3.5.2/maven-plugin-annotations-3.5.2.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugin-tools/maven-plugin-annotations/3.5.2/maven-plugin-annotations-3.5.2.pom (1.6 kB at 4.8 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugin-tools/maven-plugin-tools/3.5.2/maven-plugin-tools-3.5.2.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugin-tools/maven-plugin-tools/3.5.2/maven-plugin-tools-3.5.2.pom (15 kB at 48 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-parent/31/maven-parent-31.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-parent/31/maven-parent-31.pom (43 kB at 124 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-artifact/2.2.1/maven-artifact-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-artifact/2.2.1/maven-artifact-2.2.1.pom (1.6 kB at 4.9 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/1.5.15/plexus-utils-1.5.15.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/1.5.15/plexus-utils-1.5.15.pom (6.8 kB at 21 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire-api/2.22.2/surefire-api-2.22.2.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire-api/2.22.2/surefire-api-2.22.2.pom (3.5 kB at 10 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire-logger-api/2.22.2/surefire-logger-api-2.22.2.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire-logger-api/2.22.2/surefire-logger-api-2.22.2.pom (2.0 kB at 5.7 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire-booter/2.22.2/surefire-booter-2.22.2.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire-booter/2.22.2/surefire-booter-2.22.2.pom (7.5 kB at 23 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-descriptor/2.2.1/maven-plugin-descriptor-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-descriptor/2.2.1/maven-plugin-descriptor-2.2.1.pom (2.1 kB at 6.5 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1/plexus-container-default-1.0-alpha-9-stable-1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1/plexus-container-default-1.0-alpha-9-stable-1.pom (3.9 kB at 12 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-containers/1.0.3/plexus-containers-1.0.3.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-containers/1.0.3/plexus-containers-1.0.3.pom (492 B at 972 B/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus/1.0.4/plexus-1.0.4.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus/1.0.4/plexus-1.0.4.pom (5.7 kB at 18 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.pom (766 B at 2.4 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/hamcrest/hamcrest-parent/1.3/hamcrest-parent-1.3.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/hamcrest/hamcrest-parent/1.3/hamcrest-parent-1.3.pom (2.0 kB at 6.1 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/1.0.4/plexus-utils-1.0.4.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/1.0.4/plexus-utils-1.0.4.pom (6.9 kB at 21 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/classworlds/classworlds/1.1-alpha-2/classworlds-1.1-alpha-2.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/classworlds/classworlds/1.1-alpha-2/classworlds-1.1-alpha-2.pom (3.1 kB at 9.7 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-project/2.2.1/maven-project-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-project/2.2.1/maven-project-2.2.1.pom (2.8 kB at 8.6 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-settings/2.2.1/maven-settings-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-settings/2.2.1/maven-settings-2.2.1.pom (2.2 kB at 6.6 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-model/2.2.1/maven-model-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-model/2.2.1/maven-model-2.2.1.pom (3.2 kB at 10 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-interpolation/1.11/plexus-interpolation-1.11.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-interpolation/1.11/plexus-interpolation-1.11.pom (889 B at 2.5 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-components/1.1.14/plexus-components-1.1.14.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-components/1.1.14/plexus-components-1.1.14.pom (5.8 kB at 19 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-profile/2.2.1/maven-profile-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-profile/2.2.1/maven-profile-2.2.1.pom (2.2 kB at 6.8 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-artifact-manager/2.2.1/maven-artifact-manager-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-artifact-manager/2.2.1/maven-artifact-manager-2.2.1.pom (3.1 kB at 9.8 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-repository-metadata/2.2.1/maven-repository-metadata-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-repository-metadata/2.2.1/maven-repository-metadata-2.2.1.pom (1.9 kB at 5.7 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.pom (880 B at 2.8 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-registry/2.2.1/maven-plugin-registry-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-registry/2.2.1/maven-plugin-registry-2.2.1.pom (1.9 kB at 4.4 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-core/2.2.1/maven-core-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-core/2.2.1/maven-core-2.2.1.pom (12 kB at 27 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-parameter-documenter/2.2.1/maven-plugin-parameter-documenter-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-parameter-documenter/2.2.1/maven-plugin-parameter-documenter-2.2.1.pom (2.0 kB at 6.2 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/slf4j-jdk14/1.5.6/slf4j-jdk14-1.5.6.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/slf4j-jdk14/1.5.6/slf4j-jdk14-1.5.6.pom (1.9 kB at 5.9 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/slf4j-parent/1.5.6/slf4j-parent-1.5.6.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/slf4j-parent/1.5.6/slf4j-parent-1.5.6.pom (7.9 kB at 24 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/slf4j-api/1.5.6/slf4j-api-1.5.6.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/slf4j-api/1.5.6/slf4j-api-1.5.6.pom (3.0 kB at 9.6 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/jcl-over-slf4j/1.5.6/jcl-over-slf4j-1.5.6.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/jcl-over-slf4j/1.5.6/jcl-over-slf4j-1.5.6.pom (2.2 kB at 6.7 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.pom (2.4 kB at 7.5 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-components/15/maven-shared-components-15.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-components/15/maven-shared-components-15.pom (9.3 kB at 29 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-parent/16/maven-parent-16.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-parent/16/maven-parent-16.pom (23 kB at 72 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/apache/7/apache-7.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/apache/7/apache-7.pom (14 kB at 46 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-error-diagnostics/2.2.1/maven-error-diagnostics-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-error-diagnostics/2.2.1/maven-error-diagnostics-2.2.1.pom (1.7 kB at 5.3 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-monitor/2.2.1/maven-monitor-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-monitor/2.2.1/maven-monitor-2.2.1.pom (1.3 kB at 4.0 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/classworlds/classworlds/1.1/classworlds-1.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/classworlds/classworlds/1.1/classworlds-1.1.pom (3.3 kB at 10 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-toolchain/2.2.1/maven-toolchain-2.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-toolchain/2.2.1/maven-toolchain-2.2.1.pom (3.3 kB at 10 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-java/0.9.10/plexus-java-0.9.10.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-java/0.9.10/plexus-java-0.9.10.pom (5.1 kB at 16 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-languages/0.9.10/plexus-languages-0.9.10.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-languages/0.9.10/plexus-languages-0.9.10.pom (4.1 kB at 13 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/ow2/asm/asm/6.2/asm-6.2.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/ow2/asm/asm/6.2/asm-6.2.pom (2.9 kB at 9.4 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/thoughtworks/qdox/qdox/2.0-M8/qdox-2.0-M8.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/thoughtworks/qdox/qdox/2.0-M8/qdox-2.0-M8.pom (16 kB at 48 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/maven-surefire-common/2.22.2/maven-surefire-common-2.22.2.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/maven-surefire-common/2.22.2/maven-surefire-common-2.22.2.jar (528 kB at 928 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-api/2.2.1/maven-plugin-api-2.2.1.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugin-tools/maven-plugin-annotations/3.5.2/maven-plugin-annotations-3.5.2.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire-api/2.22.2/surefire-api-2.22.2.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire-logger-api/2.22.2/surefire-logger-api-2.22.2.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire-booter/2.22.2/surefire-booter-2.22.2.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-api/2.2.1/maven-plugin-api-2.2.1.jar (12 kB at 37 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-artifact/2.2.1/maven-artifact-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire-logger-api/2.22.2/surefire-logger-api-2.22.2.jar (13 kB at 40 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/1.5.15/plexus-utils-1.5.15.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/plugin-tools/maven-plugin-annotations/3.5.2/maven-plugin-annotations-3.5.2.jar (14 kB at 41 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-descriptor/2.2.1/maven-plugin-descriptor-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire-api/2.22.2/surefire-api-2.22.2.jar (186 kB at 410 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1/plexus-container-default-1.0-alpha-9-stable-1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-descriptor/2.2.1/maven-plugin-descriptor-2.2.1.jar (39 kB at 59 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-artifact/2.2.1/maven-artifact-2.2.1.jar (80 kB at 118 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-project/2.2.1/maven-project-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/1.5.15/plexus-utils-1.5.15.jar (228 kB at 327 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-settings/2.2.1/maven-settings-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1/plexus-container-default-1.0-alpha-9-stable-1.jar (194 kB at 220 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-profile/2.2.1/maven-profile-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar (45 kB at 44 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-artifact-manager/2.2.1/maven-artifact-manager-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-settings/2.2.1/maven-settings-2.2.1.jar (49 kB at 48 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-project/2.2.1/maven-project-2.2.1.jar (156 kB at 148 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-registry/2.2.1/maven-plugin-registry-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-profile/2.2.1/maven-profile-2.2.1.jar (35 kB at 29 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-interpolation/1.11/plexus-interpolation-1.11.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-artifact-manager/2.2.1/maven-artifact-manager-2.2.1.jar (68 kB at 32 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-model/2.2.1/maven-model-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.jar (332 kB at 155 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-core/2.2.1/maven-core-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-registry/2.2.1/maven-plugin-registry-2.2.1.jar (30 kB at 13 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-parameter-documenter/2.2.1/maven-plugin-parameter-documenter-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-model/2.2.1/maven-model-2.2.1.jar (88 kB at 36 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/slf4j-jdk14/1.5.6/slf4j-jdk14-1.5.6.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-core/2.2.1/maven-core-2.2.1.jar (178 kB at 71 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/slf4j-api/1.5.6/slf4j-api-1.5.6.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-interpolation/1.11/plexus-interpolation-1.11.jar (51 kB at 20 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/jcl-over-slf4j/1.5.6/jcl-over-slf4j-1.5.6.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-plugin-parameter-documenter/2.2.1/maven-plugin-parameter-documenter-2.2.1.jar (22 kB at 8.4 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/surefire/surefire-booter/2.22.2/surefire-booter-2.22.2.jar (274 kB at 102 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-repository-metadata/2.2.1/maven-repository-metadata-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/slf4j-jdk14/1.5.6/slf4j-jdk14-1.5.6.jar (8.8 kB at 3.2 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-error-diagnostics/2.2.1/maven-error-diagnostics-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/slf4j-api/1.5.6/slf4j-api-1.5.6.jar (22 kB at 7.9 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-monitor/2.2.1/maven-monitor-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/slf4j/jcl-over-slf4j/1.5.6/jcl-over-slf4j-1.5.6.jar (17 kB at 5.9 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/classworlds/classworlds/1.1/classworlds-1.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.jar (11 kB at 3.7 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-toolchain/2.2.1/maven-toolchain-2.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-repository-metadata/2.2.1/maven-repository-metadata-2.2.1.jar (26 kB at 8.5 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-java/0.9.10/plexus-java-0.9.10.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-error-diagnostics/2.2.1/maven-error-diagnostics-2.2.1.jar (13 kB at 4.2 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/ow2/asm/asm/6.2/asm-6.2.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-monitor/2.2.1/maven-monitor-2.2.1.jar (10 kB at 3.3 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/thoughtworks/qdox/qdox/2.0-M8/qdox-2.0-M8.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/classworlds/classworlds/1.1/classworlds-1.1.jar (38 kB at 12 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-toolchain/2.2.1/maven-toolchain-2.2.1.jar (38 kB at 11 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-java/0.9.10/plexus-java-0.9.10.jar (39 kB at 12 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/ow2/asm/asm/6.2/asm-6.2.jar (111 kB at 32 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/thoughtworks/qdox/qdox/2.0-M8/qdox-2.0-M8.jar (316 kB at 90 kB/s)
+[INFO] 
+[INFO] --- jar:3.2.0:jar (default-jar) @ webapp ---
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/file-management/3.0.0/file-management-3.0.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/file-management/3.0.0/file-management-3.0.0.pom (4.7 kB at 15 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-components/22/maven-shared-components-22.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-components/22/maven-shared-components-22.pom (5.1 kB at 16 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-parent/27/maven-parent-27.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-parent/27/maven-parent-27.pom (41 kB at 127 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/apache/17/apache-17.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/apache/17/apache-17.pom (16 kB at 52 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-io/3.0.0/maven-shared-io-3.0.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-io/3.0.0/maven-shared-io-3.0.0.pom (4.2 kB at 13 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-compat/3.0/maven-compat-3.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-compat/3.0/maven-compat-3.0.pom (4.0 kB at 13 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/wagon/wagon-provider-api/1.0-beta-6/wagon-provider-api-1.0-beta-6.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/wagon/wagon-provider-api/1.0-beta-6/wagon-provider-api-1.0-beta-6.pom (1.8 kB at 5.3 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/wagon/wagon/1.0-beta-6/wagon-1.0-beta-6.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/wagon/wagon/1.0-beta-6/wagon-1.0-beta-6.pom (12 kB at 30 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/1.4.2/plexus-utils-1.4.2.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/1.4.2/plexus-utils-1.4.2.pom (2.0 kB at 6.1 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/wagon/wagon-provider-api/2.10/wagon-provider-api-2.10.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/wagon/wagon-provider-api/2.10/wagon-provider-api-2.10.pom (1.7 kB at 5.4 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/wagon/wagon/2.10/wagon-2.10.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/wagon/wagon/2.10/wagon-2.10.pom (21 kB at 62 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-parent/26/maven-parent-26.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-parent/26/maven-parent-26.pom (40 kB at 121 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/3.0.15/plexus-utils-3.0.15.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/3.0.15/plexus-utils-3.0.15.pom (3.1 kB at 10 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-utils/3.0.0/maven-shared-utils-3.0.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-utils/3.0.0/maven-shared-utils-3.0.0.pom (5.6 kB at 17 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-components/21/maven-shared-components-21.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-components/21/maven-shared-components-21.pom (5.1 kB at 16 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-parent/25/maven-parent-25.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-parent/25/maven-parent-25.pom (37 kB at 114 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/apache/15/apache-15.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/apache/15/apache-15.pom (15 kB at 46 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/commons-io/commons-io/2.4/commons-io-2.4.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/commons-io/commons-io/2.4/commons-io-2.4.pom (10 kB at 20 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-parent/25/commons-parent-25.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-parent/25/commons-parent-25.pom (48 kB at 101 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/apache/9/apache-9.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/apache/9/apache-9.pom (15 kB at 34 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/google/code/findbugs/jsr305/2.0.1/jsr305-2.0.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/com/google/code/findbugs/jsr305/2.0.1/jsr305-2.0.1.pom (965 B at 3.1 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/3.0.22/plexus-utils-3.0.22.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-utils/3.0.22/plexus-utils-3.0.22.pom (3.8 kB at 9.3 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-archiver/3.5.0/maven-archiver-3.5.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-archiver/3.5.0/maven-archiver-3.5.0.pom (4.5 kB at 12 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-utils/3.2.1/maven-shared-utils-3.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-utils/3.2.1/maven-shared-utils-3.2.1.pom (5.6 kB at 18 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-archiver/4.2.0/plexus-archiver-4.2.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-archiver/4.2.0/plexus-archiver-4.2.0.pom (4.8 kB at 15 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-io/3.2.0/plexus-io-3.2.0.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-io/3.2.0/plexus-io-3.2.0.pom (4.5 kB at 14 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-compress/1.19/commons-compress-1.19.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-compress/1.19/commons-compress-1.19.pom (18 kB at 55 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-parent/48/commons-parent-48.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-parent/48/commons-parent-48.pom (72 kB at 220 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/iq80/snappy/snappy/0.4/snappy-0.4.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/iq80/snappy/snappy/0.4/snappy-0.4.pom (15 kB at 36 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/tukaani/xz/1.8/xz-1.8.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/tukaani/xz/1.8/xz-1.8.pom (1.9 kB at 5.8 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-interpolation/1.25/plexus-interpolation-1.25.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-interpolation/1.25/plexus-interpolation-1.25.pom (2.6 kB at 8.2 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-archiver/4.2.1/plexus-archiver-4.2.1.pom
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-archiver/4.2.1/plexus-archiver-4.2.1.pom (4.8 kB at 15 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-component-annotations/1.7.1/plexus-component-annotations-1.7.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-component-annotations/1.7.1/plexus-component-annotations-1.7.1.jar (4.3 kB at 12 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/file-management/3.0.0/file-management-3.0.0.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-io/3.0.0/maven-shared-io-3.0.0.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-compat/3.0/maven-compat-3.0.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/wagon/wagon-provider-api/2.10/wagon-provider-api-2.10.jar
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-archiver/3.5.0/maven-archiver-3.5.0.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-io/3.0.0/maven-shared-io-3.0.0.jar (41 kB at 126 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/commons-io/commons-io/2.5/commons-io-2.5.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-archiver/3.5.0/maven-archiver-3.5.0.jar (26 kB at 78 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-utils/3.2.1/maven-shared-utils-3.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/wagon/wagon-provider-api/2.10/wagon-provider-api-2.10.jar (54 kB at 160 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-archiver/4.2.1/plexus-archiver-4.2.1.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/file-management/3.0.0/file-management-3.0.0.jar (35 kB at 104 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-io/3.2.0/plexus-io-3.2.0.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/maven-compat/3.0/maven-compat-3.0.jar (285 kB at 828 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-compress/1.19/commons-compress-1.19.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-io/3.2.0/plexus-io-3.2.0.jar (76 kB at 105 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/iq80/snappy/snappy/0.4/snappy-0.4.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/commons-io/commons-io/2.5/commons-io-2.5.jar (209 kB at 287 kB/s)
+[INFO] Downloading from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/tukaani/xz/1.8/xz-1.8.jar
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/codehaus/plexus/plexus-archiver/4.2.1/plexus-archiver-4.2.1.jar (196 kB at 269 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/maven/shared/maven-shared-utils/3.2.1/maven-shared-utils-3.2.1.jar (167 kB at 224 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/apache/commons/commons-compress/1.19/commons-compress-1.19.jar (615 kB at 606 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/iq80/snappy/snappy/0.4/snappy-0.4.jar (58 kB at 55 kB/s)
+[INFO] Downloaded from asr-releases: https://artifactory.corp.adobe.com/artifactory/maven-asr-release/org/tukaani/xz/1.8/xz-1.8.jar (109 kB at 103 kB/s)
+[INFO] Building jar: /build/webapp/target/webapp-0.1.jar
+[INFO] 
+[INFO] --- spring-boot:2.7.13:repackage (default) @ webapp ---
+[INFO] Replacing main artifact with repackaged archive
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] unifiedquote 1.0-SNAPSHOT .......................... SUCCESS [04:00 min]
+[INFO] webapp 0.1 ......................................... SUCCESS [ 57.731 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  05:18 min
+[INFO] Finished at: 2026-02-04T09:48:18Z
+[INFO] ------------------------------------------------------------------------
+Installing FE Components npm
+./bin/react_install_deps.sh
+npm install from /build/client/bin/..
+npm notice 
+npm notice New major version of npm available! 9.9.4 -> 11.8.0
+npm notice Changelog: <https://github.com/npm/cli/releases/tag/v11.8.0>
+npm notice Run `npm install -g npm@11.8.0` to update!
+npm notice 
+npm ERR! code ERESOLVE
+npm ERR! ERESOLVE could not resolve
+npm ERR! 
+npm ERR! While resolving: @react/react-spectrum@2.38.0
+npm ERR! Found: react@17.0.2
+npm ERR! node_modules/react
+npm ERR!   react@"^17.0.2" from the root project
+npm ERR!   peer react@"^16.8.0 || ^17.0.0-rc.1" from @adobe/react-spectrum@3.17.0
+npm ERR!   node_modules/@adobe/react-spectrum
+npm ERR!     @adobe/react-spectrum@"^3.17" from the root project
+npm ERR!   146 more (@adobe/react-spectrum-ui, ...)
+npm ERR! 
+npm ERR! Could not resolve dependency:
+npm ERR! peer react@"^0.14 || ^15 || ^16" from @react/react-spectrum@2.38.0
+npm ERR! node_modules/@react/react-spectrum
+npm ERR!   @react/react-spectrum@"^2.37.0" from the root project
+npm ERR! 
+npm ERR! Conflicting peer dependency: react@16.14.0
+npm ERR! node_modules/react
+npm ERR!   peer react@"^0.14 || ^15 || ^16" from @react/react-spectrum@2.38.0
+npm ERR!   node_modules/@react/react-spectrum
+npm ERR!     @react/react-spectrum@"^2.37.0" from the root project
+npm ERR! 
+npm ERR! Fix the upstream dependency conflict, or retry
+npm ERR! this command with --force or --legacy-peer-deps
+npm ERR! to accept an incorrect (and potentially broken) dependency resolution.
+npm ERR! 
+npm ERR! 
+npm ERR! For a full report see:
+npm ERR! /root/.npm/_logs/2026-02-04T09_48_20_578Z-eresolve-report.txt
+
+npm ERR! A complete log of this run can be found in: /root/.npm/_logs/2026-02-04T09_48_20_578Z-debug-0.log
+
+> unified-quote-client@2.2.0 build
+> react-app-rewired build
+
+Creating an optimized production build...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx browserslist@latest --update-db
+  Why you should do it regularly: https://github.com/browserslist/browserslist#browsers-data-updating
+Browserslist: caniuse-lite is outdated. Please run:
+  npx browserslist@latest --update-db
+  Why you should do it regularly: https://github.com/browserslist/browserslist#browsers-data-updating
+Compiled with warnings.
+
+Warning
+(103:3) autoprefixer: start value has mixed support, consider using flex-start instead
+
+src/components/Common/QuoteHeader/QuoteHeader.js
+  Line 78:6:  React Hook useEffect has a missing dependency: '_SHOW_MIGRATION_MESSAGE'. Either include it or remove the dependency array                                                                                                                                                                                  react-hooks/exhaustive-deps
+  Line 86:6:  React Hook useEffect has a missing dependency: 'props'. Either include it or remove the dependency array. However, 'props' will change when *any* prop changes, so the preferred fix is to destructure the 'props' object outside of the useEffect call and refer to those specific props inside useEffect  react-hooks/exhaustive-deps
+
+src/components/Partners/Partners.js
+  Line 76:6:  React Hook useEffect has a missing dependency: 'props.soldto.address.country'. Either include it or remove the dependency array                                                                                                                                                                                                           react-hooks/exhaustive-deps
+  Line 92:6:  React Hook useEffect has missing dependencies: '_isDisplayVatReminder' and 'props'. Either include them or remove the dependency array. However, 'props' will change when *any* prop changes, so the preferred fix is to destructure the 'props' object outside of the useEffect call and refer to those specific props inside useEffect  react-hooks/exhaustive-deps
+
+src/components/Partners/components/AddressForm.js
+  Line 51:9:  '_cleanUpRegionDescription' is assigned a value but never used  no-unused-vars
+
+src/components/Partners/components/ContactForm.js
+  Line 18:17:  'useState' is defined but never used  no-unused-vars
+
+src/components/Partners/components/PartnerCard.js
+  Line 58:6:  React Hook useEffect has missing dependencies: 'modalKey' and 'props'. Either include them or remove the dependency array. However, 'props' will change when *any* prop changes, so the preferred fix is to destructure the 'props' object outside of the useEffect call and refer to those specific props inside useEffect  react-hooks/exhaustive-deps
+
+src/components/Partners/components/PaymentCard.js
+  Line 56:6:  React Hook useEffect has missing dependencies: 'props.soldto.address.country' and 'props.vatId'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src/components/Partners/components/PaymentCardDialog.js
+  Line 109:6:  React Hook useEffect has missing dependencies: 'props' and 'taxRegistrationValue'. Either include them or remove the dependency array. However, 'props' will change when *any* prop changes, so the preferred fix is to destructure the 'props' object outside of the useEffect call and refer to those specific props inside useEffect  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has a missing dependency: 'clear'. Either include it or remove the dependency array                                                                                                                                                                                                                                 react-hooks/exhaustive-deps
+
+src/components/TermsAndConditions/TermsAndConditions.js
+  Line 46:6:  React Hook useEffect has missing dependencies: 'props.cartItemList.length' and 'props.partners'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src/components/TermsAndConditions/components/Clause.js
+  Line 46:60:   Array.prototype.map() expects a value to be returned at the end of arrow function  array-callback-return
+  Line 47:9:    Expected a default case                                                            default-case
+  Line 165:59:  Array.prototype.map() expects a return value from arrow function                   array-callback-return
+  Line 172:42:  Array.prototype.map() expects a return value from arrow function                   array-callback-return
+  Line 174:54:  Array.prototype.map() expects a return value from arrow function                   array-callback-return
+
+src/components/TermsAndConditions/store/reducers/termsAndConditonsReducer.js
+  Line 76:31:   Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 90:46:   Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 97:71:   Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 98:80:   Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 101:56:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 124:31:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 129:68:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 138:52:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 143:45:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 144:63:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 146:70:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 147:88:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 150:60:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 185:38:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 202:24:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 203:37:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 204:58:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 211:48:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 228:35:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 230:36:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 231:54:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 234:50:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 253:60:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 262:46:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 264:63:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 280:30:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 282:55:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 387:48:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 389:59:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 390:52:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 392:84:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 393:70:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+  Line 427:34:  Array.prototype.map() expects a return value from arrow function  array-callback-return
+
+src/index.js
+  Line 22:13:  'Helpers' is defined but never used  no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+File sizes after gzip:
+
+  729.28 kB  build/static/js/main.790a872c.js
+  49.94 kB   build/static/css/main.b3ff4063.css
+  1.78 kB    build/static/js/787.4ea04ca7.chunk.js
+
+The bundle size is significantly larger than recommended.
+Consider reducing it with code splitting: https://goo.gl/9VhYWB
+You can also analyze the project dependencies: https://goo.gl/LeUzfb
+
+The project was built assuming it is hosted at /.
+You can control this with the homepage field in your package.json.
+
+The build folder is ready to be deployed.
+You may serve it with a static server:
+
+  npm install -g serve
+  serve -s build
+
+Find out more about deployment here:
+
+  https://cra.link/deployment
+
+# Builds the docker image for running the service.
+docker build -t unifiedquote-img .
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 460B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker-asr-release.dr.corp.adobe.com/asr/java_v11_oracle_nginx:1.12.0
+#2 ...
+
+#3 [auth] asr/java_v11_oracle_nginx:pull token for docker-asr-release.dr.corp.adobe.com
+#3 DONE 0.0s
+
+#2 [internal] load metadata for docker-asr-release.dr.corp.adobe.com/asr/java_v11_oracle_nginx:1.12.0
+#2 DONE 4.5s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 670B done
+#4 DONE 0.0s
+
+#5 [1/5] FROM docker-asr-release.dr.corp.adobe.com/asr/java_v11_oracle_nginx:1.12.0@sha256:5e7556806704525f33b8641b3f92bb6198600b631d0ab10735219b63e75f34cb
+#5 resolve docker-asr-release.dr.corp.adobe.com/asr/java_v11_oracle_nginx:1.12.0@sha256:5e7556806704525f33b8641b3f92bb6198600b631d0ab10735219b63e75f34cb 0.0s done
+#5 sha256:bf16150988fe0e0348e73d4516a0aeb4bf955fb382e65da0b09bf8abfeaa4890 0B / 1.53kB 0.2s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 0B / 131.13MB 0.2s
+#5 sha256:9ea53e3ec94a98c9446aea49718f5738659b4465a162be1d57ec094cc8dc759c 0B / 272B 0.2s
+#5 sha256:730475963cb5271430cde91f6b37a90e01aceee0314e167103ab0703aa45c12d 0B / 55.80kB 0.2s
+#5 sha256:bf16150988fe0e0348e73d4516a0aeb4bf955fb382e65da0b09bf8abfeaa4890 1.53kB / 1.53kB 1.2s done
+#5 sha256:9ea53e3ec94a98c9446aea49718f5738659b4465a162be1d57ec094cc8dc759c 272B / 272B 1.3s done
+#5 sha256:730475963cb5271430cde91f6b37a90e01aceee0314e167103ab0703aa45c12d 55.80kB / 55.80kB 1.2s done
+#5 sha256:b1ce58b38d42aa4968a830e8cba8aa5d8b31f441cae896cdd119f2e0e4450563 0B / 3.11MB 0.2s
+#5 sha256:5f49631b4261c177e9e5ebd93941fc954f75c0bf6073c1b7ca573194461edfc7 0B / 6.85kB 0.2s
+#5 sha256:157675a767755edf9c21f4ad7786daece1e1e343da9877972ac967b4842faf8a 0B / 2.60MB 0.2s
+#5 sha256:5f49631b4261c177e9e5ebd93941fc954f75c0bf6073c1b7ca573194461edfc7 6.85kB / 6.85kB 0.4s done
+#5 ...
+
+#6 [internal] load build context
+#6 transferring context: 103.10MB 1.8s done
+#6 DONE 1.8s
+
+#5 [1/5] FROM docker-asr-release.dr.corp.adobe.com/asr/java_v11_oracle_nginx:1.12.0@sha256:5e7556806704525f33b8641b3f92bb6198600b631d0ab10735219b63e75f34cb
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 0B / 36.40MB 0.2s
+#5 sha256:b1ce58b38d42aa4968a830e8cba8aa5d8b31f441cae896cdd119f2e0e4450563 1.05MB / 3.11MB 1.4s
+#5 sha256:b1ce58b38d42aa4968a830e8cba8aa5d8b31f441cae896cdd119f2e0e4450563 2.10MB / 3.11MB 1.7s
+#5 sha256:157675a767755edf9c21f4ad7786daece1e1e343da9877972ac967b4842faf8a 1.05MB / 2.60MB 1.7s
+#5 sha256:b1ce58b38d42aa4968a830e8cba8aa5d8b31f441cae896cdd119f2e0e4450563 3.11MB / 3.11MB 2.2s done
+#5 sha256:157675a767755edf9c21f4ad7786daece1e1e343da9877972ac967b4842faf8a 2.10MB / 2.60MB 2.3s
+#5 sha256:157675a767755edf9c21f4ad7786daece1e1e343da9877972ac967b4842faf8a 2.60MB / 2.60MB 2.5s done
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 2.10MB / 36.40MB 2.3s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 7.34MB / 131.13MB 4.7s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 4.19MB / 36.40MB 3.2s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 6.29MB / 36.40MB 3.8s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 8.39MB / 36.40MB 4.4s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 14.68MB / 131.13MB 6.3s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 10.49MB / 36.40MB 4.8s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 12.58MB / 36.40MB 5.1s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 14.68MB / 36.40MB 5.6s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 17.83MB / 36.40MB 6.0s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 22.02MB / 131.13MB 7.8s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 19.92MB / 36.40MB 6.3s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 22.02MB / 36.40MB 6.6s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 24.12MB / 36.40MB 6.8s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 27.26MB / 36.40MB 7.1s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 30.41MB / 36.40MB 7.4s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 29.36MB / 131.13MB 9.2s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 33.55MB / 36.40MB 7.7s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 35.65MB / 36.40MB 8.0s
+#5 sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 36.40MB / 36.40MB 8.0s done
+#5 extracting sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1
+#5 extracting sha256:54e02f814f7c5f83767e2780c6de1d18476fcf23bc2a7b0da88ffef99e217ba1 0.4s done
+#5 extracting sha256:157675a767755edf9c21f4ad7786daece1e1e343da9877972ac967b4842faf8a 0.1s done
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 36.70MB / 131.13MB 10.4s
+#5 extracting sha256:5f49631b4261c177e9e5ebd93941fc954f75c0bf6073c1b7ca573194461edfc7 done
+#5 extracting sha256:b1ce58b38d42aa4968a830e8cba8aa5d8b31f441cae896cdd119f2e0e4450563 0.1s done
+#5 extracting sha256:9ea53e3ec94a98c9446aea49718f5738659b4465a162be1d57ec094cc8dc759c done
+#5 extracting sha256:730475963cb5271430cde91f6b37a90e01aceee0314e167103ab0703aa45c12d 0.0s done
+#5 extracting sha256:caedaab88cb41783dd34021c4e428efe1cc2c0ba1d2eb707b5e9e0155db4b0d5 done
+#5 extracting sha256:bf16150988fe0e0348e73d4516a0aeb4bf955fb382e65da0b09bf8abfeaa4890 done
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 44.04MB / 131.13MB 11.4s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 51.38MB / 131.13MB 12.5s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 58.72MB / 131.13MB 13.5s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 66.06MB / 131.13MB 14.4s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 73.40MB / 131.13MB 15.3s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 80.74MB / 131.13MB 16.2s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 88.08MB / 131.13MB 17.1s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 96.47MB / 131.13MB 18.0s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 103.81MB / 131.13MB 18.9s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 111.15MB / 131.13MB 19.7s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 118.49MB / 131.13MB 20.4s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 125.83MB / 131.13MB 21.2s
+#5 sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 131.13MB / 131.13MB 21.9s done
+#5 extracting sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a
+#5 extracting sha256:e8947702c28bc0b69b0cdfa235e9d573f291f5d1c511e8f3db77fd9946ffcc7a 0.8s done
+#5 DONE 22.8s
+
+#7 [2/5] COPY nginx.conf /etc/nginx/sites-available/default
+#7 DONE 1.7s
+
+#8 [3/5] COPY client/build /var/www/
+#8 DONE 0.1s
+
+#9 [4/5] COPY client/build /var/www/unified-quote/
+#9 DONE 0.0s
+
+#10 [5/5] COPY webapp/target/webapp-*.jar /application.jar
+#10 DONE 0.6s
+
+#11 exporting to image
+#11 exporting layers
+#11 exporting layers 2.2s done
+#11 exporting manifest sha256:41b2812cd3bba360720aada46ea5efc1f6c66327cac230b2b3835624e041f466 done
+#11 exporting config sha256:b8c190b12ca472d78413cc08ffc3cdca072ef1934b41d2cd023f04ebf2ed2db3 done
+#11 exporting attestation manifest sha256:e278e19e7ef43d0464f22118c7ac84712230dc977b5aae0081d1c8665bd3ca5f 0.0s done
+#11 exporting manifest list sha256:bfbc033f189d82937ffc2eeffc341f1e7ac469d88c944776cc10974fee94142c 0.0s done
+#11 naming to docker.io/library/unifiedquote-img:latest done
+#11 unpacking to docker.io/library/unifiedquote-img:latest
+#11 unpacking to docker.io/library/unifiedquote-img:latest 0.4s done
+#11 DONE 2.7s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/o7k1uc2e12vl6as4dvy3ijui6
+echo "Success"
+Success

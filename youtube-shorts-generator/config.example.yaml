@@ -1,0 +1,56 @@
+# YouTube Shorts Generator - Configuration Template
+# Copy to config.yaml and adjust. Do not commit config.yaml if it contains secrets.
+
+# Component timeouts (seconds)
+timeouts:
+  research: 30
+  script: 60
+  tts: 90
+  video_assets: 300   # 5 minutes
+  composition: 120    # 2 minutes
+  quality: 30
+  youtube_upload: 300 # 5 minutes
+  network_per_call: 30
+  pipeline_total: 900 # 15 minutes
+
+# Retry and backoff
+retry:
+  max_retries: 3
+  backoff_seconds: [1, 2, 4]
+
+# Quality thresholds
+quality:
+  script_coherence_min: 0.85
+  uniqueness_similarity_max: 0.30
+  sync_error_max_ms: 200
+  min_duration_seconds: 15
+  max_duration_seconds: 60
+  min_resolution: [1080, 1920]
+  min_fps: 24
+  max_file_size_mb: 100
+
+# Cost limits and alerts (USD)
+cost:
+  target_per_video: 4.10
+  warning_per_video: 4.00
+  critical_per_video: 6.00
+  monthly_alert: 150
+  component_alert_multiplier: 2.0
+
+# Content preferences
+content:
+  topic_categories_min: 2
+  relevance_score_min: 0.7
+  fallback_topics: []  # Optional curated fallback topics
+
+# Resource limits (local dev)
+resources:
+  min_disk_gb: 10
+  min_ram_gb: 8
+  temp_storage_gb: 5
+
+# Paths (relative to project root or absolute)
+paths:
+  database: youtube_shorts.db
+  temp_dir: tmp
+  output_dir: output_videos

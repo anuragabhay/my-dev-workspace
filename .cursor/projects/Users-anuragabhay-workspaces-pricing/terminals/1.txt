@@ -1,0 +1,23 @@
+---
+pid: 43559
+cwd: /Users/anuragabhay/workspaces/pricing
+---
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   834    0    80  100   754    262   2472 --:--:-- --:--:-- --:--:--  2743
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  2699    0  1911  100   788   6194   2554 --:--:-- --:--:-- --:--:--  8762
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  2752    0  1990  100   762   6559   2511 --:--:-- --:--:-- --:--:--  9052
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+curl: (60) SSL: no alternative certificate subject name matches target host name 'ims-na1-qa2.adobelogin.com'
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the web page mentioned above.
+Expecting value: line 1 column 1 (char 0)

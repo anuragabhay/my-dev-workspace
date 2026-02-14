@@ -1,0 +1,46 @@
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Secrets and env
+.env
+.env.local
+*.pem
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Local DBs and state
+*.db
+*.sqlite
+*.sqlite3
+state.db
+state_backup.json
+
+# IDE / OS
+.idea/
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Logs and temp
+*.log
+tmp/
+temp/
+.cache/
+
+# Video/output artifacts (if generated under repo)
+*.mp4
+*.webm
+output/

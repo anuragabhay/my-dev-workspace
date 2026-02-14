@@ -1,0 +1,16 @@
+{
+  "name": "check_my_pending_tasks",
+  "description": "Check for pending tasks for a specific role. Returns tasks that need action, including approvals and work items.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "role": {
+        "type": "string",
+        "description": "Role name (e.g., 'CTO', 'Lead Engineer', 'Architect', 'CFO', 'CEO', 'Product Manager', 'Intern')"
+      }
+    },
+    "required": [
+      "role"
+    ]
+  }
+}

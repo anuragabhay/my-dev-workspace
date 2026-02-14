@@ -1,0 +1,16 @@
+{
+  "name": "get_my_role_tasks",
+  "description": "Get all tasks for a specific role from the workspace, including status, dependencies, and blockers.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "role": {
+        "type": "string",
+        "description": "Role name (e.g., 'CTO', 'Lead Engineer', 'Architect')"
+      }
+    },
+    "required": [
+      "role"
+    ]
+  }
+}

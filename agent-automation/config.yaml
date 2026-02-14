@@ -1,0 +1,49 @@
+workspace_path: /Users/anuragabhay/my-dev-workspace/PROJECT_WORKSPACE.md
+poll_interval: 30  # seconds (fallback if file watcher unavailable)
+prompt_dir: ./prompts
+state_db: ./state.db
+json_backup: ./state_backup.json
+
+agents:
+  cto:
+    trigger_on: ["approval_request", "architecture_review"]
+    approval_types: ["Technical Decision", "Architecture Approval"]
+    role_name: "CTO"
+  architect:
+    trigger_on: ["requirements_ready", "cto_feedback", "architecture_revision"]
+    role_name: "Architect"
+  lead_engineer:
+    trigger_on: ["architecture_approved", "implementation_ready"]
+    role_name: "Lead Engineer"
+  cfo:
+    trigger_on: ["cost_approval", "budget_review"]
+    role_name: "CFO"
+    note: "Must escalate to User for all budget decisions"
+  ceo:
+    trigger_on: ["strategic_approval", "phase_transition", "scope_change"]
+    role_name: "CEO"
+  product_manager:
+    trigger_on: ["requirements_request", "task_breakdown_ready"]
+    role_name: "Product Manager"
+  intern:
+    trigger_on: ["task_assignment"]
+    role_name: "Intern"
+
+# Status emoji mappings
+status_indicators:
+  completed: "✅"
+  in_progress: "🟡"
+  pending_approval: "🔄"
+  blocked: "⏸️"
+  pending: "⏳"
+  rejected: "❌"
+  user_intervention: "🚨"
+
+# Approval request patterns
+approval_patterns:
+  open_status: "\\[OPEN\\]"
+  pending_status: "⏳ Pending"
+  approved_status: "✅ Approved"
+  rejected_status: "❌ Rejected"
+  needs_revision: "🔄 Needs Revision"
+

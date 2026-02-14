@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "agent-automation": {
+      "command": "/Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server/venv/bin/python",
+      "args": ["/Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server/server.py"],
+      "env": {
+        "PYTHONPATH": "/Users/anuragabhay/my-dev-workspace/agent-automation"
+      }
+    }
+  }
+}
+

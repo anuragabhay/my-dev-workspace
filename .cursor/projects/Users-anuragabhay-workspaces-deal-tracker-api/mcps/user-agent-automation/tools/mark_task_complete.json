@@ -1,0 +1,21 @@
+{
+  "name": "mark_task_complete",
+  "description": "Mark a task as complete in the state tracker. Prevents duplicate triggers and logs completion.",
+  "arguments": {
+    "type": "object",
+    "properties": {
+      "task_id": {
+        "type": "string",
+        "description": "Task identifier (approval ID like '#001', work log timestamp, or task hash)"
+      },
+      "role": {
+        "type": "string",
+        "description": "Role name completing the task"
+      }
+    },
+    "required": [
+      "task_id",
+      "role"
+    ]
+  }
+}

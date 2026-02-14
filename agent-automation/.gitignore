@@ -1,0 +1,28 @@
+# State files
+state.db
+state_backup.json
+
+# Generated prompts (optional - you may want to track these)
+prompts/*_action.md
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+

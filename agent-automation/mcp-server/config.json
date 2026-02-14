@@ -1,0 +1,14 @@
+{
+  "name": "agent-automation",
+  "version": "1.0.0",
+  "description": "MCP server for agent automation system",
+  "tools": [
+    "check_my_pending_tasks",
+    "get_workspace_status",
+    "mark_task_complete",
+    "get_my_role_tasks"
+  ],
+  "config_path": "../config.yaml",
+  "workspace_path": "/Users/anuragabhay/my-dev-workspace/PROJECT_WORKSPACE.md"
+}
+

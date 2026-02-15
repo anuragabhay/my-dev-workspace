@@ -12,16 +12,34 @@
 
 **Overall Status**: 🟡 In Progress  
 **Current Phase**: Phase 1 - Project Setup & Foundation (In Progress)  
-**Last Updated**: 2026-02-15 04:40 UTC by Orchestrator  
+**Last Updated**: 2026-02-15 12:15 UTC by Orchestrator  
 **Active Agents**: CEO, Lead Engineer, CTO, Architect  
 **Pending Approvals**: 0  
 **Blockers**: None  
-**Next Actions**: Lead Engineer: Pick next task from Implementation Plan (Phase 3 service tests or Phase 2 remaining). Or Orchestrator: next cycle. Delegate via /lead-engineer.  
+**Next Actions**: Intern: Create youtube-shorts-generator/docs/runway_api_research.md (auth KEY vs SECRET, models e.g. gen4.5, task lifecycle create→poll→output URL, output format). Update Runway ML integration "Research summary" in this doc from (pending) to a one-line pointer to that file. Delegate via /intern. (Runway implementation in runwayml_service.py already done by Lead Engineer.)  
 **User Intervention Required**: No
 
 ---
 
 ## 📝 Recent Work Log (last 10)
+
+### [2026-02-15 13:15 UTC] [Lead Engineer] [10s target for TTS and video; composition never fails on duration mismatch] [COMPLETED]
+Script: prompt for 10-second Short, ~10s speech. Video: generate_video(..., duration_sec=10). Composition: output_duration=min(audio.duration, video.duration); trim both with subclipped(0, output_duration); no failure on mismatch. No-video path unchanged.
+
+### [2026-02-15 13:00 UTC] [Lead Engineer] [Fix MoviePy composition imports and clean script for TTS] [COMPLETED]
+Composition: MoviePy 2.x imports (from moviepy import AudioFileClip, ColorClip, VideoFileClip), subclipped/with_audio/with_duration, ColorClip(duration=). Script: prompt updated for spoken lines only, no stage directions or square brackets. TTS: _script_for_tts strips [...] with re.sub, normalize spaces; only cleaned text sent to ElevenLabs. requirements: moviepy>=2.0.0.
+
+### [2026-02-15 12:35 UTC] [Lead Engineer] [Align Runway with official API: use Runway SDK, text_to_video.create, wait_for_task_output, TaskFailedError handling, download to tmp/runway_output.mp4] [COMPLETED]
+runwayml_service.py: RunwayML(api_key), text_to_video.create(gen4.5, 720:1280, duration), wait_for_task_output(); TaskFailedError/TaskTimeoutError; requests download. requirements: runwayml. Doc: docs/runway_api_research.md updated. One generate run started (async).
+
+### [2026-02-15 12:30 UTC] [Intern] [Runway API research doc and Research summary update] [COMPLETED]
+Created youtube-shorts-generator/docs/runway_api_research.md (auth KEY/SECRET, models gen4.5, task lifecycle, output format). Updated PROJECT_WORKSPACE Runway ML integration Research summary to one-line pointer to doc.
+
+### [2026-02-15 12:15 UTC] [Orchestrator] [Cycle: get_workspace_status, read Dashboard/Next Actions/Role Status; determine next concrete task] [COMPLETED]
+Runway Phase 2 (implementation) done. Next: Intern backfill Runway research doc (docs/runway_api_research.md) and update Research summary. Updated Next Actions; delegate to /intern.
+
+### [2026-02-15 12:00 UTC] [Lead Engineer] [Implement real Runway video generation in runwayml_service.py (text-to-video, 768:1280, ~5s, poll/wait, download to tmp/runway_output.mp4; RUNWAYML_API_KEY or RUNWAYML_API_SECRET)] [COMPLETED]
+runwayml_service.py: POST text_to_video, poll GET tasks/:id, download output to file. requirements: requests. health + tests: support KEY or SECRET.
 
 ### [2026-02-15 04:00 UTC] [Architect] [Validate current changes: orchestrator rule, CLI health, stop hook, README (Troubleshooting/Configuration)] [COMPLETED]
 Orchestrator rule, CLI health, stop hook, youtube-shorts-generator README (Troubleshooting and Configuration reference) validated. Hand off to Intern for commit, push, --update-workspace.
@@ -35,29 +53,22 @@ Orchestrator rule: Git push/test workflow and parallel-agent sections present an
 ### [2026-02-15 01:20 UTC] [Orchestrator] [Cycle: status check, delegate Phase 6 one item to Lead Engineer] [🟡 IN PROGRESS]
 - get_workspace_status + check_my_pending_tasks(Lead Engineer). User Intervention: No; Pending Approvals: 0.\n- Next task: One Phase 6 item (tests, docs, or polish). Delegating to /lead-engineer.
 
-### [2026-02-15 01:15 UTC] [Orchestrator] [Cycle: get_workspace_status, check_my_pending_tasks, delegate Phase 6 one item] [🟡 IN PROGRESS]
-- get_workspace_status + check_my_pending_tasks(Lead Engineer). User Intervention: No; Pending Approvals: 0.\n- Next task: One Phase 6 item (tests, docs, or polish). Delegating to Lead Engineer.
-
-### [2026-02-15 01:10 UTC] [Lead Engineer] [Stop hook: run only for Orchestrator chat (conditional)] [✅ COMPLETED]
-- .cursor/hooks/stop_hook.py: read JSON payload from stdin (transcript_path, loop_count).\n- Orchestrator detection: if transcript_path missing or file missing, return {}; else read transcript and require 'parent Orchestrator' or 'orchestrator.mdc' in content; else return {}.\n- CONTINUE logic (only when Orchestrator): workspace root from payload or .cursor/hooks script location; read PROJECT_WORKSPACE.md; parse Dashboard for User Intervention Required (Yes -> {}), loop_count >= 5 (-> {}), no Pending Approvals and no CONTINUE in Next Actions (-> {}). Otherwise return followup_message.\n- Output only {} or {"followup_message": "..."}. No hooks.json change.
-
-### [2026-02-15 01:00 UTC] [Orchestrator] [Cycle 1: delegate Phase 6 (one item) to Lead Engineer] [🟡 IN PROGRESS]
-- get_workspace_status + check_my_pending_tasks(Lead Engineer). No User Intervention; 0 Pending Approvals.\n- Next task: One Phase 6 item (tests, docs, or polish). Issuing /lead-engineer with full task.
-
-### [2026-02-15 00:55 UTC] [Orchestrator] [Cycle: delegated Phase 6 (one item) to Lead Engineer] [🟡 IN PROGRESS]
-- get_workspace_status + check_my_pending_tasks(Lead Engineer) run.\n- Next task: Phase 6 tests, docs, polish — one item only.\n- Delegation: /lead-engineer — pick (a) unit tests for one critical path, or (b) improve docs (README/troubleshooting), or (c) small polish from Phase 6 list.
-
-### [2026-02-15 00:45 UTC] [Lead Engineer] [Phase 5: health check implementation] [✅ COMPLETED]
-- Added youtube-shorts-generator/src/utils/health.py: run_all_checks() with api_keys, disk_space (≥10GB), system_resources (RAM/CPU), database (SQLite), openai, elevenlabs, runwayml, youtube_channel. JSON pass/fail + detail per check.\n- Wired cmd_health() in src/cli/main.py to run_all_checks(); output JSON; exit 0/1 by ok.\n- No existing behavior changed; health command now returns full MVP report.
-
-### [2026-02-15 00:35 UTC] [Orchestrator] [Cycle: delegated health check (Phase 5) to Lead Engineer] [🟡 IN PROGRESS]
-- get_workspace_status + check_my_pending_tasks(Lead Engineer) run.\n- Next task: Implement health check in youtube-shorts-generator (Phase 5).\n- Delegation: /lead-engineer with single task (wire health command, health module, JSON report; checks: API connectivity, key validity, disk ≥10GB, resources, YouTube OAuth, DB).
-
 Full log: agent-automation/work_log.json
 
 To add an entry: run `python agent-automation/append_work_log.py --timestamp "..." --role "..." --task "..." --status "..." [--content "..."].` Then run with `--update-workspace` to refresh the recent 10 in this file.
 
 **Next steps (after Phase 6 health tests added):** (1) Work log: run append_work_log with role Lead Engineer, task e.g. "Added pytest tests for src/utils/health.py (tests/test_health.py, N tests)", status COMPLETED, then --update-workspace. (2) Next Actions: set to next Phase 6 item (e.g. "Lead Engineer: Add README Troubleshooting/Configuration section") or, if ready to push: "Architect: Validate current changes. Then Intern: append work log, commit, push, --update-workspace." (3) Orchestrator: do not re-delegate "add unit tests for health.py"; pick next concrete task from Next Actions. If subagent returns with no deliverable for the same task, use smaller subtask, another role, or pause (avoid re-delegation loops).
+
+---
+## 🎬 Runway ML integration (current initiative)
+
+**Goal:** Wire real Runway ML video generation into youtube-shorts-generator. Video step is currently a stub; we have Runway API credits and want to use them.
+
+**Phase 1 – Research (Intern):** Look up Runway API/SDK for text-to-video (and image-to-video if relevant). Document: **auth** (we use `RUNWAYML_API_KEY` in .env; Runway docs may use `RUNWAYML_API_SECRET`), **supported models** (e.g. gen4.5 text-to-video), **task lifecycle** (create → poll or wait → get output URL), **output format**. Put a short summary here in PROJECT_WORKSPACE or in a short doc (e.g. `youtube-shorts-generator/docs/runway_api_research.md`) so Lead Engineer can implement.
+
+**Phase 2 – Implementation (Lead Engineer, after research):** In youtube-shorts-generator: add Runway SDK if needed; implement real call in `src/services/runwayml_service.py` (text-to-video, Shorts-friendly ratio e.g. 768:1280, ~5s); poll or wait for task result; download video to `tmp/runway_output.mp4`. Keep using `RUNWAYML_API_KEY` from .env (or support both `RUNWAYML_API_KEY` and `RUNWAYML_API_SECRET`). Pipeline should produce a real Runway-generated video when the video agent runs. Update PROJECT_WORKSPACE work log when done.
+
+**Research summary (to be filled by Intern):** See [youtube-shorts-generator/docs/runway_api_research.md](youtube-shorts-generator/docs/runway_api_research.md) for auth (KEY vs SECRET), models (gen4.5), task lifecycle (create→poll→output URL), and output format.
 
 ---
 ## ✅ Approval Requests & Responses
@@ -1766,14 +1777,14 @@ Claude Pilot provides automated code quality enforcement:
    - [x] Commands: generate, status, health
 
 2. **Health Check**
-   - [ ] Implement health check command/endpoint
-   - [ ] Check API connectivity
-   - [ ] Verify API key validity
-   - [ ] Check disk space (minimum 10GB)
-   - [ ] Check system resources (8GB RAM, CPU cores)
-   - [ ] Verify YouTube channel access
-   - [ ] Check database connectivity
-   - [ ] Return JSON status report
+   - [x] Implement health check command/endpoint (✅ src/utils/health.py, cmd_health())
+   - [x] Check API connectivity (✅ openai, elevenlabs, runwayml, youtube_channel)
+   - [x] Verify API key validity (✅ api_keys check)
+   - [x] Check disk space (minimum 10GB) (✅ check_disk_space)
+   - [x] Check system resources (8GB RAM, CPU cores) (✅ system_resources)
+   - [x] Verify YouTube channel access (✅ youtube_channel)
+   - [x] Check database connectivity (✅ database/SQLite)
+   - [x] Return JSON status report (✅ run_all_checks)
 
 3. **Error Recovery**
    - [ ] Implement partial failure recovery

@@ -12,7 +12,7 @@ class VideoAgent(BaseAgent):
         script_data = context.data.get("script", {})
         script = script_data.get("script", "")[:200] if isinstance(script_data, dict) else "scene"
         try:
-            path, cost = generate_video(script, duration_sec=5.0)
+            path, cost = generate_video(script, duration_sec=10.0)
             self.log_cost(context.execution_id, "video", cost)
             return AgentResult(success=True, data={"video_path": str(path)})
         except Exception as e:

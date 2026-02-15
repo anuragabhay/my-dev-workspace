@@ -137,11 +137,11 @@ def check_elevenlabs_connectivity(root: Path) -> dict[str, Any]:
 
 
 def check_runwayml(root: Path) -> dict[str, Any]:
-    """RunwayML: key present (service is stub; no real endpoint to ping)."""
-    key = (os.getenv("RUNWAYML_API_KEY") or "").strip()
+    """RunwayML: key present (RUNWAYML_API_KEY or RUNWAYML_API_SECRET)."""
+    key = (os.getenv("RUNWAYML_API_KEY") or os.getenv("RUNWAYML_API_SECRET") or "").strip()
     return {
         "pass": bool(key),
-        "detail": {} if key else {"error": "RUNWAYML_API_KEY not set"},
+        "detail": {} if key else {"error": "RUNWAYML_API_KEY or RUNWAYML_API_SECRET not set"},
     }
 
 
@@ -154,7 +154,7 @@ def check_youtube_channel_access(root: Path) -> dict[str, Any]:
     try:
         from src.services.youtube_service import get_authenticated_service
         service = get_authenticated_service()
-        service.channels().list(part="id", mine=True).execute(max_results=1)
+        service.channels().list(part="id", mine=True, maxResults=1).execute()
         return {"pass": True, "detail": {}}
     except FileNotFoundError as e:
         return {"pass": False, "detail": {"error": str(e), "reason": "oauth_file_missing"}}

@@ -13,7 +13,6 @@ class ResearchAgent(BaseAgent):
             # Query for topic ideas (simplified: use GPT to suggest topics, then embed and store)
             content, cost = chat_completion(
                 messages=[{"role": "user", "content": "List 5 short trending topic ideas for a 60-second YouTube Short. One line each, diverse."}],
-                model="gpt-4",
             )
             self.log_cost(context.execution_id, "research", cost)
             lines = [l.strip() for l in content.split("\n") if l.strip()][:5]

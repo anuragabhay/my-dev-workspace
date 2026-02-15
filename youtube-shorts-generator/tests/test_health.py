@@ -45,8 +45,8 @@ def test_check_disk_space_detail_has_expected_keys():
 
 
 def test_check_runwayml_fails_when_key_missing():
-    """check_runwayml returns pass=False when RUNWAYML_API_KEY is not set."""
-    with patch.dict(os.environ, {"RUNWAYML_API_KEY": ""}, clear=False):
+    """check_runwayml returns pass=False when neither API key nor secret is set."""
+    with patch.dict(os.environ, {"RUNWAYML_API_KEY": "", "RUNWAYML_API_SECRET": ""}, clear=False):
         result = check_runwayml(Path("."))
     assert result["pass"] is False
     assert "detail" in result

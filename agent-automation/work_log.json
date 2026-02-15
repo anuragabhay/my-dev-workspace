@@ -1,5 +1,47 @@
 [
   {
+    "timestamp": "2026-02-15 13:15 UTC",
+    "role": "Lead Engineer",
+    "task": "10s target for TTS and video; composition never fails on duration mismatch",
+    "status": "COMPLETED",
+    "content": "Script: prompt for 10-second Short, ~10s speech. Video: generate_video(..., duration_sec=10). Composition: output_duration=min(audio.duration, video.duration); trim both with subclipped(0, output_duration); no failure on mismatch. No-video path unchanged."
+  },
+  {
+    "timestamp": "2026-02-15 13:00 UTC",
+    "role": "Lead Engineer",
+    "task": "Fix MoviePy composition imports and clean script for TTS",
+    "status": "COMPLETED",
+    "content": "Composition: MoviePy 2.x imports (from moviepy import AudioFileClip, ColorClip, VideoFileClip), subclipped/with_audio/with_duration, ColorClip(duration=). Script: prompt updated for spoken lines only, no stage directions or square brackets. TTS: _script_for_tts strips [...] with re.sub, normalize spaces; only cleaned text sent to ElevenLabs. requirements: moviepy>=2.0.0."
+  },
+  {
+    "timestamp": "2026-02-15 12:35 UTC",
+    "role": "Lead Engineer",
+    "task": "Align Runway with official API: use Runway SDK, text_to_video.create, wait_for_task_output, TaskFailedError handling, download to tmp/runway_output.mp4",
+    "status": "COMPLETED",
+    "content": "runwayml_service.py: RunwayML(api_key), text_to_video.create(gen4.5, 720:1280, duration), wait_for_task_output(); TaskFailedError/TaskTimeoutError; requests download. requirements: runwayml. Doc: docs/runway_api_research.md updated. One generate run started (async)."
+  },
+  {
+    "timestamp": "2026-02-15 12:30 UTC",
+    "role": "Intern",
+    "task": "Runway API research doc and Research summary update",
+    "status": "COMPLETED",
+    "content": "Created youtube-shorts-generator/docs/runway_api_research.md (auth KEY/SECRET, models gen4.5, task lifecycle, output format). Updated PROJECT_WORKSPACE Runway ML integration Research summary to one-line pointer to doc."
+  },
+  {
+    "timestamp": "2026-02-15 12:15 UTC",
+    "role": "Orchestrator",
+    "task": "Cycle: get_workspace_status, read Dashboard/Next Actions/Role Status; determine next concrete task",
+    "status": "COMPLETED",
+    "content": "Runway Phase 2 (implementation) done. Next: Intern backfill Runway research doc (docs/runway_api_research.md) and update Research summary. Updated Next Actions; delegate to /intern."
+  },
+  {
+    "timestamp": "2026-02-15 12:00 UTC",
+    "role": "Lead Engineer",
+    "task": "Implement real Runway video generation in runwayml_service.py (text-to-video, 768:1280, ~5s, poll/wait, download to tmp/runway_output.mp4; RUNWAYML_API_KEY or RUNWAYML_API_SECRET)",
+    "status": "COMPLETED",
+    "content": "runwayml_service.py: POST text_to_video, poll GET tasks/:id, download output to file. requirements: requests. health + tests: support KEY or SECRET."
+  },
+  {
     "timestamp": "2026-02-15 04:00 UTC",
     "role": "Architect",
     "task": "Validate current changes: orchestrator rule, CLI health, stop hook, README (Troubleshooting/Configuration)",

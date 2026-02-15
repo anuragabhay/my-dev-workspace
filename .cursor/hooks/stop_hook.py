@@ -125,6 +125,31 @@ def _delegated_task_already_done_in_transcript(transcript_content: str) -> bool:
     return any(m in r for m in markers)
 
 
+def _transcript_shows_recent_completion(transcript_content: str) -> bool:
+    """True if recent transcript shows a subagent just finished a task (Done, tests passed, COMPLETED, work log added).
+    Used to continue the loop when Next Actions don't say 'next cycle' but the last turn was a completion."""
+    recent = transcript_content[-4000:] if len(transcript_content) > 4000 else transcript_content
+    r = recent.lower()
+    markers = (
+        "\ndone.",
+        "done.",
+        "one cycle done",
+        " passed ",
+        "passed in ",
+        " tests pass",
+        "all 7 pass",
+        "test_pipeline",
+        "pipeline unit tests",
+        "status completed",
+        "status: completed",
+        "lead engineer entry added",
+        "work log: lead engineer",
+        "implementation: added",
+        "phase 2: added",
+    )
+    return any(m in r for m in markers)
+
+
 # Subagent role markers in transcript (first 3000 chars)
 _SUBAGENT_MARKERS = (
     "You are the **Intern**",
@@ -190,13 +215,13 @@ def main() -> None:
     head = transcript_content[:3000]
     root = _workspace_root(payload)
 
-    # 2a) Subagent chat stopped → return {} only. Check this first: subagent transcripts can
-    #     also mention orchestrator.mdc in context, which would otherwise wrongly trigger Orchestrator logic and re-inject the same delegation into the subagent chat (infinite loop).
-    if _is_subagent_chat(head):
-        print(json.dumps({}))
-        return
-    # 2b) Only continue for Orchestrator chat.
-    if "parent Orchestrator" not in head and "orchestrator.mdc" not in head:
+    # 2a) Prefer Orchestrator: if transcript has Orchestrator markers, treat as Orchestrator (it may also contain subagent content from a prior /intern or /lead-engineer run).
+    is_orchestrator = "parent Orchestrator" in head or "orchestrator.mdc" in head
+    if not is_orchestrator:
+        # 2b) Subagent-only chat → return {} so we don't inject into subagent.
+        if _is_subagent_chat(head):
+            print(json.dumps({}))
+            return
         print(json.dumps({}))
         return
 
@@ -223,10 +248,11 @@ def main() -> None:
     if loop_count >= 5:
         print(json.dumps({}))
         return
-    # Continue when: Next Actions says continue, or there are pending approvals, or Orchestrator just delegated (inject that command).
+    # Continue when: Next Actions says continue, or pending approvals, or Orchestrator just delegated, or a subagent just completed a task.
     has_continue = _next_actions_has_continue(dashboard) or _has_pending_approvals(dashboard)
     has_delegation = _last_response_contains_delegation(transcript_content)
-    if not has_continue and not has_delegation:
+    just_completed = _transcript_shows_recent_completion(transcript_content)
+    if not has_continue and not has_delegation and not just_completed:
         print(json.dumps({}))
         return
 

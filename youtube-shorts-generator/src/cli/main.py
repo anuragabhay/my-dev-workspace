@@ -18,6 +18,15 @@ def cmd_health() -> int:
     """Health check: MVP checks (API keys, disk, resources, DB, API connectivity, YouTube). Return 0 ok, 1 fail."""
     root = _project_root()
     sys.path.insert(0, str(root))
+    # Load .env from project root so API keys and YouTube credentials are available to checks
+    from src.utils.config import load_env, DEFAULT_ENV_NAME
+    env_file = root / DEFAULT_ENV_NAME
+    if not env_file.exists():
+        example = root / ".env.example"
+        if example.exists():
+            import shutil
+            shutil.copy(example, env_file)
+    load_env(env_file)
     from src.utils.health import run_all_checks
     result = run_all_checks(root)
     print(json.dumps(result, indent=2))
@@ -42,6 +51,13 @@ def cmd_generate() -> int:
     """Run pipeline once."""
     root = _project_root()
     sys.path.insert(0, str(root))
+    # Load .env so API keys (OpenAI, ElevenLabs, Runway, YouTube) are available to pipeline
+    from src.utils.config import load_env, DEFAULT_ENV_NAME
+    env_file = root / DEFAULT_ENV_NAME
+    if not env_file.exists() and (root / ".env.example").exists():
+        import shutil
+        shutil.copy(root / ".env.example", env_file)
+    load_env(env_file)
     from src.agents.research_agent import ResearchAgent
     from src.agents.script_agent import ScriptAgent
     from src.agents.uniqueness_agent import UniquenessAgent

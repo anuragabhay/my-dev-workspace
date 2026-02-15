@@ -16,7 +16,7 @@
 **Active Agents**: CEO, Lead Engineer, CTO, Architect  
 **Pending Approvals**: 0  
 **Blockers**: None  
-**Next Actions**: Architect: Validate pipeline unit tests; then Intern: single commit and push. Delegate via /architect then /intern.  
+**Next Actions**: Lead Engineer: Pick next task from Implementation Plan (Phase 3 service tests or Phase 2 remaining). Or Orchestrator: next cycle. Delegate via /lead-engineer.  
 **User Intervention Required**: No
 
 ---

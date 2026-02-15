@@ -80,6 +80,7 @@ python -m src.cli.main generate
 
 ```
 youtube-shorts-generator/
+├── .claude/rules/           # Pilot code-quality rules (see Development)
 ├── src/
 │   ├── agents/              # Agent implementations
 │   ├── orchestration/       # Pipeline orchestration
@@ -158,7 +159,7 @@ Project-specific rules live in `.claude/rules/`:
 - **video-quality.mdc** — Standards for video pipeline and composition (config, service layer).
 - **mcp-framework.mdc** — Message queue, state manager, and agent communication.
 
-**Using Pilot:** Run `/sync` in the project to generate or refresh project-specific rules. Pilot then provides formatting, linting, and type-checking (e.g. on save or on demand). Activate the project venv before running tests or tools that Pilot may invoke.
+**Using Pilot:** Run `/sync` in the project to generate or refresh project-specific rules. Pilot then provides formatting, linting, and type-checking (e.g. on save or on demand). Activate the project venv before running tests or tools that Pilot may invoke. If Pilot is not installed, see the workspace root docs or run: `curl -fsSL https://raw.githubusercontent.com/maxritter/claude-pilot/main/install.sh | bash` in the project directory. Pilot handles code quality; project status and coordination are in `PROJECT_WORKSPACE.md` at the workspace root.
 
 ### Testing
 

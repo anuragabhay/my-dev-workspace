@@ -16,7 +16,7 @@
 **Active Agents**: CEO, Lead Engineer, CTO, Architect  
 **Pending Approvals**: 0  
 **Blockers**: None  
-**Next Actions**: Orchestrator: next cycle. Intern commit/push/--update-workspace completed (Architect handoff).  
+**Next Actions**: Intern: Commit, push, append work log, run --update-workspace (Phase 6 README validated). Delegate via /intern.  
 **User Intervention Required**: No
 
 ---

@@ -60,22 +60,23 @@ _DELEGATION_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
-# Pattern to extract the full delegation line (slash command + task text).
-# Allows "/intern ..." or "/intern: ..." or "/intern: \"...\"" so prose formats still match.
+# Pattern to extract slash command even in prose (e.g. "run /lead-engineer with: \"task\"").
+# Match /role anywhere; we take the last match and normalize.
 _DELEGATION_EXTRACT_PATTERN = re.compile(
-    r"(?:^|\n)(/(?:lead-engineer|architect|intern|pm|cto|cfo)\s*:?\s*[^\n]+)",
-    re.MULTILINE | re.IGNORECASE,
+    r"/(?:lead-engineer|architect|intern|pm|cto|cfo)\s*:?\s*[^\n]+",
+    re.IGNORECASE,
 )
 
 
 def _normalize_delegation_command(raw: str) -> str:
-    """Remove optional colon after role and strip surrounding quotes so runner gets /role task."""
+    """Remove ' with:', colon after role, and surrounding quotes so runner gets /role task."""
     s = raw.strip()
-    # "/intern: \"task\"" or "/intern: task" -> "/intern task"
     role_end = re.search(r"/(?:lead-engineer|architect|intern|pm|cto|cfo)\s*:?\s*", s, re.I)
     if role_end:
         prefix = role_end.group(0).replace(":", " ").replace("  ", " ")
         rest = s[role_end.end() :].strip()
+        # "with: \"task\"" or "with: task" -> "task"
+        rest = re.sub(r"^with\s*:\s*", "", rest, flags=re.I)
         if rest.startswith('"') and rest.endswith('"'):
             rest = rest[1:-1]
         s = prefix + rest
@@ -104,6 +105,24 @@ def _orchestrator_marked_complete(transcript_content: str) -> bool:
     """True if Orchestrator wrote ORCHESTRATION_COMPLETE (or similar) in recent output."""
     recent = transcript_content[-3000:] if len(transcript_content) > 3000 else transcript_content
     return "orchestration_complete" in recent.lower() or "orchestration complete" in recent.lower()
+
+
+def _delegated_task_already_done_in_transcript(transcript_content: str) -> bool:
+    """True if recent transcript shows the delegated role already finished (avoids re-injecting same delegation).
+    Use only markers that indicate the subagent completed, not generic cycle activity (work log, Updated)."""
+    recent = transcript_content[-5000:] if len(transcript_content) > 5000 else transcript_content
+    r = recent.lower()
+    markers = (
+        "phase 6 for this scope is done",
+        "phase 6 ... is already complete",
+        "no further item",
+        "no further work",
+        "hand off to intern",   # Architect validation done
+        "hand off to intern for commit",
+        "pushed to origin",
+        "pushed to master",
+    )
+    return any(m in r for m in markers)
 
 
 # Subagent role markers in transcript (first 3000 chars)
@@ -171,8 +190,12 @@ def main() -> None:
     head = transcript_content[:3000]
     root = _workspace_root(payload)
 
-    # 2a) Subagent chat stopped → return {} only. Followup goes to the same chat; we don't want it in subagent.
-    #     Control returns to Orchestrator automatically; when Orchestrator stops, hook runs again with Orchestrator transcript.
+    # 2a) Subagent chat stopped → return {} only. Check this first: subagent transcripts can
+    #     also mention orchestrator.mdc in context, which would otherwise wrongly trigger Orchestrator logic and re-inject the same delegation into the subagent chat (infinite loop).
+    if _is_subagent_chat(head):
+        print(json.dumps({}))
+        return
+    # 2b) Only continue for Orchestrator chat.
     if "parent Orchestrator" not in head and "orchestrator.mdc" not in head:
         print(json.dumps({}))
         return
@@ -209,9 +232,10 @@ def main() -> None:
 
     if has_delegation:
         delegation_cmd = _extract_delegation_command(transcript_content)
-        if delegation_cmd:
+        if delegation_cmd and not _delegated_task_already_done_in_transcript(transcript_content):
             print(json.dumps({"followup_message": delegation_cmd}))
             return
+        # Transcript already shows task done (Done, COMPLETED, work log, etc.) — run a cycle instead of re-injecting same delegation.
 
     followup = _orchestrator_run_cycle_prompt(root)
     print(json.dumps({"followup_message": followup}))

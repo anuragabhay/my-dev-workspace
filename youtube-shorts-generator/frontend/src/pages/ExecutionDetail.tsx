@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Film } from 'lucide-react'
+import { ArrowLeft, Film, AlertTriangle } from 'lucide-react'
 import { api, type ExecutionStatus } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export function ExecutionDetail() {
   const { id } = useParams<{ id: string }>()
@@ -34,17 +35,24 @@ export function ExecutionDetail() {
   if (!id || loading) {
     return (
       <div className="space-y-8">
-        <p className="text-zinc-400">Loading...</p>
+        <Skeleton className="h-8 w-48" />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-48 w-full" />
+        </div>
       </div>
     )
   }
 
   if (!status) {
     return (
-      <div className="space-y-8">
-        <p className="text-red-500">Execution not found</p>
-        <Link to="/history">
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <AlertTriangle className="mb-4 h-12 w-12 text-zinc-600" />
+        <p className="text-lg font-medium text-zinc-400">Execution not found</p>
+        <p className="mt-1 text-sm text-zinc-500">ID #{id} does not exist</p>
+        <Link to="/history" className="mt-6">
           <Button variant="outline" className="border-zinc-700">
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to History
           </Button>
         </Link>
@@ -58,7 +66,7 @@ export function ExecutionDetail() {
     <div className="space-y-8">
       <div className="flex items-center gap-4">
         <Link to="/history">
-          <Button variant="ghost" size="sm" className="text-zinc-400">
+          <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
@@ -66,18 +74,18 @@ export function ExecutionDetail() {
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Execution #{id}</h1>
-        <p className="text-zinc-400">{status.topic || 'No topic'}</p>
+        <h1 className="text-3xl font-bold tracking-tight">Execution #{id}</h1>
+        <p className="mt-1 text-zinc-400">{status.topic || 'No topic specified'}</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="border-zinc-800 bg-zinc-900/50">
           <CardHeader>
             <CardTitle>Status</CardTitle>
-            <CardDescription>Current state and cost</CardDescription>
+            <CardDescription>Current state and cost breakdown</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-2">
+          <CardContent className="space-y-5">
+            <div className="flex items-center gap-3">
               <Badge
                 variant={
                   status.status === 'completed'
@@ -86,20 +94,24 @@ export function ExecutionDetail() {
                       ? 'destructive'
                       : 'secondary'
                 }
+                className="text-sm px-3 py-1"
               >
                 {status.status}
               </Badge>
               {status.current_stage && (
-                <span className="text-sm text-zinc-400">Stage: {status.current_stage}</span>
+                <span className="rounded-md bg-zinc-800 px-2 py-1 text-xs text-zinc-400">
+                  Stage: {status.current_stage}
+                </span>
               )}
             </div>
-            <div>
-              <span className="text-sm text-zinc-500">Cost: </span>
-              <span className="font-mono">${status.cost.toFixed(2)}</span>
+            <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-4">
+              <span className="text-sm text-zinc-500">Total Cost</span>
+              <p className="mt-1 text-2xl font-bold font-mono">${status.cost.toFixed(2)}</p>
             </div>
             {status.error_message && (
-              <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-400">
-                {status.error_message}
+              <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400">
+                <p className="font-medium">Error</p>
+                <p className="mt-1 text-red-400/80">{status.error_message}</p>
               </div>
             )}
           </CardContent>
@@ -109,7 +121,7 @@ export function ExecutionDetail() {
           <Card className="border-zinc-800 bg-zinc-900/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Film className="h-4 w-4" />
+                <Film className="h-4 w-4 text-red-500" />
                 Video Preview
               </CardTitle>
               <CardDescription>Generated output</CardDescription>
@@ -118,7 +130,7 @@ export function ExecutionDetail() {
               <video
                 src={api.videoUrl(status.execution_id)}
                 controls
-                className="w-full rounded-lg bg-black"
+                className="w-full rounded-lg border border-zinc-800 bg-black"
               >
                 Your browser does not support video playback.
               </video>
@@ -128,15 +140,17 @@ export function ExecutionDetail() {
       </div>
 
       {status.status === 'in_progress' && (
-        <Card className="border-zinc-800 bg-zinc-900/50">
+        <Card className="border-amber-500/30 bg-amber-500/5">
           <CardHeader>
-            <CardTitle>Live Progress</CardTitle>
-            <CardDescription>Connect to Generate page for WebSocket updates</CardDescription>
+            <CardTitle className="text-amber-400">Pipeline Running</CardTitle>
+            <CardDescription className="text-amber-400/70">
+              Go to the Generate page for real-time WebSocket progress
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link to={`/generate`}>
-              <Button variant="outline" className="border-zinc-700">
-                Go to Generate
+            <Link to="/generate">
+              <Button className="bg-amber-600 hover:bg-amber-700 text-white">
+                View Live Progress
               </Button>
             </Link>
           </CardContent>

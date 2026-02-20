@@ -7,7 +7,18 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
 WORK_LOG_PATH = Path(__file__).resolve().parent / "work_log.json"
-WORKSPACE_PATH = Path(__file__).resolve().parent.parent / "PROJECT_WORKSPACE.md"
+
+
+def _get_workspace_path() -> Path:
+    """Resolve PROJECT_WORKSPACE.md path via workspace_config."""
+    try:
+        from workspace_config import get_workspace_root
+        return get_workspace_root() / "PROJECT_WORKSPACE.md"
+    except ImportError:
+        return Path(__file__).resolve().parent.parent / "PROJECT_WORKSPACE.md"
+
+
+WORKSPACE_PATH = _get_workspace_path()
 MAX_ENTRIES = 500
 RECENT_N = 10
 

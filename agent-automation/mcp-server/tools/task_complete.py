@@ -12,7 +12,7 @@ import hashlib
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from state_tracker import StateTracker
-import yaml
+from workspace_config import load_config
 
 
 def mark_task_complete(task_id: str, role: str, config_path: str = None) -> Dict[str, Any]:
@@ -22,17 +22,12 @@ def mark_task_complete(task_id: str, role: str, config_path: str = None) -> Dict
     Args:
         task_id: Task identifier (approval ID, work log timestamp, etc.)
         role: Role name (e.g., "CTO", "Lead Engineer")
-        config_path: Path to config.yaml (default: ../config.yaml)
+        config_path: Path to config.yaml (default: agent-automation/config.yaml)
     
     Returns:
         Dictionary with completion status
     """
-    if config_path is None:
-        config_path = str(Path(__file__).parent.parent.parent / "config.yaml")
-    
-    # Load config
-    with open(config_path, 'r') as f:
-        config = yaml.safe_load(f)
+    config = load_config(config_path)
     
     # Initialize state tracker
     state_tracker = StateTracker(

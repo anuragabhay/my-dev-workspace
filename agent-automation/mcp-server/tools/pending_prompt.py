@@ -7,7 +7,11 @@ Returns the prompt and clears the file so the Orchestrator can run one cycle wit
 from pathlib import Path
 from typing import Dict, Any
 
-import yaml
+# Add parent to path for workspace_config
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
+from workspace_config import get_workspace_root
 
 
 def get_pending_orchestrator_prompt(config_path: str = None) -> Dict[str, Any]:
@@ -17,17 +21,7 @@ def get_pending_orchestrator_prompt(config_path: str = None) -> Dict[str, Any]:
     Returns:
         {"prompt": "<content>"} if file existed and had content, else {"prompt": ""}.
     """
-    if config_path is None:
-        config_path = str(Path(__file__).resolve().parent.parent.parent / "config.yaml")
-    try:
-        with open(config_path, "r") as f:
-            config = yaml.safe_load(f)
-    except Exception:
-        return {"prompt": ""}
-    workspace_path = config.get("workspace_path")
-    if not workspace_path:
-        return {"prompt": ""}
-    root = Path(workspace_path).resolve().parent
+    root = get_workspace_root()
     pending_file = root / "agent-automation" / "orchestrator_pending_prompt.txt"
     if not pending_file.exists():
         return {"prompt": ""}

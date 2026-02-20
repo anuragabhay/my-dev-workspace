@@ -52,6 +52,14 @@
 
 ## 📝 Recent Work Log (last 10)
 
+### [2026-02-20 12:00 UTC] [Junior Engineer 1] [Phase B platform-agnostic: configurable paths, agents, hooks, MCP docs] [✅ COMPLETED]
+- B.1: Created workspace_config.py (get_workspace_root, load_config) with WORKSPACE_ROOT env and workspace_config.yaml; updated main.py, config.yaml, mcp-server/config.json
+- B.2: Added agent-automation/agents/pm.md, cto.md, cfo.md; existing lead-engineer, junior-engineer-1/2, architect, reviewer, tester already present
+- B.3: Created agent-automation/docs/hooks.md (stop hook behavior, non-Cursor replication)
+- B.4: Updated agent-automation/mcp-server/README.md with standalone MCP docs (Cursor, Claude Code, any MCP client)
+- B.5: Created docs/platform-agnostic.md; updated PROJECT_WORKSPACE.md, orchestrator rule, ORCHESTRATOR_SETUP, TROUBLESHOOTING, MCP_INTEGRATION, SETUP paths
+- No hardcoded /Users/anuragabhay paths; default: derive from agent-automation parent
+
 ### [2026-02-20T09:35:27Z] [Orchestrator] [Step 0: commit, push to step0-merge, delete stale branches] [COMPLETED]
 Committed all work (staging config, retry, CLI, services, branching docs). Pushed to step0-merge. Direct push to staging blocked by branch protection. Deleted feature/ui and feature/platform-agnostic. User must merge PR step0-merge → staging to complete Step 0.
 
@@ -78,9 +86,6 @@ Expanded youtube-shorts-generator/README.md Troubleshooting: missing/invalid .en
 
 ### [2026-02-20 15:30 UTC] [Architect] [Validate config validation, Pilot rules, README] [COMPLETED]
 Validated main.py config validation, .claude/rules, README setup; all OK. Hand off to Junior Engineer 1 for commit, push.
-
-### [2026-02-20 15:00 UTC] [Orchestrator] [Dev plan cycle 1: three-way split completed] [COMPLETED]
-Delegated Part 1 (Lead Engineer: config validation on startup), Part 2 (Junior Engineer 1: Pilot rules agent-guidelines.mdc + refs), Part 3 (Junior Engineer 2: README setup). All three delivered. Next: Architect validate then Junior Engineer 1 or 2 commit, push.
 
 Full log: agent-automation/work_log.json
 
@@ -139,7 +144,7 @@ To add an entry: run `python agent-automation/append_work_log.py --timestamp "..
 - **Frequency**: Check document before starting work, after completing work, when blocked
 
 ### Before Starting Work
-1. **Check for automated tasks**: Check `/Users/anuragabhay/agent-automation/prompts/{your_role}_action.md` for pending automated tasks (see "Checking for Automated Tasks" below)
+1. **Check for automated tasks**: Check `agent-automation/prompts/{your_role}_action.md` (or `{WORKSPACE_ROOT}/agent-automation/prompts/...`) for pending automated tasks (see "Checking for Automated Tasks" below)
 2. Read entire document (Dashboard, Work Log, Approval Requests, Role sections)
 3. Check for pending approvals you need to respond to (if senior role)
 4. Check for blockers or dependencies
@@ -154,7 +159,7 @@ To add an entry: run `python agent-automation/append_work_log.py --timestamp "..
    - Call `@check_my_pending_tasks role="Your Role"` in Cursor
    - Returns structured JSON with pending tasks, approvals, and context
    - No manual file checking needed
-2. **Fallback - Check prompt files**: If MCP is unavailable, check `/Users/anuragabhay/agent-automation/prompts/{your_role}_action.md`
+2. **Fallback - Check prompt files**: If MCP is unavailable, check `agent-automation/prompts/{your_role}_action.md` (relative to workspace root)
    - If prompt file exists: Read and execute the task
    - Update PROJECT_WORKSPACE.md as instructed
    - System will track state automatically

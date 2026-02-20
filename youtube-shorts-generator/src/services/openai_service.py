@@ -5,7 +5,6 @@ Uses /v1/chat/completions so projects with 'Model capabilities' but not 'Respons
 Public entry points: :func:`chat_completion`, :func:`get_embeddings`.
 """
 import os
-import time
 from typing import Optional, List, Any
 
 # Lazy import openai to avoid import errors if key missing
@@ -14,20 +13,8 @@ def _client():
     return openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
-def _retry(max_retries: int = 3, backoff: tuple = (1, 2, 4)):
-    def decorator(f):
-        def wrapped(*args, **kwargs):
-            last = None
-            for i, wait in enumerate(backoff[:max_retries]):
-                try:
-                    return f(*args, **kwargs)
-                except Exception as e:
-                    last = e
-                    if i < max_retries - 1:
-                        time.sleep(wait)
-            raise last
-        return wrapped
-    return decorator
+# Import retry utility
+from src.utils.retry import retry_decorator
 
 
 def _default_chat_model() -> str:
@@ -66,7 +53,7 @@ def _chat_completion_chat_api(
     return content, cost
 
 
-@_retry()
+@retry_decorator(max_retries=3, base_delay=1.0, max_delay=60.0)
 def chat_completion(
     messages: List[dict],
     model: Optional[str] = None,
@@ -122,7 +109,7 @@ def _fallback_embedding_models() -> List[str]:
     return ["text-embedding-ada-002"]
 
 
-@_retry()
+@retry_decorator(max_retries=3, base_delay=1.0, max_delay=60.0)
 def get_embeddings(texts: List[str], model: Optional[str] = None) -> tuple[List[List[float]], float]:
     """Compute embeddings for a list of texts and return vectors plus estimated cost.
 

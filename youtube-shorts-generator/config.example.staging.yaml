@@ -1,0 +1,57 @@
+# YouTube Shorts Generator - Staging Configuration Template
+# Copy to config.staging.yaml and adjust for staging environment.
+# To use staging config, set ENV=staging before running commands.
+
+# Component timeouts (seconds) - Staging may use longer timeouts for testing
+timeouts:
+  research: 45        # Longer timeout for staging testing
+  script: 90         # Extended for staging
+  tts: 120          # Extended for staging
+  video_assets: 600  # 10 minutes - longer for staging testing
+  composition: 180  # 3 minutes - extended for staging
+  quality: 45       # Extended for staging
+  youtube_upload: 600 # 10 minutes - longer for staging
+  network_per_call: 60 # Extended network timeout for staging
+  pipeline_total: 1800 # 30 minutes - longer total timeout for staging
+
+# Retry and backoff - More retries for staging
+retry:
+  max_retries: 5    # More retries in staging
+  backoff_seconds: [1, 2, 4, 8, 16]  # Extended backoff
+
+# Quality thresholds - May be relaxed for staging testing
+quality:
+  script_coherence_min: 0.80  # Slightly relaxed for staging
+  uniqueness_similarity_max: 0.35  # More lenient for staging
+  sync_error_max_ms: 300      # More lenient sync tolerance
+  min_duration_seconds: 15
+  max_duration_seconds: 60
+  min_resolution: [1080, 1920]
+  min_fps: 24
+  max_file_size_mb: 150       # Larger file size allowed in staging
+
+# Cost limits and alerts (USD) - Staging may have different limits
+cost:
+  target_per_video: 5.00     # Higher target for staging
+  warning_per_video: 5.50     # Adjusted for staging
+  critical_per_video: 8.00    # Higher critical threshold
+  monthly_alert: 200          # Higher monthly alert for staging
+  component_alert_multiplier: 2.5  # More lenient multiplier
+
+# Content preferences - Staging may use test/fallback topics
+content:
+  topic_categories_min: 1     # More lenient for staging
+  relevance_score_min: 0.65   # Lower threshold for staging
+  fallback_topics: []          # Add test topics here if needed
+
+# Resource limits (local dev) - Staging may have different requirements
+resources:
+  min_disk_gb: 15             # More disk space for staging
+  min_ram_gb: 8
+  temp_storage_gb: 10         # More temp storage for staging
+
+# Paths (relative to project root or absolute) - Staging may use different paths
+paths:
+  database: youtube_shorts_staging.db  # Separate staging database
+  temp_dir: tmp_staging                # Separate staging temp dir
+  output_dir: output_videos_staging    # Separate staging output dir

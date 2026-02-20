@@ -14,7 +14,7 @@ def _project_root() -> Path:
     return here.parent if here.name == "src" else Path.cwd()
 
 
-def cmd_health() -> int:
+def cmd_health(json_output: bool = False) -> int:
     """Health check: MVP checks (API keys, disk, resources, DB, API connectivity, YouTube). Return 0 ok, 1 fail."""
     root = _project_root()
     sys.path.insert(0, str(root))
@@ -29,11 +29,17 @@ def cmd_health() -> int:
     load_env(env_file)
     from src.utils.health import run_all_checks
     result = run_all_checks(root)
-    print(json.dumps(result, indent=2))
+    
+    if json_output:
+        print(json.dumps(result, indent=2))
+    else:
+        from src.utils.ui import format_health_check_result
+        format_health_check_result(result, show_json=False)
+    
     return 0 if result.get("ok") else 1
 
 
-def cmd_status() -> int:
+def cmd_status(json_output: bool = False) -> int:
     """Last execution status."""
     root = _project_root()
     sys.path.insert(0, str(root))
@@ -41,9 +47,16 @@ def cmd_status() -> int:
     repository.ensure_schema()
     last = repository.get_last_executions(1)
     if not last:
-        print(json.dumps({"status": "no_executions"}))
-        return 0
-    print(json.dumps({"last": last[0]}))
+        status_data = {"status": "no_executions"}
+    else:
+        status_data = {"last": last[0]}
+    
+    if json_output:
+        print(json.dumps(status_data))
+    else:
+        from src.utils.ui import format_status_result
+        format_status_result(status_data)
+    
     return 0
 
 
@@ -98,6 +111,7 @@ def _ensure_config_for_command(command: str) -> tuple[bool, list[str]]:
 def main() -> int:
     p = argparse.ArgumentParser(prog="youtube-shorts")
     p.add_argument("command", choices=["generate", "status", "health"])
+    p.add_argument("--json", action="store_true", help="Output raw JSON instead of formatted display")
     args = p.parse_args()
 
     # Validate config on startup for commands that need API keys and settings
@@ -109,9 +123,9 @@ def main() -> int:
             return 1
 
     if args.command == "health":
-        return cmd_health()
+        return cmd_health(json_output=args.json)
     if args.command == "status":
-        return cmd_status()
+        return cmd_status(json_output=args.json)
     if args.command == "generate":
         return cmd_generate()
     return 0

@@ -1,10 +1,10 @@
 """
 Main entry point for Agent Automation System.
 Monitors PROJECT_WORKSPACE.md and triggers agents when action is needed.
+Uses workspace_config for path resolution (WORKSPACE_ROOT env or workspace_config.yaml).
 """
 
 import sys
-import yaml
 import hashlib
 from pathlib import Path
 from typing import Dict, Any
@@ -14,14 +14,15 @@ from parser import WorkspaceParser
 from router import AgentRouter
 from trigger import AgentTrigger
 from state_tracker import StateTracker
+from workspace_config import load_config
 
 
 class AgentAutomationSystem:
     """Main automation system that coordinates all components."""
     
-    def __init__(self, config_path: str = "config.yaml"):
-        self.config_path = Path(config_path)
-        self.config = self._load_config()
+    def __init__(self, config_path: str = None):
+        self.config = load_config(str(config_path) if config_path else None)
+        config_path = Path(self.config.get("_config_path", "config.yaml"))
         
         # Initialize components
         self.state_tracker = StateTracker(
@@ -29,18 +30,13 @@ class AgentAutomationSystem:
             json_backup_path=self.config['json_backup']
         )
         self.parser = WorkspaceParser(self.config['workspace_path'])
-        self.router = AgentRouter(config_path)
+        self.router = AgentRouter(str(config_path))
         self.trigger = AgentTrigger(
-            config_path=config_path,
+            config_path=str(config_path),
             workspace_path=self.config['workspace_path']
         )
         
         self.workspace_path = Path(self.config['workspace_path'])
-    
-    def _load_config(self) -> Dict[str, Any]:
-        """Load configuration."""
-        with open(self.config_path, 'r') as f:
-            return yaml.safe_load(f)
     
     def _generate_task_hash(self, item: Dict[str, Any], trigger_type: str) -> str:
         """Generate a hash for a task/item to track if processed."""

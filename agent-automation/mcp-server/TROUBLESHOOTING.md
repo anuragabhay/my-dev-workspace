@@ -5,9 +5,9 @@
 Run the test script to identify issues:
 
 ```bash
-cd /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server
+cd agent-automation/mcp-server
 source venv/bin/activate
-PYTHONPATH=/Users/anuragabhay/my-dev-workspace/agent-automation python test_server.py
+PYTHONPATH=../.. python test_server.py
 ```
 
 ## Common Issues
@@ -20,7 +20,7 @@ PYTHONPATH=/Users/anuragabhay/my-dev-workspace/agent-automation python test_serv
 
 **Solution:**
 ```bash
-cd /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server
+cd agent-automation/mcp-server
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
@@ -40,7 +40,7 @@ python -c "from mcp.server import Server; print('OK')"
 
 **Solution:**
 ```bash
-cd /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server
+cd agent-automation/mcp-server
 source venv/bin/activate
 pip install PyYAML
 ```
@@ -61,14 +61,14 @@ python -c "import yaml; print('OK')"
 1. Verify PYTHONPATH in `.cursor/mcp.json`:
    ```json
    "env": {
-     "PYTHONPATH": "/Users/anuragabhay/my-dev-workspace/agent-automation"
+     "PYTHONPATH": "agent-automation"
    }
    ```
 
 2. Verify parent directory structure:
    ```bash
-   ls /Users/anuragabhay/my-dev-workspace/agent-automation/parser.py
-   ls /Users/anuragabhay/my-dev-workspace/agent-automation/router.py
+   ls agent-automation/parser.py
+   ls agent-automation/router.py
    ```
 
 ### Issue 4: Cursor Shows "Error" Status
@@ -92,7 +92,7 @@ python -c "import yaml; print('OK')"
 
 3. **Verify Configuration:**
    ```bash
-   cat /Users/anuragabhay/my-dev-workspace/.cursor/mcp.json
+   cat .cursor/mcp.json
    ```
    
    Should show:
@@ -176,9 +176,9 @@ If issues persist:
 
 **Full test sequence:**
 ```bash
-cd /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server
+cd agent-automation/mcp-server
 source venv/bin/activate
-PYTHONPATH=/Users/anuragabhay/my-dev-workspace/agent-automation python test_server.py
+PYTHONPATH=../.. python test_server.py
 ```
 
 **Individual component tests:**

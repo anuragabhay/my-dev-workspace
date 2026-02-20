@@ -25,19 +25,12 @@ _ROLE_TO_DIR = {
 
 
 def _workspace_root() -> Path:
-    """Resolve workspace root from agent-automation config or path heuristic."""
+    """Resolve workspace root via workspace_config (WORKSPACE_ROOT env or workspace_config.yaml)."""
     try:
-        import yaml
-        config_path = Path(__file__).resolve().parent.parent.parent / "config.yaml"
-        if config_path.exists():
-            with open(config_path, "r") as f:
-                config = yaml.safe_load(f)
-            wp = config.get("workspace_path", "")
-            if wp:
-                return Path(wp).resolve().parent
-    except Exception:
-        pass
-    return Path(__file__).resolve().parent.parent.parent
+        from workspace_config import get_workspace_root
+        return get_workspace_root()
+    except ImportError:
+        return Path(__file__).resolve().parent.parent.parent
 
 
 def get_role_guidance(role: str, workspace_root: Optional[str] = None) -> dict:
@@ -52,6 +45,8 @@ def get_role_guidance(role: str, workspace_root: Optional[str] = None) -> dict:
         Dict with keys: role, content (str or summary), source (file path), error (if any).
     """
     root = Path(workspace_root) if workspace_root else _workspace_root()
+    # Prefer agent-automation/agents/ (host-agnostic), then .cursor/skills, then .cursor/agents
+    agents_auto = root / "agent-automation" / "agents"
     skills_dir = root / ".cursor" / "skills"
     agents_dir = root / ".cursor" / "agents"
 
@@ -60,11 +55,12 @@ def get_role_guidance(role: str, workspace_root: Optional[str] = None) -> dict:
     if not role_key:
         # Support "junior-engineer-1" / "junior-engineer-2" as input
         role_key = role_stripped.lower().replace(" ", "-")
+    agent_auto_path = agents_auto / f"{role_key}.md"
     skill_path = skills_dir / role_key / "SKILL.md"
     agent_path = agents_dir / f"{role_key}.md"
 
-    # Prefer SKILL.md, then agent .md
-    for path in (skill_path, agent_path):
+    # Prefer agent-automation/agents/ (host-agnostic), then .cursor/skills, then .cursor/agents
+    for path in (agent_auto_path, skill_path, agent_path):
         if path.exists():
             try:
                 content = path.read_text(encoding="utf-8", errors="replace").strip()
@@ -86,7 +82,7 @@ def get_role_guidance(role: str, workspace_root: Optional[str] = None) -> dict:
         "role": role,
         "content": None,
         "source": None,
-        "error": f"No SKILL.md or agent file found for role '{role}' (tried {skill_path}, {agent_path})",
+        "error": f"No role file found for '{role}' (tried {agent_auto_path}, {skill_path}, {agent_path})",
     }
 
 

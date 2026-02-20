@@ -11,7 +11,7 @@ from typing import Dict, Any
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from parser import WorkspaceParser
-import yaml
+from workspace_config import load_config
 
 
 def get_workspace_status(config_path: str = None) -> Dict[str, Any]:
@@ -19,17 +19,12 @@ def get_workspace_status(config_path: str = None) -> Dict[str, Any]:
     Get current workspace status.
     
     Args:
-        config_path: Path to config.yaml (default: ../config.yaml)
+        config_path: Path to config.yaml (default: agent-automation/config.yaml)
     
     Returns:
         Dictionary with workspace status, approvals, blockers, etc.
     """
-    if config_path is None:
-        config_path = str(Path(__file__).parent.parent.parent / "config.yaml")
-    
-    # Load config
-    with open(config_path, 'r') as f:
-        config = yaml.safe_load(f)
+    config = load_config(config_path)
     
     # Initialize parser
     parser = WorkspaceParser(config['workspace_path'])

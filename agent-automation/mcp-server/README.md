@@ -92,7 +92,7 @@ Reads the pending orchestrator run-cycle prompt (written by the stop hook when a
 
 ### 6. get_role_guidance(role: string)
 
-Returns role guidance from `.cursor/skills/<role>/SKILL.md` or `.cursor/agents/<role>.md`. Use when deciding which role to delegate to.
+Returns role guidance from `agent-automation/agents/<role>.md` (host-agnostic), or `.cursor/skills/<role>/SKILL.md`, or `.cursor/agents/<role>.md`. Use when deciding which role to delegate to.
 
 **Parameters:**
 - `role`: Role name (e.g. "Lead Engineer", "Junior Engineer 1", "Junior Engineer 2", "Reviewer", "Tester", "Architect")
@@ -115,33 +115,75 @@ Reads `agent-automation/workflow.yml`, `roles.yml`, and `decisions.yml`. Returns
 - `decisions`: list of decision rules (priority, condition, action, target_role_from)
 - `error`: if any file is missing or invalid
 
-## Cursor Integration
+## Standalone MCP Server (Any Host)
 
-### Configuration
+The MCP server runs standalone and can be connected from **Cursor**, **Claude Code**, **Vertex AI**, **Augment**, or any MCP client.
 
-Add to Cursor's MCP configuration (`.cursor/mcp.json` or Cursor settings):
+### Workspace Configuration
+
+Set the workspace root so paths resolve correctly:
+
+- **Environment variable**: `WORKSPACE_ROOT=/path/to/your-workspace`
+- **Config file**: Create `agent-automation/workspace_config.yaml` with `workspace_root: /path/to/your-workspace` (or `.` for current dir)
+- **Default**: Parent of `agent-automation/` (when running from project root)
+
+### Running the Server
+
+```bash
+cd agent-automation/mcp-server
+pip install -r requirements.txt
+
+# From project root, with PYTHONPATH so tools can import workspace_config, parser, etc.
+WORKSPACE_ROOT=/path/to/your-workspace PYTHONPATH=/path/to/agent-automation python server.py
+```
+
+Or from the workspace root:
+
+```bash
+cd /path/to/your-workspace
+PYTHONPATH=./agent-automation python agent-automation/mcp-server/server.py
+```
+
+### Cursor Integration
+
+Add to Cursor's MCP configuration (`.cursor/mcp.json` or Cursor settings). Use `$WORKSPACE` or your actual workspace path:
 
 ```json
 {
   "mcpServers": {
     "agent-automation": {
       "command": "python",
-      "args": ["/Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server/server.py"],
-      "env": {}
+      "args": ["agent-automation/mcp-server/server.py"],
+      "env": {
+        "PYTHONPATH": "agent-automation",
+        "WORKSPACE_ROOT": "."
+      }
     }
   }
 }
 ```
 
-### Usage in Cursor
+When Cursor opens the workspace, `WORKSPACE_ROOT` can be `.` (current dir) or omitted (defaults to agent-automation parent).
 
-Agents can now call MCP tools directly:
+### Claude Code / Other MCP Clients
+
+Configure your MCP client to run the server with:
+
+- `command`: `python` (or path to venv python)
+- `args`: `["agent-automation/mcp-server/server.py"]`
+- `env`: `PYTHONPATH=agent-automation`, `WORKSPACE_ROOT=/path/to/workspace` (if needed)
+
+### Usage
+
+Agents can call MCP tools directly:
 
 ```
 @check_my_pending_tasks role="Lead Engineer"
+@get_workspace_status
+@get_pending_orchestrator_prompt
 ```
 
-The tool will return structured JSON with pending tasks, eliminating the need to manually check prompt files.
+The tools return structured JSON with pending tasks, workspace status, and role guidance.
 
 ## Integration
 

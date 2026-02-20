@@ -61,7 +61,7 @@ python main.py --once
 The main configuration file is `config.yaml`. Key settings:
 
 ```yaml
-workspace_path: /Users/anuragabhay/my-dev-workspace/PROJECT_WORKSPACE.md  # Path to workspace file
+workspace_path: PROJECT_WORKSPACE.md  # Resolved via workspace_config (WORKSPACE_ROOT or workspace_config.yaml)
 poll_interval: 30  # Polling interval in seconds (fallback mode)
 prompt_dir: ./prompts  # Directory for generated prompt files
 state_db: ./state.db  # SQLite database for state tracking
@@ -145,7 +145,7 @@ python main.py
 **Option 3: Using tmux**
 
 ```bash
-tmux new-session -d -s automation 'cd /Users/anuragabhay/my-dev-workspace/agent-automation && source venv/bin/activate && python main.py'
+tmux new-session -d -s automation 'cd agent-automation && source venv/bin/activate && python main.py'
 ```
 
 ## System Components
@@ -214,7 +214,7 @@ sqlite3 state.db "SELECT * FROM trigger_history ORDER BY triggered_at DESC LIMIT
 
 ```bash
 # Test workspace parsing
-python -c "from parser import WorkspaceParser; p = WorkspaceParser('/Users/anuragabhay/my-dev-workspace/PROJECT_WORKSPACE.md'); data = p.parse_all(); print(f'Found {len(data[\"approval_requests\"])} approval requests')"
+python -c "from workspace_config import load_config; c = load_config(); from parser import WorkspaceParser; p = WorkspaceParser(c['workspace_path']); data = p.parse_all(); print(f'Found {len(data[\"approval_requests\"])} approval requests')"
 ```
 
 ## Troubleshooting

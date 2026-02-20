@@ -63,9 +63,18 @@ agent-automation/
 
 ## Configuration
 
-Edit `config.yaml` to configure:
+### Workspace Path (Platform-Agnostic)
 
-- **workspace_path**: Path to `PROJECT_WORKSPACE.md`
+Paths are resolved via `workspace_config.py`:
+- **WORKSPACE_ROOT** env var, or
+- **workspace_config.yaml** with `workspace_root`, or
+- Default: parent of `agent-automation/`
+
+See `workspace_config.yaml.example` and `docs/platform-agnostic.md`.
+
+### config.yaml
+
+- **workspace_path**: Path to `PROJECT_WORKSPACE.md` (relative to workspace root; default `PROJECT_WORKSPACE.md`)
 - **poll_interval**: Polling interval in seconds (fallback mode)
 - **prompt_dir**: Directory for generated prompts
 - **state_db**: SQLite database path

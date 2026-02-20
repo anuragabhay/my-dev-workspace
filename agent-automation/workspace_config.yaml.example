@@ -1,0 +1,5 @@
+# Optional: workspace_config.yaml
+# Override workspace root when WORKSPACE_ROOT env is not set.
+# Default: parent of agent-automation/ (or cwd when running from project root)
+
+workspace_root: .   # or absolute path, e.g. /path/to/my-dev-workspace

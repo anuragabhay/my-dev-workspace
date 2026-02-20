@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from parser import WorkspaceParser
 from router import AgentRouter
 from state_tracker import StateTracker
-import yaml
+from workspace_config import load_config
 
 
 def check_my_pending_tasks(role: str, config_path: str = None) -> Dict[str, Any]:
@@ -22,17 +22,12 @@ def check_my_pending_tasks(role: str, config_path: str = None) -> Dict[str, Any]
     
     Args:
         role: Role name (e.g., "CTO", "Lead Engineer", "Architect")
-        config_path: Path to config.yaml (default: ../config.yaml)
+        config_path: Path to config.yaml (default: agent-automation/config.yaml)
     
     Returns:
         Dictionary with pending tasks, approvals, and context
     """
-    if config_path is None:
-        config_path = str(Path(__file__).parent.parent.parent / "config.yaml")
-    
-    # Load config
-    with open(config_path, 'r') as f:
-        config = yaml.safe_load(f)
+    config = load_config(config_path)
     
     # Initialize components
     parser = WorkspaceParser(config['workspace_path'])

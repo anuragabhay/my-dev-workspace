@@ -8,7 +8,7 @@ This guide configures **one parent Orchestrator** and **role-based subagents** s
 
 ### Orchestrator (parent agent)
 
-- **File**: `/Users/anuragabhay/my-dev-workspace/.cursor/rules/orchestrator.mdc`
+- **File**: `.cursor/rules/orchestrator.mdc`
 - **Role**: Reads PROJECT_WORKSPACE.md and MCP (`get_workspace_status`, `check_my_pending_tasks`); decides next step; delegates to the right subagent; updates the workspace after each step.
 - **Escalation**: Architect for design, CTO for tech/architecture approval, User only for budget / phase / strategy / blockers.
 
@@ -30,12 +30,12 @@ This guide configures **one parent Orchestrator** and **role-based subagents** s
 
 **Orchestrator first read:** `agent-automation/orchestrator_patterns.md` — stages, role index, parallel execution, MCP usage. Read each cycle with PROJECT_WORKSPACE.md.
 
-All paths above are under `/Users/anuragabhay/my-dev-workspace/.cursor/` when the workspace root is `/Users/anuragabhay/my-dev-workspace`.
+All paths above are under `.cursor/` when the workspace root contains PROJECT_WORKSPACE.md and agent-automation.
 
 ### Hooks
 
-- **File**: `/Users/anuragabhay/my-dev-workspace/.cursor/hooks.json`
-- **Script**: `/Users/anuragabhay/my-dev-workspace/.cursor/hooks/stop_hook.py`
+- **File**: `.cursor/hooks.json`
+- **Script**: `.cursor/hooks/stop_hook.py`
 - **Logic**: On the `stop` hook, the script reads PROJECT_WORKSPACE.md. If **User Intervention Required** is Yes, it does nothing (no follow-up). Otherwise, if there are **Pending Approvals**, **Next Actions** with work, or an explicit **CONTINUE** in Next Actions, and the auto-followup count is under 5, it returns a `followup_message` so Cursor sends a follow-up prompt to the Orchestrator (e.g. “run get_workspace_status, delegate to the right subagent, update workspace”). Cursor enforces a maximum of 5 auto-followups.
 - **Prompt enhancer**: Every prompt injected by the stop hook is passed through the prompt enhancer (`agent-automation/prompt_enhancer.py`), which appends requirements from `roles.yml` and division-of-work hints from `workflow.yml` so delegated tasks are detailed and structured. If the enhancer fails to load or run, the hook still returns the raw followup message.
 
@@ -83,7 +83,7 @@ For each **custom subagent** created in the UI (if file-based subagents are not 
 
 ## 4. How to Run
 
-1. Open Cursor with workspace root **/Users/anuragabhay** (or the folder that contains PROJECT_WORKSPACE.md and .cursor).
+1. Open Cursor with workspace root at the folder that contains PROJECT_WORKSPACE.md and .cursor.
 2. Ensure MCP server **agent-automation** is running and configured (see MCP_INTEGRATION.md).
 3. In chat, give one instruction to the Orchestrator, e.g.:  
    **“Read PROJECT_WORKSPACE.md and MCP get_workspace_status and check_my_pending_tasks for Lead Engineer. Then delegate the next Phase 1 task to the Lead Engineer subagent and update the workspace.”**

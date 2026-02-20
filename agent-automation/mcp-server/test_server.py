@@ -41,7 +41,7 @@ try:
 except ImportError as e:
     print(f"❌ Import error: {e}")
     print("\nPlease install dependencies:")
-    print("  cd /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server")
+    print("  cd agent-automation/mcp-server")
     print("  source venv/bin/activate")
     print("  pip install -r requirements.txt")
     sys.exit(1)

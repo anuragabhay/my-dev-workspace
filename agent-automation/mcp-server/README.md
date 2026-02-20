@@ -78,13 +78,42 @@ Marks a task as complete in the state tracker.
 Gets all tasks for a specific role from the workspace.
 
 **Parameters:**
-- `role`: Role name
+- `role`: Role name (e.g. "Lead Engineer", "Junior Engineer 1", "Junior Engineer 2", "Architect")
 
 **Returns:**
 - `tasks`: List of all tasks with status
 - `current_status`: Current role status
 - `blockers`: Role-specific blockers
 - `next_action`: Next action for the role
+
+### 5. get_pending_orchestrator_prompt()
+
+Reads the pending orchestrator run-cycle prompt (written by the stop hook when a subagent chat stops). Returns the prompt and clears the file. Call at the start of an Orchestrator cycle; if non-empty, treat as the run-cycle instruction.
+
+### 6. get_role_guidance(role: string)
+
+Returns role guidance from `.cursor/skills/<role>/SKILL.md` or `.cursor/agents/<role>.md`. Use when deciding which role to delegate to.
+
+**Parameters:**
+- `role`: Role name (e.g. "Lead Engineer", "Junior Engineer 1", "Junior Engineer 2", "Reviewer", "Tester", "Architect")
+
+**Returns:**
+- `role`, `content` (text or summary), `source` (file path), `error` (if any)
+
+### 7. list_roles()
+
+Returns list of role names and one-line "when to use". Includes Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect, PM, CTO, CFO (no single "Junior Engineer" or "Intern"). Use when deciding which role to delegate to.
+
+### 8. get_workflow_config(workspace_root?: string)
+
+Reads `agent-automation/workflow.yml`, `roles.yml`, and `decisions.yml`. Returns workflow stages, role list with slash commands, and priority-ordered decision rules. Use for current-stage logic and when the Orchestrator needs the canonical role list.
+
+**Returns:**
+- `workflow`: name, description
+- `stages`: list of stage id, name, description, next, roles, parallel_ok
+- `roles`: list of role id, display_name, slash, when_to_use, concurrency_max, parallel_ok
+- `decisions`: list of decision rules (priority, condition, action, target_role_from)
+- `error`: if any file is missing or invalid
 
 ## Cursor Integration
 

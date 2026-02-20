@@ -32,7 +32,8 @@ class AgentRouter:
             'CFO': 'cfo',
             'CEO': 'ceo',
             'Product Manager': 'product_manager',
-            'Intern': 'intern'
+            'Junior Engineer 1': 'junior_engineer_1',
+            'Junior Engineer 2': 'junior_engineer_2',
         }
         
         # Try exact match first
@@ -55,8 +56,12 @@ class AgentRouter:
             return 'ceo'
         elif 'product manager' in requested_lower or 'pm' in requested_lower:
             return 'product_manager'
-        elif 'intern' in requested_lower:
-            return 'intern'
+        elif 'junior engineer 1' in requested_lower or 'junior-engineer-1' in requested_lower:
+            return 'junior_engineer_1'
+        elif 'junior engineer 2' in requested_lower or 'junior-engineer-2' in requested_lower:
+            return 'junior_engineer_2'
+        elif 'junior engineer' in requested_lower or 'junior-engineer' in requested_lower:
+            return 'junior_engineer_1'  # default to first when ambiguous
         
         return None
     

@@ -23,6 +23,8 @@ from tools.workspace_status import get_workspace_status
 from tools.task_complete import mark_task_complete
 from tools.role_tasks import get_my_role_tasks
 from tools.pending_prompt import get_pending_orchestrator_prompt
+from tools.role_guidance import get_role_guidance, list_roles
+from tools.workflow_config import get_workflow_config
 
 
 # Initialize MCP server
@@ -41,7 +43,7 @@ async def list_tools() -> list[Tool]:
                 "properties": {
                     "role": {
                         "type": "string",
-                        "description": "Role name (e.g., 'CTO', 'Lead Engineer', 'Architect', 'CFO', 'CEO', 'Product Manager', 'Intern')"
+                        "description": "Role name (e.g., 'CTO', 'Lead Engineer', 'Junior Engineer 1', 'Junior Engineer 2', 'Architect', 'CFO', 'CEO', 'Product Manager')"
                     }
                 },
                 "required": ["role"]
@@ -94,6 +96,43 @@ async def list_tools() -> list[Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {},
+                "required": []
+            }
+        ),
+        Tool(
+            name="get_role_guidance",
+            description="Get role guidance from .cursor/skills/<role>/SKILL.md or .cursor/agents/<role>.md. Use when deciding which role to delegate to (e.g. Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect).",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "role": {
+                        "type": "string",
+                        "description": "Role name (e.g. 'Lead Engineer', 'Junior Engineer 1', 'Junior Engineer 2', 'Reviewer', 'Tester', 'Architect')"
+                    }
+                },
+                "required": ["role"]
+            }
+        ),
+        Tool(
+            name="list_roles",
+            description="List role names and one-line 'when to use'. Use when deciding which role to delegate to. Includes Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect, PM, CTO, CFO.",
+            inputSchema={
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
+        ),
+        Tool(
+            name="get_workflow_config",
+            description="Read workflow.yml, roles.yml, decisions.yml. Returns workflow stages, role list with slash commands, and priority-ordered decision rules. Use for current-stage logic and role list.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "workspace_root": {
+                        "type": "string",
+                        "description": "Optional workspace root path; defaults to agent-automation parent."
+                    }
+                },
                 "required": []
             }
         )
@@ -165,6 +204,37 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> Sequence[TextConten
             return [TextContent(
                 type="text",
                 text=json.dumps(result, indent=2)
+            )]
+        
+        elif name == "get_role_guidance":
+            role = arguments.get("role", "")
+            if not role:
+                return [TextContent(
+                    type="text",
+                    text='{"error": "role parameter is required"}'
+                )]
+            result = get_role_guidance(role)
+            import json
+            return [TextContent(
+                type="text",
+                text=json.dumps(result, indent=2, default=str)
+            )]
+        
+        elif name == "list_roles":
+            result = list_roles()
+            import json
+            return [TextContent(
+                type="text",
+                text=json.dumps(result, indent=2)
+            )]
+        
+        elif name == "get_workflow_config":
+            workspace_root = arguments.get("workspace_root")
+            result = get_workflow_config(workspace_root)
+            import json
+            return [TextContent(
+                type="text",
+                text=json.dumps(result, indent=2, default=str)
             )]
         
         else:

@@ -82,10 +82,32 @@ def cmd_generate() -> int:
         return 1
 
 
+def _ensure_config_for_command(command: str) -> tuple[bool, list[str]]:
+    """
+    For commands that need config (health, generate), load and validate.
+    Returns (ok, errors). If not ok, errors is a non-empty list of messages.
+    """
+    root = _project_root()
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+    from src.utils.config import get_config
+    _, errors = get_config()
+    return (len(errors) == 0, errors)
+
+
 def main() -> int:
     p = argparse.ArgumentParser(prog="youtube-shorts")
     p.add_argument("command", choices=["generate", "status", "health"])
     args = p.parse_args()
+
+    # Validate config on startup for commands that need API keys and settings
+    if args.command in ("health", "generate"):
+        ok, errors = _ensure_config_for_command(args.command)
+        if not ok:
+            msg = "Configuration invalid or missing. Fix the following and try again:\n  " + "\n  ".join(errors)
+            print(msg, file=sys.stderr)
+            return 1
+
     if args.command == "health":
         return cmd_health()
     if args.command == "status":

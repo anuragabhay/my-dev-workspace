@@ -19,17 +19,25 @@ This guide configures **one parent Orchestrator** and **role-based subagents** s
 | Lead Engineer   | `.cursor/agents/lead-engineer.md`         | Implementation (code, config, venv, tests) in youtube-shorts-generator |
 | Architect       | `.cursor/agents/architect.md`             | Design, “how to implement,” design Approval Requests |
 | CTO             | `.cursor/agents/cto.md`                   | Tech/architecture approval, Approval Requests for stack/architecture |
-| Intern          | `.cursor/agents/intern.md`               | Research, docs, tests when assigned by Lead Engineer |
+| Junior Engineer 1 | `.cursor/agents/junior-engineer-1.md`     | Part 2 of dev split; implementation (tests, docs, small features), work log, commit/push when assigned |
+| Junior Engineer 2 | `.cursor/agents/junior-engineer-2.md`     | Part 3 of dev split; implementation (tests, docs, small features), work log, commit/push when assigned |
+| Reviewer        | `.cursor/agents/reviewer.md`             | Code review, quality review |
+| Tester          | `.cursor/agents/tester.md`               | Test execution, test plans, QA |
 | CFO             | `.cursor/agents/cfo.md`                  | Cost tracking and analysis (no budget approval) |
 | PM              | `.cursor/agents/pm.md`                   | Task breakdown, acceptance criteria, roadmap within MVP |
 
-All paths above are under `/Users/anuragabhay/my-dev-workspace/.cursor/` when the workspace root is `/Users/anuragabhay`.
+**Skill paths (optional):** `.cursor/skills/<role>/SKILL.md` (e.g. lead-engineer, junior-engineer-1, junior-engineer-2, reviewer, tester, architect; optional qa-reviewer, ui-reviewer). **Workflow YAML:** `agent-automation/workflow.yml`, `roles.yml`, `decisions.yml`; use MCP `get_workflow_config`.
+
+**Orchestrator first read:** `agent-automation/orchestrator_patterns.md` — stages, role index, parallel execution, MCP usage. Read each cycle with PROJECT_WORKSPACE.md.
+
+All paths above are under `/Users/anuragabhay/my-dev-workspace/.cursor/` when the workspace root is `/Users/anuragabhay/my-dev-workspace`.
 
 ### Hooks
 
 - **File**: `/Users/anuragabhay/my-dev-workspace/.cursor/hooks.json`
 - **Script**: `/Users/anuragabhay/my-dev-workspace/.cursor/hooks/stop_hook.py`
 - **Logic**: On the `stop` hook, the script reads PROJECT_WORKSPACE.md. If **User Intervention Required** is Yes, it does nothing (no follow-up). Otherwise, if there are **Pending Approvals**, **Next Actions** with work, or an explicit **CONTINUE** in Next Actions, and the auto-followup count is under 5, it returns a `followup_message` so Cursor sends a follow-up prompt to the Orchestrator (e.g. “run get_workspace_status, delegate to the right subagent, update workspace”). Cursor enforces a maximum of 5 auto-followups.
+- **Prompt enhancer**: Every prompt injected by the stop hook is passed through the prompt enhancer (`agent-automation/prompt_enhancer.py`), which appends requirements from `roles.yml` and division-of-work hints from `workflow.yml` so delegated tasks are detailed and structured. If the enhancer fails to load or run, the hook still returns the raw followup message.
 
 ---
 
@@ -43,11 +51,12 @@ Cursor does not restrict tools per subagent in the `.md` files; the following is
 | Lead Engineer  | Yes                        | Yes      | Yes       | Yes                                     |
 | Architect      | Yes                        | No       | Yes       | Yes                                     |
 | CTO            | Yes                        | No       | Yes       | Yes                                     |
-| Intern         | Yes                        | Yes      | Yes*      | Yes                                     |
+| Junior Engineer 1 | Yes                    | Yes      | Yes*      | Yes                                     |
+| Junior Engineer 2 | Yes                    | Yes      | Yes*      | Yes                                     |
 | CFO            | Yes                        | No       | Yes       | Yes                                     |
 | PM             | Yes                        | No       | Yes       | Yes                                     |
 
-\* Intern may edit only when the task explicitly includes “write” (e.g. docs); otherwise prefer read-only + report.
+\* Junior Engineer 1 or 2 may edit only when the task explicitly includes “write” (e.g. docs); otherwise prefer read-only + report.
 
 ---
 
@@ -66,7 +75,7 @@ If your Cursor version requires **manually adding** an “Orchestrator” agent:
 - **Tools**: MCP (agent-automation), file edit, read-only.
 
 For each **custom subagent** created in the UI (if file-based subagents are not used):
-- **Name**: lead-engineer (or architect, cto, intern, cfo, pm)  
+- **Name**: lead-engineer (or architect, cto, junior-engineer-1, junior-engineer-2, cfo, pm)  
 - **Prompt**: Paste the body (below the YAML frontmatter) of the corresponding `.cursor/agents/<name>.md` file.  
 - **Tools**: As in the table above.
 
@@ -86,14 +95,14 @@ For each **custom subagent** created in the UI (if file-based subagents are not 
 
 ## 5. After subagent completes (trigger next Orchestrator cycle)
 
-When a **subagent** chat (Lead Engineer, Architect, Intern, etc.) stops, the stop hook detects it and returns:
+When a **subagent** chat (Lead Engineer, Junior Engineer 1, Junior Engineer 2, Architect, etc.) stops, the stop hook detects it and returns:
 
 - `followup_message`: the **orchestrator run-cycle prompt** (same text as in `agent-automation/prompts/orchestrator_run_cycle.md`).
 - `orchestrator_cycle`: `true` (so the runner can route this to the Orchestrator chat if supported).
 
 **Canonical prompt file**: `agent-automation/prompts/orchestrator_run_cycle.md` — single line:
 
-`Run one cycle: get_workspace_status, read PROJECT_WORKSPACE.md (Dashboard, Next Actions, Role Status). Determine which role the next action is for from Next Actions; call check_my_pending_tasks(role="<that role>") — e.g. Lead Engineer, Architect, Intern, PM, CTO, CFO. Then decide next step, delegate if needed, update PROJECT_WORKSPACE.md.`
+`Run one cycle: get_workspace_status, read PROJECT_WORKSPACE.md (Dashboard, Next Actions, Role Status). Determine which role the next action is for from Next Actions; call check_my_pending_tasks(role="<that role>") — e.g. Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect, PM, CTO, CFO. Then decide next step, delegate if needed, update PROJECT_WORKSPACE.md.`
 
 **Runner behavior**: Cursor injects the followup into the chat that stopped (often the subagent chat), so the next cycle does not start in the Orchestrator automatically. To close the loop:
 
@@ -127,6 +136,6 @@ The stop hook treats this as a signal to return a `followup_message` (subject to
 ## 8. Summary
 
 - **Orchestrator**: `.cursor/rules/orchestrator.mdc` — one parent agent in one chat.  
-- **Subagents**: `.cursor/agents/{lead-engineer,architect,cto,intern,cfo,pm}.md` — invoked via `/lead-engineer`, `/architect`, etc.  
+- **Subagents**: `.cursor/agents/{lead-engineer,junior-engineer-1,junior-engineer-2,architect,cto,reviewer,tester,cfo,pm}.md` — invoked via `/lead-engineer`, `/junior-engineer-1`, `/junior-engineer-2`, etc.  
 - **Hooks**: `.cursor/hooks.json` + `.cursor/hooks/stop_hook.py` — optional auto-continue until done or user intervention.  
 - **Authority**: No User approval for implementation/design/tech within the approved plan; Architect for design, CTO for tech/architecture; User only for budget, phase, strategy, blockers.

@@ -54,10 +54,14 @@ def check_my_pending_tasks(role: str, config_path: str = None) -> Dict[str, Any]
         'CEO': 'ceo',
         'Product Manager': 'product_manager',
         'PM': 'product_manager',
-        'Intern': 'intern'
+        'Junior Engineer 1': 'junior_engineer_1',
+        'Junior Engineer 2': 'junior_engineer_2',
     }
     
-    agent_key = role_mapping.get(role, role.lower().replace(' ', '_'))
+    agent_key = role_mapping.get(role)
+    if not agent_key:
+        # e.g. "junior-engineer-1" -> junior_engineer_1
+        agent_key = role.strip().lower().replace(' ', '_').replace('-', '_')
     
     # Get triggers for this agent
     agents_to_trigger = router.find_agents_to_trigger(parsed_data)

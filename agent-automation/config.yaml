@@ -25,9 +25,12 @@ agents:
   product_manager:
     trigger_on: ["requirements_request", "task_breakdown_ready"]
     role_name: "Product Manager"
-  intern:
+  junior_engineer_1:
     trigger_on: ["task_assignment"]
-    role_name: "Intern"
+    role_name: "Junior Engineer 1"
+  junior_engineer_2:
+    trigger_on: ["task_assignment"]
+    role_name: "Junior Engineer 2"
 
 # Status emoji mappings
 status_indicators:

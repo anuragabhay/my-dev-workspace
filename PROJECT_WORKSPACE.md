@@ -12,63 +12,63 @@
 
 **Overall Status**: 🟡 In Progress  
 **Current Phase**: Phase 1 - Project Setup & Foundation (In Progress)  
-**Last Updated**: 2026-02-15 12:15 UTC by Orchestrator  
-**Active Agents**: CEO, Lead Engineer, CTO, Architect  
+**Last Updated**: 2026-02-20 by Orchestrator  
+**Active Agents**: Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect, PM, CTO, CFO  
 **Pending Approvals**: 0  
 **Blockers**: None  
-**Next Actions**: Intern: Create youtube-shorts-generator/docs/runway_api_research.md (auth KEY vs SECRET, models e.g. gen4.5, task lifecycle create→poll→output URL, output format). Update Runway ML integration "Research summary" in this doc from (pending) to a one-line pointer to that file. Delegate via /intern. (Runway implementation in runwayml_service.py already done by Lead Engineer.)  
+**Next Actions**: **Task: Dev plan execution with engineer split, Architect/PM for infrastructure, and research exchange.** Use Implementation Plan and Phase checklist; split dev work among Lead Engineer (part 1), Junior Engineer 1 (part 2), Junior Engineer 2 (part 3); when backlog supports three parts issue /lead-engineer, /junior-engineer-1, /junior-engineer-2 in one response. Bring in Architect/PM for design/scope when unclear. Handoffs via slash commands; Orchestrator relays prior agents' output into next delegation. Proceed step-wise until dev plan scope done. **Current cycle:** Delegating Phase 1/6 items to all three engineers.  
 **User Intervention Required**: No
 
 ---
 
 ## 📝 Recent Work Log (last 10)
 
+### [2026-02-20 16:00 UTC] [Junior Engineer 1] [Create custom Pilot rules for youtube-shorts-generator (Phase 1)] [✅ COMPLETED]
+Updated .claude/rules/agent-guidelines.mdc to reference PROJECT_WORKSPACE.md (path from workspace root: PROJECT_WORKSPACE.md). Set alwaysApply: true; fixed role refs (Junior Engineer 1/2). Existing content-generation.mdc and video-quality.mdc already present.
+
+### [2026-02-20 06:01 UTC] [Junior Engineer 2] [Complete README.md with setup instructions (Phase 6)] [✅ COMPLETED]
+- Expanded youtube-shorts-generator/README.md Setup section: venv create/activate (macOS, Linux, Windows), pip install -r requirements.txt, .env from .env.example and required API keys, config.yaml from config.example.yaml, run health command, run generate command.\n- Deliverable: README setup instructions complete; work log updated.
+
+### [2026-02-20 14:15 UTC] [Orchestrator] [Legacy agents removed and prompt enhancer verified] [COMPLETED]
+Verified: intern.md and junior-engineer.md deleted; .cursor/agents has only junior-engineer-1.md, junior-engineer-2.md and current roles. prompt_enhancer.py in agent-automation; stop hook calls _enhance_followup before every followup_message. Refs cleaned to Junior Engineer 1 and 2 only.
+
+### [2026-02-20 14:00 UTC] [Lead Engineer] [Remove legacy agents and prompt enhancer] [✅ COMPLETED]
+- Deleted .cursor/agents/intern.md and .cursor/agents/junior-engineer.md.\n- Cleaned all references: agents, rules, skills, MCP role_guidance, prompts, docs; only Junior Engineer 1 and 2.\n- Created agent-automation/prompt_enhancer.py; integrated into .cursor/hooks/stop_hook.py; documented in ORCHESTRATOR_SETUP.md.\n- Prompt enhancer runs on every injected followup_message; on failure hook returns raw prompt.
+
+### [2026-02-20 12:15 UTC] [Orchestrator] [YAML workflow and Junior Engineer 1 & 2 verified] [COMPLETED]
+Verified: workflow.yml, roles.yml, decisions.yml; junior-engineer-1.md and junior-engineer-2.md; stop hook and rule support /junior-engineer-1 and /junior-engineer-2; get_workflow_config; patterns and docs point to YAML. Dev stage three-way split in place.
+
+### [2026-02-20 12:00 UTC] [Lead Engineer] [YAML workflow and Junior Engineer 1 & 2] [✅ COMPLETED]
+Created workflow.yml, roles.yml, decisions.yml; junior-engineer-1.md, junior-engineer-2.md; deprecated intern.md; updated stop_hook, orchestrator.mdc, orchestrator_patterns.md, docs; skills junior-engineer-1/2; MCP get_workflow_config, role_guidance/list_roles; PROJECT_WORKSPACE and agent-automation prompts/router/config.
+
+### [2026-02-19 18:30 UTC] [Orchestrator] [Full subagent infrastructure makeover verified] [COMPLETED]
+Lead Engineer completed makeover. Zero Intern/\/intern in .cursor, agent-automation, docs, PROJECT_WORKSPACE. Patterns doc, skills, MCP get_role_guidance/list_roles, rule and hook updated. Next Actions set to doc polish or Architect validate → Junior Engineer commit, push.
+
+### [2026-02-19 16:00 UTC] [Lead Engineer] [New role files in .cursor/agents/ and stop_hook delegation patterns] [COMPLETED]
+Created junior-engineer.md, reviewer.md, tester.md; updated architect.md, lead-engineer.md, intern.md (alias); added researcher.md, writer.md. Updated stop_hook.py: delegation regexes and subagent markers for lead-engineer|architect|junior-engineer|reviewer|tester|intern|pm|cto|cfo. Hook recognizes new roles and intern alias.
+
+### [2026-02-19 15:15 UTC] [Orchestrator] [Cycle: get_workspace_status, check_my_pending_tasks(Lead Engineer); delegate Phase 2 tests] [COMPLETED]
+Delegated runwayml_service pytest tests to Lead Engineer. Subagent reported: 8 tests in test_runwayml_service.py, 61 total pass. Note: test file may need re-creation if subagent ran in isolated env. Next: doc polish, or Architect validate → Junior Engineer commit, push.
+
 ### [2026-02-15 13:15 UTC] [Lead Engineer] [10s target for TTS and video; composition never fails on duration mismatch] [COMPLETED]
 Script: prompt for 10-second Short, ~10s speech. Video: generate_video(..., duration_sec=10). Composition: output_duration=min(audio.duration, video.duration); trim both with subclipped(0, output_duration); no failure on mismatch. No-video path unchanged.
-
-### [2026-02-15 13:00 UTC] [Lead Engineer] [Fix MoviePy composition imports and clean script for TTS] [COMPLETED]
-Composition: MoviePy 2.x imports (from moviepy import AudioFileClip, ColorClip, VideoFileClip), subclipped/with_audio/with_duration, ColorClip(duration=). Script: prompt updated for spoken lines only, no stage directions or square brackets. TTS: _script_for_tts strips [...] with re.sub, normalize spaces; only cleaned text sent to ElevenLabs. requirements: moviepy>=2.0.0.
-
-### [2026-02-15 12:35 UTC] [Lead Engineer] [Align Runway with official API: use Runway SDK, text_to_video.create, wait_for_task_output, TaskFailedError handling, download to tmp/runway_output.mp4] [COMPLETED]
-runwayml_service.py: RunwayML(api_key), text_to_video.create(gen4.5, 720:1280, duration), wait_for_task_output(); TaskFailedError/TaskTimeoutError; requests download. requirements: runwayml. Doc: docs/runway_api_research.md updated. One generate run started (async).
-
-### [2026-02-15 12:30 UTC] [Intern] [Runway API research doc and Research summary update] [COMPLETED]
-Created youtube-shorts-generator/docs/runway_api_research.md (auth KEY/SECRET, models gen4.5, task lifecycle, output format). Updated PROJECT_WORKSPACE Runway ML integration Research summary to one-line pointer to doc.
-
-### [2026-02-15 12:15 UTC] [Orchestrator] [Cycle: get_workspace_status, read Dashboard/Next Actions/Role Status; determine next concrete task] [COMPLETED]
-Runway Phase 2 (implementation) done. Next: Intern backfill Runway research doc (docs/runway_api_research.md) and update Research summary. Updated Next Actions; delegate to /intern.
-
-### [2026-02-15 12:00 UTC] [Lead Engineer] [Implement real Runway video generation in runwayml_service.py (text-to-video, 768:1280, ~5s, poll/wait, download to tmp/runway_output.mp4; RUNWAYML_API_KEY or RUNWAYML_API_SECRET)] [COMPLETED]
-runwayml_service.py: POST text_to_video, poll GET tasks/:id, download output to file. requirements: requests. health + tests: support KEY or SECRET.
-
-### [2026-02-15 04:00 UTC] [Architect] [Validate current changes: orchestrator rule, CLI health, stop hook, README (Troubleshooting/Configuration)] [COMPLETED]
-Orchestrator rule, CLI health, stop hook, youtube-shorts-generator README (Troubleshooting and Configuration reference) validated. Hand off to Intern for commit, push, --update-workspace.
-
-### [2026-02-15 01:45 UTC] [Architect] [Validate orchestrator rule, CLI health, stop hook (pre-push)] [✅ COMPLETED]
-Orchestrator rule: Git push/test workflow and parallel-agent sections present and consistent.\nCLI health: youtube-shorts-generator health command runs with venv; returns JSON (ok + checks); expected failures when env keys missing.\nStop hook: Syntax valid; empty payload -> {}; transcript with 'parent Orchestrator' in first 3000 chars -> followup_message. Flow solid, no errors.
-
-### [2026-02-15 01:25 UTC] [Orchestrator] [Cycle: status, delegate Phase 6 one item to Lead Engineer] [🟡 IN PROGRESS]
-- get_workspace_status + check_my_pending_tasks(Lead Engineer). User Intervention: No; Pending Approvals: 0.\n- Next task: One Phase 6 item (tests, docs, or polish). Delegating to /lead-engineer.
-
-### [2026-02-15 01:20 UTC] [Orchestrator] [Cycle: status check, delegate Phase 6 one item to Lead Engineer] [🟡 IN PROGRESS]
-- get_workspace_status + check_my_pending_tasks(Lead Engineer). User Intervention: No; Pending Approvals: 0.\n- Next task: One Phase 6 item (tests, docs, or polish). Delegating to /lead-engineer.
 
 Full log: agent-automation/work_log.json
 
 To add an entry: run `python agent-automation/append_work_log.py --timestamp "..." --role "..." --task "..." --status "..." [--content "..."].` Then run with `--update-workspace` to refresh the recent 10 in this file.
 
-**Next steps (after Phase 6 health tests added):** (1) Work log: run append_work_log with role Lead Engineer, task e.g. "Added pytest tests for src/utils/health.py (tests/test_health.py, N tests)", status COMPLETED, then --update-workspace. (2) Next Actions: set to next Phase 6 item (e.g. "Lead Engineer: Add README Troubleshooting/Configuration section") or, if ready to push: "Architect: Validate current changes. Then Intern: append work log, commit, push, --update-workspace." (3) Orchestrator: do not re-delegate "add unit tests for health.py"; pick next concrete task from Next Actions. If subagent returns with no deliverable for the same task, use smaller subtask, another role, or pause (avoid re-delegation loops).
+**Next steps (after Phase 6 health tests added):** (1) Work log: run append_work_log with role Lead Engineer, task e.g. "Added pytest tests for src/utils/health.py (tests/test_health.py, N tests)", status COMPLETED, then --update-workspace. (2) Next Actions: set to next Phase 6 item (e.g. "Lead Engineer: Add README Troubleshooting/Configuration section") or, if ready to push: "Architect: Validate current changes. Then Junior Engineer 1 or 2: append work log, commit, push, --update-workspace." (3) Orchestrator: do not re-delegate "add unit tests for health.py"; pick next concrete task from Next Actions. If subagent returns with no deliverable for the same task, use smaller subtask, another role, or pause (avoid re-delegation loops).
 
 ---
 ## 🎬 Runway ML integration (current initiative)
 
 **Goal:** Wire real Runway ML video generation into youtube-shorts-generator. Video step is currently a stub; we have Runway API credits and want to use them.
 
-**Phase 1 – Research (Intern):** Look up Runway API/SDK for text-to-video (and image-to-video if relevant). Document: **auth** (we use `RUNWAYML_API_KEY` in .env; Runway docs may use `RUNWAYML_API_SECRET`), **supported models** (e.g. gen4.5 text-to-video), **task lifecycle** (create → poll or wait → get output URL), **output format**. Put a short summary here in PROJECT_WORKSPACE or in a short doc (e.g. `youtube-shorts-generator/docs/runway_api_research.md`) so Lead Engineer can implement.
+**Phase 1 – Research (Junior Engineer):** Look up Runway API/SDK for text-to-video (and image-to-video if relevant). Document: **auth** (we use `RUNWAYML_API_KEY` in .env; Runway docs may use `RUNWAYML_API_SECRET`), **supported models** (e.g. gen4.5 text-to-video), **task lifecycle** (create → poll or wait → get output URL), **output format**. Put a short summary here in PROJECT_WORKSPACE or in a short doc (e.g. `youtube-shorts-generator/docs/runway_api_research.md`) so Lead Engineer can implement.
 
 **Phase 2 – Implementation (Lead Engineer, after research):** In youtube-shorts-generator: add Runway SDK if needed; implement real call in `src/services/runwayml_service.py` (text-to-video, Shorts-friendly ratio e.g. 768:1280, ~5s); poll or wait for task result; download video to `tmp/runway_output.mp4`. Keep using `RUNWAYML_API_KEY` from .env (or support both `RUNWAYML_API_KEY` and `RUNWAYML_API_SECRET`). Pipeline should produce a real Runway-generated video when the video agent runs. Update PROJECT_WORKSPACE work log when done.
 
-**Research summary (to be filled by Intern):** See [youtube-shorts-generator/docs/runway_api_research.md](youtube-shorts-generator/docs/runway_api_research.md) for auth (KEY vs SECRET), models (gen4.5), task lifecycle (create→poll→output URL), and output format.
+**Research summary (to be filled by Junior Engineer):** See [youtube-shorts-generator/docs/runway_api_research.md](youtube-shorts-generator/docs/runway_api_research.md) for auth (KEY vs SECRET), models (gen4.5), task lifecycle (create→poll→output URL), and output format.
 
 ---
 ## ✅ Approval Requests & Responses
@@ -95,7 +95,7 @@ To add an entry: run `python agent-automation/append_work_log.py --timestamp "..
 - Service layer abstraction for external APIs
 
 **Approval Types**:
-- **Technical Decision**: Architect→CTO, Lead Engineer→Architect, Intern→Lead Engineer
+- **Technical Decision**: Architect→CTO, Lead Engineer→Architect, Junior Engineer 1 or 2→Lead Engineer
 - **Cost Decision**: CFO→User (ALL budget transactions require User approval)
 - **Phase Transition**: CEO→User
 - **Strategic Decision**: CEO→User
@@ -144,7 +144,10 @@ To add an entry: run `python agent-automation/append_work_log.py --timestamp "..
 - CFO: `cfo_action.md` or `cfo_review.md`
 - CEO: `ceo_action.md` or `ceo_approve.md`
 - Product Manager: `pm_action.md` or `product_manager_action.md`
-- Intern: `intern_action.md`
+- Junior Engineer 1: `junior_engineer_1_action.md`
+- Junior Engineer 2: `junior_engineer_2_action.md`
+- Reviewer: `reviewer_action.md` (if used)
+- Tester: `tester_action.md` (if used)
 
 **Integration with Automation:**
 - **MCP Server**: Provides programmatic access to automation system (preferred method)
@@ -173,7 +176,10 @@ When creating a new Cursor chat for a specific role, assign the role explicitly:
 - **CFO**: `prompts/cfo_action.md` or `prompts/cfo_review.md`
 - **CEO**: `prompts/ceo_action.md` or `prompts/ceo_approve.md`
 - **Product Manager**: `prompts/pm_action.md`
-- **Intern**: `prompts/intern_action.md`
+- **Junior Engineer 1**: `prompts/junior_engineer_1_action.md`
+- **Junior Engineer 2**: `prompts/junior_engineer_2_action.md`
+- **Reviewer**: `prompts/reviewer_action.md` (if used)
+- **Tester**: `prompts/tester_action.md` (if used)
 
 **How It Works:**
 
@@ -223,7 +229,7 @@ You are the Lead Engineer. Your role-specific prompt file location is: /Users/an
 
 ### Autonomous Decision Authority
 **You can make decisions without approval if:**
-- **Intern**: Tasks assigned by Lead Engineer, documentation, research
+- **Junior Engineer**: Tasks assigned by Lead Engineer, documentation, research
 - **Lead Engineer**: Implementation details, code structure (within approved architecture)
 - **Architect**: System design patterns (within CTO guidelines)
 - **CTO**: Technical decisions, tool selection (within budget)
@@ -232,7 +238,7 @@ You are the Lead Engineer. Your role-specific prompt file location is: /Users/an
 - **CEO**: Strategic decisions within approved vision, resource allocation
 
 **You MUST request approval for:**
-- **Intern**: Any code changes, architectural decisions
+- **Junior Engineer**: Any code changes, architectural decisions
 - **Lead Engineer**: Architecture changes, new dependencies, major refactors
 - **Architect**: Technology stack changes, major design pattern changes
 - **CTO**: Budget increases, new paid services, phase transitions
@@ -290,12 +296,12 @@ Lead Engineer (Implementation, Code Structure)
     ↓
 Product Manager (Requirements, Task Prioritization)
     ↓
-Intern (Research, Documentation, Testing)
+Junior Engineer (Implementation, Documentation, Testing)
 ```
 
 ### Decision Authority Matrix
 
-| Decision Type | Intern | Lead Eng | Architect | CTO | CFO | PM | CEO | User |
+| Decision Type | Junior Engineer | Lead Eng | Architect | CTO | CFO | PM | CEO | User |
 |--------------|--------|---------|-----------|-----|-----|----|-----|------|
 | Code Implementation | ❌ | ✅ | ✅ | ✅ | - | - | - | - |
 | Architecture Changes | ❌ | ❌ | ⚠️ | ✅ | - | - | - | - |
@@ -441,7 +447,7 @@ Intern (Research, Documentation, Testing)
 **Current Status**: 🟡 Phase 1–5 implementation complete (health check + conditional stop hook done)  
 **Last Updated**: 2026-02-15 01:10 UTC  
 **Senior**: Architect (for design questions), CTO (for tech decisions)  
-**Junior**: Intern (assigns tasks to)
+**Junior**: Junior Engineer (assigns tasks to)
 
 **Tasks:**
 - [x] Stop hook conditional for Orchestrator only (✅ 2026-02-15 01:10) - .cursor/hooks/stop_hook.py: payload from stdin, transcript check (parent Orchestrator/orchestrator.mdc), Dashboard parse, followup only when CONTINUE and not User Intervention
@@ -464,14 +470,14 @@ Intern (Research, Documentation, Testing)
 - [x] Phase 3–5: services, 8 agents, CLI (✅ 2026-02-14 25:00)
 - [x] Phase 6: unit tests for health.py (✅ 2026-02-15 02:25) - tests/test_health.py, 5 pytest tests
 - [x] Phase 6: README Troubleshooting/Configuration (✅ 2026-02-15) - youtube-shorts-generator/README.md
-- [x] Phase 6: one small polish or Architect validate → Intern push (✅ 2026-02-15)
+- [x] Phase 6: one small polish or Architect validate → Junior Engineer push (✅ 2026-02-15)
 - [ ] Configure Pilot rules for Python development (🟡 Next - Phase 1)
 - [ ] Create custom rules integrating with PROJECT_WORKSPACE.md (🟡 Next - Phase 1)
 - [ ] Train team on Pilot usage (if applicable) (⏳ Waiting for Pilot setup)
-- [ ] Assign tasks to Intern (⏳ Waiting for project structure setup)
+- [ ] Assign tasks to Junior Engineer (⏳ Waiting for project structure setup)
 
 **Approval Requests I Need to Respond To:**
-- None (no intern tasks yet)
+- None (no Junior Engineer tasks yet)
 
 **Blockers**: None  
 **Next Action**: Pick next task from Implementation Plan (Phase 2 tests, Phase 1 Pilot/config, or doc polish). Append work log + --update-workspace when done.  
@@ -496,7 +502,7 @@ Intern (Research, Documentation, Testing)
 
 ---
 
-## 🎓 Intern Status
+## 🎓 Junior Engineer Status
 
 **Current Status**: ⏳ Waiting for Assignment  
 **Last Updated**: 2026-02-14 23:00 UTC  
@@ -510,7 +516,7 @@ Intern (Research, Documentation, Testing)
 
 **Approval Authority**: None - all work requires Lead Engineer approval  
 **Blockers**: No assignments yet  
-**Next Action**: Wait for Lead Engineer to assign tasks; check MCP or intern_action.md for new tasks
+**Next Action**: Wait for Lead Engineer to assign tasks; check MCP or junior_engineer_action.md for new tasks
 
 ---
 
@@ -544,12 +550,12 @@ Intern (Research, Documentation, Testing)
 - [ ] Lead Engineer: Create custom Pilot rules for project (🟡 Ready - Phase 1)
 - [ ] Lead Engineer: Integrate Pilot with workspace workflow (🟡 Ready - Phase 1)
 - [x] Lead Engineer: Document Pilot usage (✅ 2026-02-15 - README Pilot section)
-- [ ] Intern: Research libraries (⏳ Waiting for Lead assignment)
+- [ ] Junior Engineer: Research libraries (⏳ Waiting for Lead assignment)
 
 **Blockers**: None - Ready to start Phase 1 implementation
 
 ### Phase 3: Development
-**Status**: ⏸️ Blocked | **Owner**: Lead Engineer + Intern | **Dependencies**: Implementation Plan (⏸️)
+**Status**: ⏸️ Blocked | **Owner**: Lead Engineer + Junior Engineer | **Dependencies**: Implementation Plan (⏸️)
 
 **Tasks:**
 - [ ] TBD after implementation plan
@@ -1952,7 +1958,7 @@ Claude Pilot provides automated code quality enforcement:
 
 ## Testing Strategy
 
-*[Lead Engineer/Intern documents here]*
+*[Lead Engineer/Junior Engineer documents here]*
 
 **Status**: ⏳ Not Started - Waiting for implementation
 
@@ -1960,7 +1966,7 @@ Claude Pilot provides automated code quality enforcement:
 
 ## Documentation
 
-*[Intern/PM maintains here]*
+*[Junior Engineer/PM maintains here]*
 
 **Status**: ⏳ Not Started - Waiting for code
 

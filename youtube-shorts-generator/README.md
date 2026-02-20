@@ -37,44 +37,88 @@ See `PROJECT_WORKSPACE.md` for detailed architecture documentation.
   - RunwayML (video generation)
   - YouTube Data API v3
 
-## Quick Start
+## Setup
 
-### 1. Clone and Setup
+Follow these steps from the project root (`youtube-shorts-generator/`).
+
+### 1. Create a virtual environment
+
+Create and activate a Python virtual environment so dependencies are isolated:
 
 ```bash
 cd youtube-shorts-generator
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+**Activate the venv:**
+
+- **macOS/Linux:** `source venv/bin/activate`
+- **Windows (cmd):** `venv\Scripts\activate.bat`
+- **Windows (PowerShell):** `venv\Scripts\Activate.ps1`
+
+Your prompt should show `(venv)` when active. Use this same shell for the steps below.
+
+### 2. Install dependencies
+
+From the project root (with venv activated):
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 2. Configuration
+This installs core libraries (PyYAML, python-dotenv, pydantic, structlog), API clients (OpenAI, ElevenLabs, RunwayML, Google APIs), video tools (moviepy, ffmpeg-python), and dev dependencies (pytest). Ensure **FFmpeg** is installed on your system and on your PATH; the health check will verify it.
 
-1. Copy `.env.example` to `.env` and fill in your API keys:
+### 3. Environment variables (.env)
+
+Copy the example env file and set your API keys:
+
 ```bash
 cp .env.example .env
-# Edit .env with your API keys
 ```
 
-2. Copy `config.example.yaml` to `config.yaml` and adjust settings:
+Edit `.env` and set at least these (required for full pipeline):
+
+| Variable | Purpose |
+|----------|---------|
+| `OPENAI_API_KEY` | Required. OpenAI API key for GPT and embeddings. |
+| `ELEVENLABS_API_KEY` | Required for TTS. |
+| `RUNWAYML_API_KEY` | Required for video generation. |
+| `YOUTUBE_CLIENT_ID` | YouTube Data API v3 OAuth client ID. |
+| `YOUTUBE_CLIENT_SECRET` | YouTube OAuth client secret. |
+| `YOUTUBE_REFRESH_TOKEN` | Obtained after first OAuth flow; used for uploads. |
+
+Optional overrides (leave blank to use defaults): `OPENAI_CHAT_MODEL`, `OPENAI_FALLBACK_CHAT_MODEL`, `OPENAI_EMBEDDING_MODEL`, `OPENAI_FALLBACK_EMBEDDING_MODEL`.  
+**Do not commit `.env`** — it is gitignored.
+
+### 4. Config file (config.yaml)
+
+Copy the example config and adjust if needed:
+
 ```bash
 cp config.example.yaml config.yaml
-# Edit config.yaml with your preferences
 ```
 
-### 3. Health Check
+`config.yaml` controls timeouts, retries, quality thresholds, cost limits, content preferences, resource limits (disk/RAM), and paths (database, temp dir, output dir). You can run with the defaults; change values when you need different limits or paths. See **Configuration reference** below for main sections. Do not commit `config.yaml` if it contains secrets.
 
-Before running, verify all systems are ready:
+### 5. Run the health check
+
+Verify environment, API keys, disk/RAM, and FFmpeg before generating:
+
 ```bash
 python -m src.cli.main health
 ```
 
-### 4. Generate Video
+This prints a JSON report. All checks should show `"ok": true`. If any fail, fix the reported issue (e.g. missing key, low disk space) and run again. See **Troubleshooting** for common causes.
 
-Run the pipeline:
+### 6. Generate a Short
+
+Run the full pipeline (research → script → TTS → video → composition → quality → optional YouTube upload):
+
 ```bash
 python -m src.cli.main generate
 ```
+
+Ensure the health check passes first. Output videos are written to the directory configured in `config.yaml` (default: `output_videos/`).
 
 ## Project Structure
 

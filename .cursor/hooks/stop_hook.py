@@ -56,14 +56,14 @@ def _has_pending_approvals(dashboard: str) -> bool:
 
 # Regex to detect delegation slash commands in the last assistant message
 _DELEGATION_PATTERN = re.compile(
-    r"/(?:lead-engineer|architect|intern|pm|cto|cfo)(?:\s|$)",
+    r"/(?:lead-engineer|junior-engineer-1|junior-engineer-2|architect|reviewer|tester|pm|cto|cfo)(?:\s|$)",
     re.IGNORECASE,
 )
 
 # Pattern to extract slash command even in prose (e.g. "run /lead-engineer with: \"task\"").
 # Match /role anywhere; we take the last match and normalize.
 _DELEGATION_EXTRACT_PATTERN = re.compile(
-    r"/(?:lead-engineer|architect|intern|pm|cto|cfo)\s*:?\s*[^\n]+",
+    r"/(?:lead-engineer|junior-engineer-1|junior-engineer-2|architect|reviewer|tester|pm|cto|cfo)\s*:?\s*[^\n]+",
     re.IGNORECASE,
 )
 
@@ -71,7 +71,7 @@ _DELEGATION_EXTRACT_PATTERN = re.compile(
 def _normalize_delegation_command(raw: str) -> str:
     """Remove ' with:', colon after role, and surrounding quotes so runner gets /role task."""
     s = raw.strip()
-    role_end = re.search(r"/(?:lead-engineer|architect|intern|pm|cto|cfo)\s*:?\s*", s, re.I)
+    role_end = re.search(r"/(?:lead-engineer|junior-engineer-1|junior-engineer-2|architect|reviewer|tester|pm|cto|cfo)\s*:?\s*", s, re.I)
     if role_end:
         prefix = role_end.group(0).replace(":", " ").replace("  ", " ")
         rest = s[role_end.end() :].strip()
@@ -86,7 +86,7 @@ def _normalize_delegation_command(raw: str) -> str:
 def _extract_delegation_command(transcript_content: str) -> str | None:
     """
     Extract the slash command line from the last assistant message.
-    Returns e.g. "/lead-engineer Add README ..." or "/intern Commit and push ..."
+    Returns e.g. "/lead-engineer Add README ..." or "/junior-engineer-1 Commit and push ..."
     or None if no delegation line found.
     """
     recent = transcript_content[-4000:] if len(transcript_content) > 4000 else transcript_content
@@ -117,8 +117,8 @@ def _delegated_task_already_done_in_transcript(transcript_content: str) -> bool:
         "phase 6 ... is already complete",
         "no further item",
         "no further work",
-        "hand off to intern",   # Architect validation done
-        "hand off to intern for commit",
+        "hand off to junior engineer",   # Architect validation done
+        "hand off to junior engineer for commit",
         "pushed to origin",
         "pushed to master",
     )
@@ -152,15 +152,21 @@ def _transcript_shows_recent_completion(transcript_content: str) -> bool:
 
 # Subagent role markers in transcript (first 3000 chars)
 _SUBAGENT_MARKERS = (
-    "You are the **Intern**",
+    "You are the **Junior Engineer 1**",
+    "You are the **Junior Engineer 2**",
     "You are the **Lead Engineer**",
+    "You are the **Reviewer**",
+    "You are the **Tester**",
     "You are the **Architect**",
     "You are the **CTO**",
     "You are the **CFO**",
     "You are the **Product Manager**",
+    "name: junior-engineer-1",
+    "name: junior-engineer-2",
     "name: lead-engineer",
     "name: architect",
-    "name: intern",
+    "name: reviewer",
+    "name: tester",
     "name: cto",
     "name: cfo",
     "name: pm",
@@ -168,8 +174,38 @@ _SUBAGENT_MARKERS = (
 
 
 def _is_subagent_chat(transcript_head: str) -> bool:
-    """True if the transcript appears to be from a workspace subagent (Intern, Lead Engineer, etc.)."""
+    """True if the transcript appears to be from a workspace subagent (Junior Engineer, Lead Engineer, etc.)."""
     return any(marker in transcript_head for marker in _SUBAGENT_MARKERS)
+
+
+def _parse_role_from_delegation_line(line: str) -> str:
+    """Extract role slug from a delegation line (e.g. '/junior-engineer-1 task' -> 'junior-engineer-1')."""
+    s = (line or "").strip()
+    if not s.startswith("/"):
+        return ""
+    rest = s[1:].lstrip()
+    if not rest:
+        return ""
+    role = rest.split(maxsplit=1)[0].strip().lower()
+    return role
+
+
+def _enhance_followup(followup: str, root: Path, role: str = "", stage: str = "dev") -> str:
+    """Run prompt_enhancer.enhance; on any exception return raw followup."""
+    context = {"workspace_root": root, "role": role or None, "stage": stage or None}
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "prompt_enhancer",
+            root / "agent-automation" / "prompt_enhancer.py",
+        )
+        if spec is None or spec.loader is None:
+            return followup
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod.enhance(followup, context)
+    except Exception:
+        return followup
 
 
 def _orchestrator_run_cycle_prompt(root: Path) -> str:
@@ -182,7 +218,7 @@ def _orchestrator_run_cycle_prompt(root: Path) -> str:
             pass
     return (
         "Run one cycle: get_workspace_status, read PROJECT_WORKSPACE.md (Dashboard, Next Actions, Role Status). "
-        "Determine which role the next action is for from Next Actions; call check_my_pending_tasks(role=\"<that role>\") — e.g. Lead Engineer, Architect, Intern, PM, CTO, CFO. "
+        "Determine which role the next action is for from Next Actions; call check_my_pending_tasks(role=\"<that role>\") — e.g. Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect, PM, CTO, CFO. "
         "Then decide next step, delegate if needed, update PROJECT_WORKSPACE.md."
     )
 
@@ -215,11 +251,18 @@ def main() -> None:
     head = transcript_content[:3000]
     root = _workspace_root(payload)
 
-    # 2a) Prefer Orchestrator: if transcript has Orchestrator markers, treat as Orchestrator (it may also contain subagent content from a prior /intern or /lead-engineer run).
+    # 2a) Prefer Orchestrator: if transcript has Orchestrator markers, treat as Orchestrator (it may also contain subagent content from a prior /junior-engineer-1, /junior-engineer-2, or /lead-engineer run).
     is_orchestrator = "parent Orchestrator" in head or "orchestrator.mdc" in head
     if not is_orchestrator:
-        # 2b) Subagent-only chat → return {} so we don't inject into subagent.
+        # 2b) Subagent-only chat → write run-cycle prompt so Orchestrator can continue; return {} so we don't inject into subagent.
         if _is_subagent_chat(head):
+            prompt = _orchestrator_run_cycle_prompt(root)
+            pending_path = root / "agent-automation" / "orchestrator_pending_prompt.txt"
+            pending_path.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                pending_path.write_text(prompt, encoding="utf-8")
+            except OSError:
+                pass
             print(json.dumps({}))
             return
         print(json.dumps({}))
@@ -259,12 +302,15 @@ def main() -> None:
     if has_delegation:
         delegation_cmd = _extract_delegation_command(transcript_content)
         if delegation_cmd and not _delegated_task_already_done_in_transcript(transcript_content):
-            print(json.dumps({"followup_message": delegation_cmd}))
+            role = _parse_role_from_delegation_line(delegation_cmd)
+            followup_message = _enhance_followup(delegation_cmd, root, role=role, stage="dev")
+            print(json.dumps({"followup_message": followup_message}))
             return
         # Transcript already shows task done (Done, COMPLETED, work log, etc.) — run a cycle instead of re-injecting same delegation.
 
     followup = _orchestrator_run_cycle_prompt(root)
-    print(json.dumps({"followup_message": followup}))
+    followup_message = _enhance_followup(followup, root, role="", stage="")
+    print(json.dumps({"followup_message": followup_message}))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,46 @@
+# Workflow definition - source of truth for stages and transitions.
+# Narrative and policy: agent-automation/orchestrator_patterns.md
+
+name: orchestrator-workflow
+description: Multi-agent development workflow stages and transitions.
+
+stages:
+  plan:
+    id: plan
+    name: Plan
+    description: Decide what to do next from Implementation Plan and work log. Optionally delegate to PM for task breakdown or Architect for design options.
+    next: dev
+    roles: [pm, architect]
+    parallel_ok: []
+
+  dev:
+    id: dev
+    name: Dev
+    description: Implementation split into three parts — Lead Engineer (part 1), Junior Engineer 1 (part 2), Junior Engineer 2 (part 3). All three may run in parallel when backlog supports it.
+    next: review
+    roles: [lead-engineer, junior-engineer-1, junior-engineer-2]
+    parallel_ok: [lead-engineer, junior-engineer-1, junior-engineer-2]
+
+  review:
+    id: review
+    name: Review
+    description: QA Reviewer, UI Reviewer, and Tester may run in parallel when applicable. Architect validates design/flow when needed.
+    next: merge
+    roles: [reviewer, qa-reviewer, ui-reviewer, tester, architect]
+    parallel_ok: [reviewer, qa-reviewer, ui-reviewer, tester]
+
+  merge:
+    id: merge
+    name: Merge
+    description: After successful validation, one Merge step — Junior Engineer 1 or Junior Engineer 2 performs commit/push and work log update.
+    next: next_steps
+    roles: [junior-engineer-1, junior-engineer-2]
+    parallel_ok: []
+
+  next_steps:
+    id: next_steps
+    name: Next steps
+    description: After each stage, Orchestrator reads PROJECT_WORKSPACE.md (Implementation Plan, Next Actions, Work Log), decides next action, delegates to concerned role, or writes ORCHESTRATION_COMPLETE when no remaining task.
+    next: null  # may loop to plan/dev or end
+    roles: []
+    parallel_ok: []

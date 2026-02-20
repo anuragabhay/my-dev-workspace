@@ -1,0 +1,113 @@
+# Role definitions - source of truth for subagents, slash commands, skills, concurrency.
+# Narrative: agent-automation/orchestrator_patterns.md
+
+roles:
+  lead-engineer:
+    display_name: Lead Engineer
+    slash: /lead-engineer
+    skill_path: .cursor/skills/lead-engineer/SKILL.md
+    agent_path: .cursor/agents/lead-engineer.md
+    when_to_use: "Part 1 of dev split; core implementation, architecture-critical code, config, venv, main tests"
+    completion_criteria: "Feature/service done; tests pass; handoff note with slash command"
+    concurrency_max: 2
+    parallel_ok: true
+
+  junior-engineer-1:
+    display_name: Junior Engineer 1
+    slash: /junior-engineer-1
+    skill_path: .cursor/skills/junior-engineer-1/SKILL.md
+    agent_path: .cursor/agents/junior-engineer-1.md
+    when_to_use: "Part 2 of dev split; implementation (tests, docs, small features, helpers), work log, commit/push when requested"
+    completion_criteria: "Deliver part; update work log; commit/push if requested"
+    concurrency_max: 2
+    parallel_ok: true
+
+  junior-engineer-2:
+    display_name: Junior Engineer 2
+    slash: /junior-engineer-2
+    skill_path: .cursor/skills/junior-engineer-2/SKILL.md
+    agent_path: .cursor/agents/junior-engineer-2.md
+    when_to_use: "Part 3 of dev split; implementation (tests, docs, small features, helpers), work log, commit/push when requested"
+    completion_criteria: "Deliver part; update work log; commit/push if requested"
+    concurrency_max: 2
+    parallel_ok: true
+
+  reviewer:
+    display_name: Reviewer
+    slash: /reviewer
+    skill_path: .cursor/skills/reviewer/SKILL.md
+    agent_path: .cursor/agents/reviewer.md
+    when_to_use: "Code review, quality review"
+    completion_criteria: "Review delivered; feedback or approval"
+    concurrency_max: 2
+    parallel_ok: true
+
+  qa-reviewer:
+    display_name: QA Reviewer
+    slash: null
+    skill_path: .cursor/skills/qa-reviewer/SKILL.md
+    agent_path: null
+    when_to_use: "QA-focused review"
+    completion_criteria: "QA review delivered"
+    concurrency_max: 1
+    parallel_ok: true
+
+  ui-reviewer:
+    display_name: UI Reviewer
+    slash: null
+    skill_path: .cursor/skills/ui-reviewer/SKILL.md
+    agent_path: null
+    when_to_use: "UI/UX review"
+    completion_criteria: "UI review delivered"
+    concurrency_max: 1
+    parallel_ok: true
+
+  tester:
+    display_name: Tester
+    slash: /tester
+    skill_path: .cursor/skills/tester/SKILL.md
+    agent_path: .cursor/agents/tester.md
+    when_to_use: "Test execution, test plans, QA"
+    completion_criteria: "Tests run; results reported"
+    concurrency_max: 2
+    parallel_ok: true
+
+  architect:
+    display_name: Architect
+    slash: /architect
+    skill_path: .cursor/skills/architect/SKILL.md
+    agent_path: .cursor/agents/architect.md
+    when_to_use: "Design, how to implement, architecture alignment, validation"
+    completion_criteria: "Design or validation delivered"
+    concurrency_max: 1
+    parallel_ok: false
+
+  pm:
+    display_name: Product Manager
+    slash: /pm
+    skill_path: null
+    agent_path: .cursor/agents/pm.md
+    when_to_use: "Task breakdown, acceptance criteria, scope"
+    completion_criteria: "Breakdown or scope delivered"
+    concurrency_max: 1
+    parallel_ok: false
+
+  cto:
+    display_name: CTO
+    slash: /cto
+    skill_path: null
+    agent_path: .cursor/agents/cto.md
+    when_to_use: "Technology, architecture approval"
+    completion_criteria: "Approval or feedback delivered"
+    concurrency_max: 1
+    parallel_ok: false
+
+  cfo:
+    display_name: CFO
+    slash: /cfo
+    skill_path: null
+    agent_path: .cursor/agents/cfo.md
+    when_to_use: "Cost tracking and analysis only"
+    completion_criteria: "Analysis or report delivered"
+    concurrency_max: 1
+    parallel_ok: false

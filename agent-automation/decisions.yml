@@ -1,0 +1,46 @@
+# Priority-ordered decision rules for the Orchestrator.
+# Evaluated in order; first matching rule determines action.
+# Narrative: agent-automation/orchestrator_patterns.md
+
+rules:
+  - id: pending_approvals
+    priority: 1
+    condition: "pending_approvals > 0"
+    action: delegate_to_approver
+    target_role_from: approval_request
+    description: "Delegate to the role that must respond to the approval (CTO, Architect, etc.)."
+
+  - id: user_intervention
+    priority: 2
+    condition: "user_intervention_required == true"
+    action: stop
+    target_role_from: null
+    description: "Stop and report to user; do not auto-continue."
+
+  - id: last_stage_review_merge
+    priority: 3
+    condition: "last_stage in [review, merge]"
+    action: fetch_plan_next_steps_then_delegate_or_complete
+    target_role_from: workflow
+    description: "Read PROJECT_WORKSPACE.md (Implementation Plan, Next Actions, Work Log); decide next task or ORCHESTRATION_COMPLETE."
+
+  - id: no_next_task
+    priority: 4
+    condition: "no next uncompleted task in plan"
+    action: ORCHESTRATION_COMPLETE
+    target_role_from: null
+    description: "Write ORCHESTRATION_COMPLETE and stop."
+
+  - id: default_dev_split
+    priority: 5
+    condition: "current_stage == dev and backlog supports tasks"
+    action: split_dev_work_delegate_parallel
+    target_role_from: workflow
+    description: "Split dev work into three parts (part_1 → lead-engineer, part_2 → junior-engineer-1, part_3 → junior-engineer-2). Delegate all three in same response when three tasks exist; otherwise delegate only to relevant role(s)."
+
+  - id: default_other_stages
+    priority: 6
+    condition: "default"
+    action: delegate_by_stage
+    target_role_from: workflow
+    description: "Delegate according to current stage roles (workflow.yml); one or more slash commands as appropriate."

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Zap } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import { Button } from '@/components/ui/button'
@@ -35,8 +35,8 @@ export function Generate() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Generate Short</h1>
-        <p className="text-zinc-400">Create a new YouTube Short from a topic</p>
+        <h1 className="text-3xl font-bold tracking-tight">Generate Short</h1>
+        <p className="mt-1 text-zinc-400">Create a new YouTube Short from a topic</p>
       </div>
 
       <Card className="border-zinc-800 bg-zinc-900/50">
@@ -53,20 +53,24 @@ export function Generate() {
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 disabled={loading}
-                className="border-zinc-700 bg-zinc-900"
               />
             </div>
             {error && (
-              <p className="text-sm text-red-500">{error}</p>
+              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                {error}
+              </div>
             )}
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="bg-red-600 hover:bg-red-700 text-white">
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Starting...
                 </>
               ) : (
-                'Start Generation'
+                <>
+                  <Zap className="mr-2 h-4 w-4" />
+                  Start Generation
+                </>
               )}
             </Button>
           </form>
@@ -77,23 +81,37 @@ export function Generate() {
         <Card className="border-zinc-800 bg-zinc-900/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              Progress
+              Pipeline Progress
               {connected && (
-                <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+                <span className="flex h-2.5 w-2.5 items-center justify-center">
+                  <span className="absolute h-2.5 w-2.5 animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
+                </span>
               )}
             </CardTitle>
             <CardDescription>
-              Execution #{executionId} — real-time updates
+              Execution #{executionId} — real-time updates via WebSocket
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Progress value={percent} />
-            <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg bg-zinc-900/50 p-3 font-mono text-xs">
-              {events.map((ev, i) => (
-                <div key={i} className="text-zinc-400">
-                  <span className="text-amber-500">{ev.agent}</span> {ev.step}: {ev.log}
-                </div>
-              ))}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-zinc-400">Progress</span>
+                <span className="font-mono text-zinc-300">{Math.round(percent)}%</span>
+              </div>
+              <Progress value={percent} />
+            </div>
+            <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs">
+              {events.length === 0 ? (
+                <span className="text-zinc-600">Waiting for pipeline events...</span>
+              ) : (
+                events.map((ev, i) => (
+                  <div key={i} className="text-zinc-400">
+                    <span className="text-amber-500">[{ev.agent}]</span>{' '}
+                    <span className="text-zinc-500">{ev.step}:</span> {ev.log}
+                  </div>
+                ))
+              )}
             </div>
             <div className="flex gap-2">
               <Button
@@ -110,7 +128,6 @@ export function Generate() {
                   setLoading(false)
                   setTopic('')
                 }}
-                className="bg-zinc-800"
               >
                 New Generation
               </Button>

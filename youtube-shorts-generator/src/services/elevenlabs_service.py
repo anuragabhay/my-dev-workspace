@@ -5,11 +5,14 @@ import os
 from pathlib import Path
 from typing import Optional
 
+from src.utils.retry import retry_decorator
+
 def _client():
     from elevenlabs.client import ElevenLabs
     return ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 
 
+@retry_decorator(max_retries=3, base_delay=1.0, max_delay=60.0)
 def text_to_speech(
     text: str,
     output_path: Optional[Path] = None,

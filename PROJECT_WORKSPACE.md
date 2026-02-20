@@ -15,13 +15,54 @@
 **Last Updated**: 2026-02-20 by Orchestrator  
 **Active Agents**: Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect, PM, CTO, CFO  
 **Pending Approvals**: 0  
-**Blockers**: None  
-**Next Actions**: **Task: Dev plan execution with engineer split, Architect/PM for infrastructure, and research exchange.** Use Implementation Plan and Phase checklist; split dev work among Lead Engineer (part 1), Junior Engineer 1 (part 2), Junior Engineer 2 (part 3); when backlog supports three parts issue /lead-engineer, /junior-engineer-1, /junior-engineer-2 in one response. Bring in Architect/PM for design/scope when unclear. Handoffs via slash commands; Orchestrator relays prior agents' output into next delegation. Proceed step-wise until dev plan scope done. **Current cycle:** Cycle 1 done (config validation, Pilot rules, README → Architect validate → Merge). Cycle 2: delegating Phase 6 items (config tests, API doc, Troubleshooting).  
-**User Intervention Required**: No
+**Blockers**: Staging branch protection blocks direct push; PR required.  
+**Next Actions**: **Step 0 — BLOCKED:** All work committed and pushed to `step0-merge`. Staging has branch protection (requires PR). **User action:** Create PR `step0-merge` → `staging` at https://github.com/anuragabhay/my-dev-workspace/pull/new/step0-merge and merge. After merge, proceed with Task A (Web UI) and Task B (platform-agnostic) in parallel.  
+**User Intervention Required**: Yes — Merge PR step0-merge → staging to complete Step 0.
+
+---
+
+## 📌 Step 0: Merge to Staging (in progress)
+
+**Status:** Committed and pushed to `step0-merge`. Stale branches `feature/ui`, `feature/platform-agnostic` deleted.
+
+**Done:**
+- ✅ All modified and new files committed (staging config, retry utility, CLI enhancements, service updates, branching docs)
+- ✅ Pushed to `origin/step0-merge` (direct push to staging blocked by branch protection)
+- ✅ Deleted `feature/ui` and `feature/platform-agnostic` locally
+
+**Blocked:** Staging requires PR. Create PR at https://github.com/anuragabhay/my-dev-workspace/pull/new/step0-merge (base: staging), merge, then Step 0 complete. Task A and B blocked until then.
+
+---
+
+## 🚀 Git Branching Strategy — Phase 3.2: Complete
+
+**Status:** ✅ Phase 3.2 complete. No publish to master for this batch. Staging is the default branch; release to master only when many features warrant a formal release (see `docs/git-branching-strategy.md`).
+
+**Completed:**
+- ✅ Phase 1.1: Git branching strategy documented (`docs/git-branching-strategy.md`)
+- ✅ Phase 1.2: GitHub branch protection configured (user completed)
+- ✅ Phase 1.3: Staging branch created locally and pushed to origin
+- ✅ Phase 1.4: Staging environment config created (`.env.example.staging`, `config.example.staging.yaml`, config loader supports `ENV=staging`)
+- ✅ Phase 2.1: UI workstream (feature/ui) — rich library, colored output, progress indicators, formatted displays
+- ✅ Phase 2.2: Platform-agnostic workstream (feature/platform-agnostic) — retry utility, enhanced pipeline, improved ElevenLabs service
+- ✅ Phase 3.1: Integration review complete — UI wired into CLI, retry wired into services, `rich` added to requirements.txt
+- ✅ Phase 3.2: Documented default branch = staging, release to master only for releases. Continuing work on staging.
 
 ---
 
 ## 📝 Recent Work Log (last 10)
+
+### [2026-02-20T09:35:27Z] [Orchestrator] [Step 0: commit, push to step0-merge, delete stale branches] [COMPLETED]
+Committed all work (staging config, retry, CLI, services, branching docs). Pushed to step0-merge. Direct push to staging blocked by branch protection. Deleted feature/ui and feature/platform-agnostic. User must merge PR step0-merge → staging to complete Step 0.
+
+### [2026-02-20 08:45 UTC] [Lead Engineer] [Complete integration fixes identified in Phase 3.1 review] [COMPLETED]
+Integration fixes complete: (1) CLI commands (cmd_health, cmd_status) now use UI utilities (format_health_check_result, format_status_result) with --json flag support for raw JSON output. (2) Replaced custom _retry decorator in openai_service.py with retry_decorator from src/utils/retry.py for chat_completion and get_embeddings. (3) Added retry logic to elevenlabs_service.py text_to_speech using retry_decorator. (4) Added rich>=13.0.0 to requirements.txt. Tested: health command shows formatted colored output (unless --json), imports work correctly.
+
+### [2026-02-20 08:43 UTC] [Junior Engineer 1] [Merge feature/ui to staging] [COMPLETED]
+Merged UI enhancements (rich library, colored output, progress indicators) to staging. Reviewer approved. Branches were already in sync (staging and feature/ui pointing to same commit 8d883a4). Verified merge status and pushed staging to origin.
+
+### [2026-02-20 08:43 UTC] [Junior Engineer 2] [Merge feature/platform-agnostic to staging] [✅ COMPLETED]
+Merged platform-agnostic improvements (retry utility, enhanced pipeline, ElevenLabs service) to staging. Reviewer approved. Branch already synchronized with staging (no merge needed).
 
 ### [2026-02-20 17:30 UTC] [Architect] [Validate Cycle 2: test_config, openai_service docs, README Troubleshooting] [COMPLETED]
 Validated test_config.py, openai_service docstrings and docs/API.md, README Troubleshooting; all OK. Hand off to Junior Engineer 1 for commit, push.
@@ -40,18 +81,6 @@ Validated main.py config validation, .claude/rules, README setup; all OK. Hand o
 
 ### [2026-02-20 15:00 UTC] [Orchestrator] [Dev plan cycle 1: three-way split completed] [COMPLETED]
 Delegated Part 1 (Lead Engineer: config validation on startup), Part 2 (Junior Engineer 1: Pilot rules agent-guidelines.mdc + refs), Part 3 (Junior Engineer 2: README setup). All three delivered. Next: Architect validate then Junior Engineer 1 or 2 commit, push.
-
-### [2026-02-20 16:00 UTC] [Junior Engineer 1] [Create custom Pilot rules for youtube-shorts-generator (Phase 1)] [✅ COMPLETED]
-Updated .claude/rules/agent-guidelines.mdc to reference PROJECT_WORKSPACE.md (path from workspace root: PROJECT_WORKSPACE.md). Set alwaysApply: true; fixed role refs (Junior Engineer 1/2). Existing content-generation.mdc and video-quality.mdc already present.
-
-### [2026-02-20 06:01 UTC] [Junior Engineer 2] [Complete README.md with setup instructions (Phase 6)] [✅ COMPLETED]
-- Expanded youtube-shorts-generator/README.md Setup section: venv create/activate (macOS, Linux, Windows), pip install -r requirements.txt, .env from .env.example and required API keys, config.yaml from config.example.yaml, run health command, run generate command.\n- Deliverable: README setup instructions complete; work log updated.
-
-### [2026-02-20 14:15 UTC] [Orchestrator] [Legacy agents removed and prompt enhancer verified] [COMPLETED]
-Verified: intern.md and junior-engineer.md deleted; .cursor/agents has only junior-engineer-1.md, junior-engineer-2.md and current roles. prompt_enhancer.py in agent-automation; stop hook calls _enhance_followup before every followup_message. Refs cleaned to Junior Engineer 1 and 2 only.
-
-### [2026-02-20 14:00 UTC] [Lead Engineer] [Remove legacy agents and prompt enhancer] [✅ COMPLETED]
-- Deleted .cursor/agents/intern.md and .cursor/agents/junior-engineer.md.\n- Cleaned all references: agents, rules, skills, MCP role_guidance, prompts, docs; only Junior Engineer 1 and 2.\n- Created agent-automation/prompt_enhancer.py; integrated into .cursor/hooks/stop_hook.py; documented in ORCHESTRATOR_SETUP.md.\n- Prompt enhancer runs on every injected followup_message; on failure hook returns raw prompt.
 
 Full log: agent-automation/work_log.json
 

@@ -120,6 +120,45 @@ python -m src.cli.main generate
 
 Ensure the health check passes first. Output videos are written to the directory configured in `config.yaml` (default: `output_videos/`).
 
+### 7. Web UI (optional)
+
+A production-ready web interface is available for generating Shorts, viewing history, and managing config.
+
+**Prerequisites:** Same as above (venv, dependencies, `.env`, `config.yaml`). Additionally, install frontend dependencies:
+
+```bash
+cd frontend && npm install && cd ..
+```
+
+**Run the web UI:**
+
+```bash
+./run_dev.sh
+```
+
+This starts:
+- **API** (FastAPI) at http://localhost:8000
+- **Frontend** (React + Vite) at http://localhost:5173
+
+Open http://localhost:5173 in your browser. The frontend proxies `/api` and `/ws` to the backend.
+
+**Or run separately:**
+
+```bash
+# Terminal 1: API
+uvicorn src.api.app:app --reload --host 0.0.0.0 --port 8000
+
+# Terminal 2: Frontend
+cd frontend && npm run dev
+```
+
+**Web UI features:**
+- **Dashboard**: Health checks, recent executions, quick-generate
+- **Generate**: Topic form, real-time progress via WebSocket
+- **History**: Paginated execution table
+- **Execution detail**: Status, cost, video preview, logs
+- **Config**: View/edit non-secret config (writes to `config.yaml`)
+
 ## Project Structure
 
 ```
@@ -127,12 +166,15 @@ youtube-shorts-generator/
 ├── .claude/rules/           # Pilot code-quality rules (see Development)
 ├── src/
 │   ├── agents/              # Agent implementations
+│   ├── api/                 # FastAPI web API
 │   ├── orchestration/       # Pipeline orchestration
 │   ├── services/            # External API integrations
-│   ├── database/             # Database layer
+│   ├── database/            # Database layer
 │   ├── utils/               # Shared utilities
 │   └── cli/                 # CLI interface
+├── frontend/                # React + Vite web UI
 ├── tests/                   # Test suite
+├── run_dev.sh               # Start API + frontend dev servers
 ├── config.yaml              # System settings
 ├── .env                     # API keys (gitignored)
 └── README.md

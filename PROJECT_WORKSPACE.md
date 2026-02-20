@@ -23,6 +23,12 @@
 
 ## 📝 Recent Work Log (last 10)
 
+### [2026-02-20 17:30 UTC] [Architect] [Validate Cycle 2: test_config, openai_service docs, README Troubleshooting] [COMPLETED]
+Validated test_config.py, openai_service docstrings and docs/API.md, README Troubleshooting; all OK. Hand off to Junior Engineer 1 for commit, push.
+
+### [2026-02-20 16:45 UTC] [Orchestrator] [Dev plan cycle 2: three-way split completed] [COMPLETED]
+Delegated Part 1 (Lead: config tests test_config.py), Part 2 (JE1: openai_service docstrings + docs/API.md), Part 3 (JE2: README Troubleshooting). All delivered. Next: Architect validate then Merge.
+
 ### [2026-02-20T16:30:00Z] [Lead Engineer] [Add unit tests for src/utils/config.py (tests/test_config.py)] [COMPLETED]
 tests/test_config.py: 13 pytest tests for get_config, validate_env, validate_config, load_env, load_config (mocked env / tmp .env and YAML; no real API keys). All 13 passed. Added test_load_env_with_tmp_env_file and test_get_config_valid_env_and_config_returns_no_errors.
 
@@ -46,12 +52,6 @@ Verified: intern.md and junior-engineer.md deleted; .cursor/agents has only juni
 
 ### [2026-02-20 14:00 UTC] [Lead Engineer] [Remove legacy agents and prompt enhancer] [✅ COMPLETED]
 - Deleted .cursor/agents/intern.md and .cursor/agents/junior-engineer.md.\n- Cleaned all references: agents, rules, skills, MCP role_guidance, prompts, docs; only Junior Engineer 1 and 2.\n- Created agent-automation/prompt_enhancer.py; integrated into .cursor/hooks/stop_hook.py; documented in ORCHESTRATOR_SETUP.md.\n- Prompt enhancer runs on every injected followup_message; on failure hook returns raw prompt.
-
-### [2026-02-20 12:15 UTC] [Orchestrator] [YAML workflow and Junior Engineer 1 & 2 verified] [COMPLETED]
-Verified: workflow.yml, roles.yml, decisions.yml; junior-engineer-1.md and junior-engineer-2.md; stop hook and rule support /junior-engineer-1 and /junior-engineer-2; get_workflow_config; patterns and docs point to YAML. Dev stage three-way split in place.
-
-### [2026-02-20 12:00 UTC] [Lead Engineer] [YAML workflow and Junior Engineer 1 & 2] [✅ COMPLETED]
-Created workflow.yml, roles.yml, decisions.yml; junior-engineer-1.md, junior-engineer-2.md; deprecated intern.md; updated stop_hook, orchestrator.mdc, orchestrator_patterns.md, docs; skills junior-engineer-1/2; MCP get_workflow_config, role_guidance/list_roles; PROJECT_WORKSPACE and agent-automation prompts/router/config.
 
 Full log: agent-automation/work_log.json
 

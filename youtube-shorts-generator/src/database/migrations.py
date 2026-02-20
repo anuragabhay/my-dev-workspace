@@ -73,6 +73,15 @@ def _project_root() -> Path:
     return here.parent if here.name == "src" else Path.cwd()
 
 
+def _add_column_if_missing(conn: sqlite3.Connection, table: str, column: str, col_type: str = "TEXT") -> None:
+    """Add column to table if it does not exist."""
+    try:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {col_type}")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+
+
 def run_migrations(db_path: Optional[Path] = None) -> None:
     """Create or update schema. Idempotent (IF NOT EXISTS)."""
     path = db_path or _project_root() / DEFAULT_DB
@@ -81,5 +90,7 @@ def run_migrations(db_path: Optional[Path] = None) -> None:
     try:
         conn.executescript(SCHEMA)
         conn.commit()
+        _add_column_if_missing(conn, "executions", "output_path")
+        _add_column_if_missing(conn, "executions", "topic")
     finally:
         conn.close()

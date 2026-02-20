@@ -48,6 +48,8 @@ def update_execution(
     current_stage: Optional[str] = None,
     error_message: Optional[str] = None,
     cost_total: Optional[float] = None,
+    output_path: Optional[str] = None,
+    topic: Optional[str] = None,
     db_path: Optional[Path] = None,
 ) -> None:
     conn = _get_conn(db_path)
@@ -69,6 +71,12 @@ def update_execution(
         if cost_total is not None:
             updates.append("cost_total = ?")
             args.append(cost_total)
+        if output_path is not None:
+            updates.append("output_path = ?")
+            args.append(output_path)
+        if topic is not None:
+            updates.append("topic = ?")
+            args.append(topic)
         if not updates:
             return
         args.append(execution_id)
@@ -89,6 +97,17 @@ def get_execution(execution_id: int, db_path: Optional[Path] = None) -> Optional
         conn.row_factory = sqlite3.Row
         row = conn.execute("SELECT * FROM executions WHERE id = ?", (execution_id,)).fetchone()
         return dict(row) if row else None
+    finally:
+        conn.close()
+
+
+def get_executions_count(db_path: Optional[Path] = None) -> int:
+    """Total count of executions for pagination."""
+    ensure_schema(db_path)
+    conn = _get_conn(db_path)
+    try:
+        row = conn.execute("SELECT COUNT(*) FROM executions").fetchone()
+        return int(row[0]) if row else 0
     finally:
         conn.close()
 

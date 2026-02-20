@@ -1,5 +1,33 @@
 [
   {
+    "timestamp": "2026-02-20 17:30 UTC",
+    "role": "Architect",
+    "task": "Validate Cycle 2: test_config, openai_service docs, README Troubleshooting",
+    "status": "COMPLETED",
+    "content": "Validated test_config.py, openai_service docstrings and docs/API.md, README Troubleshooting; all OK. Hand off to Junior Engineer 1 for commit, push."
+  },
+  {
+    "timestamp": "2026-02-20 16:45 UTC",
+    "role": "Orchestrator",
+    "task": "Dev plan cycle 2: three-way split completed",
+    "status": "COMPLETED",
+    "content": "Delegated Part 1 (Lead: config tests test_config.py), Part 2 (JE1: openai_service docstrings + docs/API.md), Part 3 (JE2: README Troubleshooting). All delivered. Next: Architect validate then Merge."
+  },
+  {
+    "timestamp": "2026-02-20T16:30:00Z",
+    "role": "Lead Engineer",
+    "task": "Add unit tests for src/utils/config.py (tests/test_config.py)",
+    "status": "COMPLETED",
+    "content": "tests/test_config.py: 13 pytest tests for get_config, validate_env, validate_config, load_env, load_config (mocked env / tmp .env and YAML; no real API keys). All 13 passed. Added test_load_env_with_tmp_env_file and test_get_config_valid_env_and_config_returns_no_errors."
+  },
+  {
+    "timestamp": "2026-02-20 17:00 UTC",
+    "role": "Junior Engineer 2",
+    "task": "Expand README Troubleshooting section (Phase 6)",
+    "status": "✅ COMPLETED",
+    "content": "Expanded youtube-shorts-generator/README.md Troubleshooting: missing/invalid .env (OPENAI_API_KEY, Runway KEY/SECRET), config errors (timeouts, cost.target_per_video, paths), health check failures, API errors (OpenAI, ElevenLabs, Runway) with remedies; added 'Where to look' table (stderr, health JSON, stdout logs, PROJECT_WORKSPACE.md)."
+  },
+  {
     "timestamp": "2026-02-20 15:30 UTC",
     "role": "Architect",
     "task": "Validate config validation, Pilot rules, README",

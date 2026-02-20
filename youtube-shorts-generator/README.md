@@ -140,21 +140,68 @@ youtube-shorts-generator/
 
 ## Troubleshooting
 
+Use this section when the health check fails, `generate` errors, or you see config/API errors. Where to look: **logs** (stdout from the CLI), **stderr** (config/startup errors), **health JSON** (`python -m src.cli.main health`), and **PROJECT_WORKSPACE.md** (at the workspace root) for implementation status and coordination.
+
+### Missing or invalid .env
+
+**Symptom:** Health check shows `ok: false` for `openai`, `elevenlabs`, or `runwayml` with messages like `OPENAI_API_KEY not set`; or the CLI prints `Missing or empty env: OPENAI_API_KEY` (and similar) to stderr before exiting.
+
+**Remedies:**
+
+- Ensure `.env` exists in the project root: `cp .env.example .env` then edit `.env`.
+- Set every **required** variable with a non-empty value (no leading/trailing spaces). Required: `OPENAI_API_KEY`, `ELEVENLABS_API_KEY`, `RUNWAYML_API_KEY`, `YOUTUBE_CLIENT_ID`, `YOUTUBE_CLIENT_SECRET`, `YOUTUBE_REFRESH_TOKEN`.
+- For OpenAI: use a valid API key from the OpenAI dashboard; 401/403 usually mean wrong key or no access to the model.
+- For Runway: the app accepts either `RUNWAYML_API_KEY` or `RUNWAYML_API_SECRET`; set one of them.
+- Restart the shell or re-run from the project root so the process sees the updated `.env`. Never commit `.env`.
+
+### Config errors (config.yaml)
+
+**Symptom:** CLI prints validation errors to stderr at startup (e.g. when running `health` or `generate`), such as `timeouts.research must be a positive number` or `cost.target_per_video must be positive`.
+
+**Remedies:**
+
+- Copy the example: `cp config.example.yaml config.yaml` if you don’t have `config.yaml`.
+- **Timeouts:** Under `timeouts`, every value must be a positive number (integer or float). Fix or remove any zero/negative or non-numeric values.
+- **Cost:** `cost.target_per_video` must be positive. Set it to a number > 0 (e.g. `4.10`).
+- **Paths:** `paths.database`, `paths.temp_dir`, and `paths.output_dir` must be valid; ensure the project directory is writable. Use relative paths from the project root or absolute paths.
+- **YAML syntax:** Avoid tabs; use spaces. Check for duplicate keys or invalid indentation if you see parse errors.
+
 ### Health check failures
 
-Run `python -m src.cli.main health` to get a JSON report. Common causes:
+Run `python -m src.cli.main health` to get a JSON report. Use it to see which check failed and the `detail` field for the reason.
 
-- **Missing or invalid API keys**: One or more checks show `ok: false`. Ensure `.env` exists (copy from `.env.example`) and all required keys are set. See **Configuration reference** below for the list.
-- **Insufficient disk space**: The `disk_space` check fails if free space is below the configured minimum (default 10GB). Free space or increase `resources.min_disk_gb` in `config.yaml`.
-- **Low RAM**: The `system_resources` check can fail if available RAM is below the minimum (default 8GB). Close other applications or adjust `resources.min_ram_gb`.
-- **Database/SQLite errors**: Ensure the project directory is writable and the path in `paths.database` (default `youtube_shorts.db`) is valid.
-- **API connectivity**: OpenAI, ElevenLabs, RunwayML, or YouTube checks can fail due to invalid keys, network issues, or rate limits. Verify keys in the provider dashboards and retry.
+- **Missing or invalid API keys:** One or more of `openai`, `elevenlabs`, `runwayml` (or `youtube`) show `"ok": false`. Fix `.env` as in **Missing or invalid .env** above; re-run health.
+- **Insufficient disk space:** The `disk_space` check fails if free space is below the configured minimum (default 10GB). Free space or increase `resources.min_disk_gb` in `config.yaml`.
+- **Low RAM:** The `system_resources` check can fail if available RAM is below the minimum (default 8GB). Close other applications or adjust `resources.min_ram_gb` in `config.yaml`.
+- **Database/SQLite:** Ensure the project directory is writable and `paths.database` (default `youtube_shorts.db`) is valid. Fix path or permissions and re-run.
+- **FFmpeg not found:** Install FFmpeg and ensure it is on your PATH; required for video processing. The health check verifies FFmpeg availability.
+- **API connectivity:** Keys set but check still fails: possible network issues, rate limits, or revoked keys. Verify keys in the provider dashboards and retry; see **API errors** below for provider-specific hints.
 
-### Common errors
+### API errors (OpenAI, ElevenLabs, Runway)
 
-- **ModuleNotFoundError or import errors**: Activate the venv (`source venv/bin/activate` or `venv\Scripts\activate`) and ensure `pip install -r requirements.txt` was run from the project root.
-- **Permission denied on .env or config.yaml**: Ensure the files exist and are readable; do not commit `.env` or a `config.yaml` that contains secrets.
-- **FFmpeg not found**: Install FFmpeg and ensure it is on your PATH (required for video processing).
+Errors from external APIs often appear in the **CLI stdout** (structlog JSON) or in the health report `detail` field. Typical cases:
+
+- **OpenAI:** 401/403 usually mean invalid key or no access to the model. If you get 403 for the default model, set `OPENAI_CHAT_MODEL` or `OPENAI_FALLBACK_CHAT_MODEL` / `OPENAI_EMBEDDING_MODEL` / `OPENAI_FALLBACK_EMBEDDING_MODEL` in `.env` to models you have access to. Rate limits: retry later or reduce concurrency.
+- **ElevenLabs:** Invalid key or quota exceeded. Check the ElevenLabs dashboard for usage and key validity; ensure `ELEVENLABS_API_KEY` is correct and has quota.
+- **Runway:** Invalid or missing key (use `RUNWAYML_API_KEY` or `RUNWAYML_API_SECRET`). Rate limits or service errors: retry after a delay; check Runway status or docs if errors persist.
+
+If the health check passes but `generate` fails mid-pipeline, inspect the **last log lines** on stdout for the failing component (research, script, tts, video, etc.) and the exception message.
+
+### Other common errors
+
+- **ModuleNotFoundError or import errors:** Activate the venv (`source venv/bin/activate` or `venv\Scripts\activate`) and run `pip install -r requirements.txt` from the project root (`youtube-shorts-generator/`).
+- **Permission denied on .env or config.yaml:** Ensure the files exist in the project root and are readable by the current user; do not commit `.env` or a `config.yaml` that contains secrets.
+- **FFmpeg not found:** Install FFmpeg and ensure it is on your PATH (required for video processing).
+
+### Where to look
+
+| What you need | Where to look |
+|---------------|----------------|
+| Config/startup validation errors | CLI **stderr** when running `health` or `generate` |
+| Per-check pass/fail and API key issues | Output of `python -m src.cli.main health` (JSON) |
+| Pipeline progress and API/service errors | CLI **stdout** (structlog JSON logs) |
+| Project status, plan, and coordination | **PROJECT_WORKSPACE.md** at the workspace root |
+| Configuration reference | This README: **Configuration reference** (env vars and config.yaml sections) |
 
 ## Configuration reference
 

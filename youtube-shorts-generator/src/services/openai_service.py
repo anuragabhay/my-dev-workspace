@@ -1,6 +1,8 @@
 """
-OpenAI API: Chat Completions only (Model capabilities); embeddings. Retry + cost tracking.
+OpenAI API: Chat Completions and embeddings with retry and cost tracking.
+
 Uses /v1/chat/completions so projects with 'Model capabilities' but not 'Responses API' work.
+Public entry points: :func:`chat_completion`, :func:`get_embeddings`.
 """
 import os
 import time
@@ -70,7 +72,24 @@ def chat_completion(
     model: Optional[str] = None,
     temperature: float = 0.7,
 ) -> tuple[str, float]:
-    """Return (content, estimated_cost_usd). Uses Chat Completions only (Model capabilities). Tries default model then fallbacks on 403."""
+    """Call OpenAI Chat Completions API and return response text plus estimated cost.
+
+    Uses the default chat model (or OPENAI_CHAT_MODEL); on 403/model access errors,
+    tries fallback models (OPENAI_FALLBACK_CHAT_MODEL or built-in list). Retries
+    on transient errors (up to 3 attempts with backoff).
+
+    Args:
+        messages: List of message dicts with "role" and "content" (OpenAI format).
+        model: Model name (e.g. "gpt-4.1"). If None or empty, uses default/fallback chain.
+        temperature: Sampling temperature in [0, 2]. Default 0.7.
+
+    Returns:
+        Tuple of (response_content, estimated_cost_usd). content is stripped text.
+
+    Raises:
+        Exception: Re-raised from OpenAI client on non–model-access errors after retries.
+        RuntimeError: If all models in the chain fail with model access errors.
+    """
     preferred = (model or "").strip() or _default_chat_model()
     fallbacks = _fallback_chat_models()
     # Try preferred first, then each fallback (skip if already preferred)
@@ -105,7 +124,25 @@ def _fallback_embedding_models() -> List[str]:
 
 @_retry()
 def get_embeddings(texts: List[str], model: Optional[str] = None) -> tuple[List[List[float]], float]:
-    """Return (list of embedding vectors, estimated_cost_usd). Tries default model then fallbacks on 403."""
+    """Compute embeddings for a list of texts and return vectors plus estimated cost.
+
+    Uses the default embedding model (or OPENAI_EMBEDDING_MODEL); on 403/model access
+    errors, tries fallback models (OPENAI_FALLBACK_EMBEDDING_MODEL or built-in list).
+    Retries on transient errors (up to 3 attempts with backoff).
+
+    Args:
+        texts: List of strings to embed. Order of returned vectors matches order of texts.
+        model: Embedding model name (e.g. "text-embedding-3-small"). If None or empty,
+            uses default/fallback chain.
+
+    Returns:
+        Tuple of (list of embedding vectors, estimated_cost_usd). Each vector is a
+        list of floats; length depends on the model.
+
+    Raises:
+        Exception: Re-raised from OpenAI client on non–model-access errors after retries.
+        RuntimeError: If all models in the chain fail with model access errors.
+    """
     preferred = (model or "").strip() or _default_embedding_model()
     fallbacks = _fallback_embedding_models()
     to_try = [preferred] + [m for m in fallbacks if m != preferred]

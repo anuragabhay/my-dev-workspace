@@ -16,12 +16,18 @@
 **Active Agents**: Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect, PM, CTO, CFO  
 **Pending Approvals**: 0  
 **Blockers**: None  
-**Next Actions**: **Task: Dev plan execution with engineer split, Architect/PM for infrastructure, and research exchange.** Use Implementation Plan and Phase checklist; split dev work among Lead Engineer (part 1), Junior Engineer 1 (part 2), Junior Engineer 2 (part 3); when backlog supports three parts issue /lead-engineer, /junior-engineer-1, /junior-engineer-2 in one response. Bring in Architect/PM for design/scope when unclear. Handoffs via slash commands; Orchestrator relays prior agents' output into next delegation. Proceed step-wise until dev plan scope done. **Current cycle:** Delegating Phase 1/6 items to all three engineers.  
+**Next Actions**: **Task: Dev plan execution with engineer split, Architect/PM for infrastructure, and research exchange.** Use Implementation Plan and Phase checklist; split dev work among Lead Engineer (part 1), Junior Engineer 1 (part 2), Junior Engineer 2 (part 3); when backlog supports three parts issue /lead-engineer, /junior-engineer-1, /junior-engineer-2 in one response. Bring in Architect/PM for design/scope when unclear. Handoffs via slash commands; Orchestrator relays prior agents' output into next delegation. Proceed step-wise until dev plan scope done. **Current cycle:** Cycle 1 done (config validation, Pilot rules, README → Architect validate → Merge). Cycle 2: delegating Phase 6 items (config tests, API doc, Troubleshooting).  
 **User Intervention Required**: No
 
 ---
 
 ## 📝 Recent Work Log (last 10)
+
+### [2026-02-20T16:30:00Z] [Lead Engineer] [Add unit tests for src/utils/config.py (tests/test_config.py)] [COMPLETED]
+tests/test_config.py: 13 pytest tests for get_config, validate_env, validate_config, load_env, load_config (mocked env / tmp .env and YAML; no real API keys). All 13 passed. Added test_load_env_with_tmp_env_file and test_get_config_valid_env_and_config_returns_no_errors.
+
+### [2026-02-20 17:00 UTC] [Junior Engineer 2] [Expand README Troubleshooting section (Phase 6)] [✅ COMPLETED]
+Expanded youtube-shorts-generator/README.md Troubleshooting: missing/invalid .env (OPENAI_API_KEY, Runway KEY/SECRET), config errors (timeouts, cost.target_per_video, paths), health check failures, API errors (OpenAI, ElevenLabs, Runway) with remedies; added 'Where to look' table (stderr, health JSON, stdout logs, PROJECT_WORKSPACE.md).
 
 ### [2026-02-20 15:30 UTC] [Architect] [Validate config validation, Pilot rules, README] [COMPLETED]
 Validated main.py config validation, .claude/rules, README setup; all OK. Hand off to Junior Engineer 1 for commit, push.
@@ -46,12 +52,6 @@ Verified: workflow.yml, roles.yml, decisions.yml; junior-engineer-1.md and junio
 
 ### [2026-02-20 12:00 UTC] [Lead Engineer] [YAML workflow and Junior Engineer 1 & 2] [✅ COMPLETED]
 Created workflow.yml, roles.yml, decisions.yml; junior-engineer-1.md, junior-engineer-2.md; deprecated intern.md; updated stop_hook, orchestrator.mdc, orchestrator_patterns.md, docs; skills junior-engineer-1/2; MCP get_workflow_config, role_guidance/list_roles; PROJECT_WORKSPACE and agent-automation prompts/router/config.
-
-### [2026-02-19 18:30 UTC] [Orchestrator] [Full subagent infrastructure makeover verified] [COMPLETED]
-Lead Engineer completed makeover. Zero Intern/\/intern in .cursor, agent-automation, docs, PROJECT_WORKSPACE. Patterns doc, skills, MCP get_role_guidance/list_roles, rule and hook updated. Next Actions set to doc polish or Architect validate → Junior Engineer commit, push.
-
-### [2026-02-19 16:00 UTC] [Lead Engineer] [New role files in .cursor/agents/ and stop_hook delegation patterns] [COMPLETED]
-Created junior-engineer.md, reviewer.md, tester.md; updated architect.md, lead-engineer.md, intern.md (alias); added researcher.md, writer.md. Updated stop_hook.py: delegation regexes and subagent markers for lead-engineer|architect|junior-engineer|reviewer|tester|intern|pm|cto|cfo. Hook recognizes new roles and intern alias.
 
 Full log: agent-automation/work_log.json
 
@@ -444,8 +444,8 @@ Junior Engineer (Implementation, Documentation, Testing)
 
 ## 👨‍💻 Lead Engineer Status
 
-**Current Status**: 🟡 Phase 1–5 implementation complete (health check + conditional stop hook done)  
-**Last Updated**: 2026-02-15 01:10 UTC  
+**Current Status**: 🟡 Phase 6 code quality in progress (config tests done)  
+**Last Updated**: 2026-02-20 16:30 UTC  
 **Senior**: Architect (for design questions), CTO (for tech decisions)  
 **Junior**: Junior Engineer (assigns tasks to)
 
@@ -469,6 +469,7 @@ Junior Engineer (Implementation, Documentation, Testing)
 - [x] Phase 2 message_queue, state_manager, pipeline (✅ 2026-02-14 24:45)
 - [x] Phase 3–5: services, 8 agents, CLI (✅ 2026-02-14 25:00)
 - [x] Phase 6: unit tests for health.py (✅ 2026-02-15 02:25) - tests/test_health.py, 5 pytest tests
+- [x] Phase 6: unit tests for config.py (✅ 2026-02-20 16:30) - tests/test_config.py, 13 pytest tests (get_config, validate_env, validate_config, load_env, load_config; no real API keys)
 - [x] Phase 6: README Troubleshooting/Configuration (✅ 2026-02-15) - youtube-shorts-generator/README.md
 - [x] Phase 6: one small polish or Architect validate → Junior Engineer push (✅ 2026-02-15)
 - [ ] Configure Pilot rules for Python development (🟡 Next - Phase 1)

@@ -106,3 +106,24 @@ def test_get_config_includes_missing_env_errors():
         with patch.dict(os.environ, {}, clear=True):
             _, errors = get_config()
     assert any("Missing or empty env" in e for e in errors)
+
+
+def test_load_env_with_tmp_env_file(tmp_path):
+    """load_env loads .env from given path; no real API keys required."""
+    env_file = tmp_path / ".env"
+    env_file.write_text("SOME_KEY=value\nANOTHER=test\n")
+    # Pass explicit path so no real .env or project root needed
+    load_env(env_path=env_file)
+    assert os.getenv("SOME_KEY") == "value"
+    assert os.getenv("ANOTHER") == "test"
+
+
+def test_get_config_valid_env_and_config_returns_no_errors():
+    """get_config with all required env set and valid config returns empty errors."""
+    valid_config = {"timeouts": {"research": 30}, "cost": {"target_per_video": 5.0}}
+    with patch("src.utils.config.load_env"):
+        with patch("src.utils.config.load_config", return_value=valid_config):
+            with patch.dict(os.environ, {k: "set" for k in REQUIRED_ENV_KEYS}, clear=False):
+                config, errors = get_config()
+    assert config == valid_config
+    assert errors == []

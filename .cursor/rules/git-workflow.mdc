@@ -1,0 +1,72 @@
+---
+description: Git workflow rules for branch protection, squash merge, and parallel work
+globs:
+alwaysApply: true
+---
+
+# Git Workflow Rules
+
+## Branch Protection
+
+- `staging` and `master` have GitHub branch protection. **Direct push is blocked.**
+- To get commits onto staging: create a feature branch, push it, create a PR, merge the PR. There is no shortcut.
+- **Never** run `git push origin staging` or `git push origin master` — it will fail.
+
+## Squash Merge Behavior
+
+- GitHub PRs use **squash merge**. This creates a NEW commit SHA on the target branch.
+- After a PR is squash-merged, the feature branch commits have **different SHAs** from what landed on staging. The feature branch is now **stale**.
+- **After every PR merge**, immediately:
+  1. Delete the feature branch (local + remote)
+  2. Reset local staging to match remote:
+     ```
+     git fetch origin && git reset --hard origin/staging
+     ```
+- **Never use `git pull` after a squash merge** — it creates merge commits from the SHA mismatch. Always use `git fetch origin && git reset --hard origin/staging`.
+
+## Cherry-Pick Rules
+
+- Cherry-pick copies a single commit with a **new SHA**. The source branch still has the original SHA.
+- **Never merge a branch after cherry-picking from it** — the duplicate content (different SHAs) will cause conflicts.
+- If you cherry-pick onto staging, you still need a temp branch + PR to push (branch protection).
+
+## Creating Feature Branches
+
+Always start from a fresh staging:
+```
+git checkout staging
+git fetch origin
+git reset --hard origin/staging
+git checkout -b feature/my-feature
+```
+
+## Conflict Resolution
+
+If a PR shows conflicts, rebase the feature branch:
+```
+git checkout feature/xxx
+git fetch origin
+git rebase origin/staging
+git push --force-with-lease origin feature/xxx
+```
+- If rebase says "No changes — did you forget to use git add?": run `git rebase --skip` (commit already in staging).
+- **Before force-pushing**, verify content is preserved: `git diff origin/staging...HEAD --stat`
+- **Never force-push without verifying** that all intended changes are still present.
+
+## Parallel Branch Workflow
+
+- Each engineer gets a **separate feature branch** touching **different files**.
+- Never share a feature branch between engineers.
+- After all PRs are ready, merge to staging **one at a time**:
+  1. Merge first PR on GitHub
+  2. `git fetch origin && git reset --hard origin/staging`
+  3. Merge next PR on GitHub
+  4. `git fetch origin && git reset --hard origin/staging`
+  5. Repeat until all merged
+- Always reset between merges. Never `git pull`.
+
+## Post-Merge Cleanup (mandatory after every PR merge)
+
+1. Delete feature branch: `git branch -D feature/xxx && git push origin --delete feature/xxx`
+2. Reset staging: `git fetch origin && git reset --hard origin/staging`
+3. Verify: `git status` shows "nothing to commit, working tree clean" and "up to date with origin/staging"

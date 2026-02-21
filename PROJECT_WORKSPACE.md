@@ -16,8 +16,8 @@
 **Active Agents**: Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect, PM, CTO, CFO  
 **Pending Approvals**: 0  
 **Blockers**: None  
-**Next Actions**: Objective 1 PR pushed. User must merge feature/orchestrator-rules → staging. Then continue with platform-agnostic Phases B, C, D.  
-**User Intervention Required**: Yes — Merge PR feature/orchestrator-rules → staging on GitHub.
+**Next Actions**: Phase B PR pushed. User must merge feature/pa-phase-b → staging. Then Phase C + Task 2 in parallel.  
+**User Intervention Required**: Yes — Merge PR feature/pa-phase-b → staging on GitHub.
 
 ---
 
@@ -202,7 +202,7 @@ When creating a new Cursor chat for a specific role, assign the role explicitly:
 1. **Name the chat** with the role name (e.g., "CTO", "Lead Engineer", "Architect")
 2. **Give the chat this initial prompt:**
    ```
-   You are the [ROLE]. Your role-specific prompt file location is: /Users/anuragabhay/agent-automation/prompts/{role}_action.md. Always check this file before starting any work. If a prompt file exists, read it and execute the task described. If no prompt file exists, proceed with normal workflow from PROJECT_WORKSPACE.md.
+   You are the [ROLE]. Your role-specific prompt file location is: agent-automation/prompts/{role}_action.md (relative to workspace root). Always check this file before starting any work. If a prompt file exists, read it and execute the task described. If no prompt file exists, proceed with normal workflow from PROJECT_WORKSPACE.md.
    ```
 
 **Role-to-Prompt File Mapping:**
@@ -230,12 +230,12 @@ When creating a new Cursor chat for a specific role, assign the role explicitly:
 
 **CTO Chat Setup:**
 ```
-You are the CTO. Your role-specific prompt file location is: /Users/anuragabhay/agent-automation/prompts/cto_action.md. Always check this file before starting any work.
+You are the CTO. Your role-specific prompt file location is: agent-automation/prompts/cto_action.md (relative to workspace root). Always check this file before starting any work.
 ```
 
 **Lead Engineer Chat Setup:**
 ```
-You are the Lead Engineer. Your role-specific prompt file location is: /Users/anuragabhay/agent-automation/prompts/lead_engineer_action.md. Always check this file before starting any work.
+You are the Lead Engineer. Your role-specific prompt file location is: agent-automation/prompts/lead_engineer_action.md (relative to workspace root). Always check this file before starting any work.
 ```
 
 **Important Notes:**

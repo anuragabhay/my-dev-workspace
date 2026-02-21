@@ -17,7 +17,7 @@
 **Pending Approvals**: 0  
 **Blockers**: None  
 **Next Actions**: Task 1 complete (staging up to date with all Web UI work). Ready for Task 2 (platform-agnostic refactor).  
-**User Intervention Required**: No
+**User Intervention Required**: Yes — Merge PR feature/pa-code-wiring → staging on GitHub.
 
 ---
 

@@ -20,6 +20,30 @@ This document defines the branching model for the repository. All agents and con
 
 ---
 
+## Agent workflow
+
+Rules for automated agents (Orchestrator, Lead Engineer, Junior Engineers, etc.) when interacting with Git:
+
+1. **Agents push to feature branches only.** Agents never push directly to `staging` or `master`. All work goes on a feature branch off `staging`.
+
+2. **Pause after push.** After a subagent pushes a feature branch, the Orchestrator sets `User Intervention Required = Yes` in `PROJECT_WORKSPACE.md` and pauses. The Orchestrator outputs an "ACTION REQUIRED" message with the GitHub PR URL.
+
+3. **User creates and merges PR.** The user (human) creates and merges the pull request on GitHub manually. Agents do not create or merge PRs.
+
+4. **Sync after merge — never `git pull`.** After the user confirms the PR is merged, agents run:
+   ```
+   git checkout staging && git fetch origin && git reset --hard origin/staging
+   ```
+   Never use `git pull` after a squash merge — squash-merge rewrites history, causing divergent histories that `git pull` cannot reconcile.
+
+5. **Agents never use `gh` CLI.** Agents do not use GitHub CLI (`gh`) for PR creation, closure, or any GitHub API operations. All GitHub operations are performed by the user.
+
+6. **One feature branch per task/phase.** Each task or phase gets its own feature branch. Delete feature branches locally after the PR is merged.
+
+7. **The Orchestrator never runs git commands.** The Orchestrator delegates all git operations (checkout, fetch, reset, commit, push, branch creation/deletion) to subagents (Lead Engineer, Junior Engineer 1, Junior Engineer 2). The Orchestrator only reads workspace state, decides the next task, and issues slash-command delegations.
+
+---
+
 ## GitHub repository checklist (user action)
 
 Configure the GitHub repository as follows. The Orchestrator and agents do **not** change GitHub settings; the user must perform these steps.

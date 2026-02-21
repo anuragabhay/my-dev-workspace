@@ -12,9 +12,17 @@ from datetime import datetime
 class AgentTrigger:
     """Generates prompts for agents to act on workspace changes."""
     
-    def __init__(self, config_path: str, workspace_path: str):
-        self.config = self._load_config(config_path)
-        self.workspace_path = Path(workspace_path)
+    def __init__(self, config=None, config_path: str = None, workspace_path: str = None):
+        if isinstance(config, dict):
+            self.config = config
+        elif config_path:
+            self.config = self._load_config(config_path)
+        elif isinstance(config, str):
+            self.config = self._load_config(config)
+        else:
+            from workspace_config import load_config
+            self.config = load_config()
+        self.workspace_path = Path(workspace_path) if workspace_path else Path(self.config.get('workspace_path', 'PROJECT_WORKSPACE.md'))
         self.prompt_dir = Path(self.config.get('prompt_dir', './prompts'))
         self.prompt_dir.mkdir(exist_ok=True)
     

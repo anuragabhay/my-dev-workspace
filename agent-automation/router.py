@@ -11,8 +11,16 @@ from pathlib import Path
 class AgentRouter:
     """Routes workspace events to appropriate agents."""
     
-    def __init__(self, config_path: str):
-        self.config = self._load_config(config_path)
+    def __init__(self, config=None, config_path: str = None):
+        if isinstance(config, dict):
+            self.config = config
+        elif config_path:
+            self.config = self._load_config(config_path)
+        elif isinstance(config, str):
+            self.config = self._load_config(config)
+        else:
+            from workspace_config import load_config
+            self.config = load_config()
         self.agent_configs = self.config.get('agents', {})
     
     def _load_config(self, config_path: str) -> Dict:

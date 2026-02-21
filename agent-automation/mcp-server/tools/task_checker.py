@@ -31,7 +31,7 @@ def check_my_pending_tasks(role: str, config_path: str = None) -> Dict[str, Any]
     
     # Initialize components
     parser = WorkspaceParser(config['workspace_path'])
-    router = AgentRouter(config_path)
+    router = AgentRouter(config=config)
     state_tracker = StateTracker(
         db_path=config['state_db'],
         json_backup_path=config['json_backup']

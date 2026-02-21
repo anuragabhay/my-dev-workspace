@@ -1,0 +1,3 @@
+# Workspace root is auto-detected as the parent of agent-automation/.
+# Only set workspace_root if agent-automation/ is NOT inside your workspace root.
+# workspace_root: /path/to/workspace

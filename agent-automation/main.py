@@ -30,9 +30,9 @@ class AgentAutomationSystem:
             json_backup_path=self.config['json_backup']
         )
         self.parser = WorkspaceParser(self.config['workspace_path'])
-        self.router = AgentRouter(str(config_path))
+        self.router = AgentRouter(config=self.config)
         self.trigger = AgentTrigger(
-            config_path=str(config_path),
+            config=self.config,
             workspace_path=self.config['workspace_path']
         )
         

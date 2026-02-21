@@ -3,6 +3,35 @@
 # Narrative: agent-automation/orchestrator_patterns.md
 
 rules:
+  - id: orchestrator_never_implements
+    priority: 0
+    condition: "always"
+    action: delegate_only
+    description: >
+      HARD RULE: The Orchestrator NEVER runs shell commands (git, npm, pip, python, etc.),
+      NEVER edits or creates files, NEVER writes code. If the next step involves running
+      a command, editing a file, creating a file, or any implementation — delegate it to
+      the appropriate subagent (Lead Engineer, Junior Engineer 1, Junior Engineer 2, etc.).
+      This includes git checkout, git fetch, git reset, git commit, git push, file creation,
+      and any code changes. The Orchestrator's ONLY outputs are: (1) reading workspace/MCP,
+      (2) deciding next step, (3) issuing slash-command delegations, (4) updating
+      PROJECT_WORKSPACE.md Dashboard/Next Actions text (via a subagent if file edits needed).
+      After a user confirms a manual action (e.g. "done", "merged", "continue"), the
+      Orchestrator reads the plan, decides the next task, and delegates it to a subagent.
+      It does NOT execute the next task itself.
+
+  - id: user_checkpoint_resume
+    priority: 1.5
+    condition: "user_confirmed_checkpoint"
+    action: read_plan_then_delegate
+    target_role_from: workflow
+    description: >
+      After user confirms a checkpoint action (PR merged, branch created, etc.):
+      (1) read PROJECT_WORKSPACE.md and git state via a subagent if needed,
+      (2) decide the next concrete task from the plan,
+      (3) delegate to the appropriate subagent via slash command.
+      Do NOT execute the task directly. Do NOT run git commands.
+
   - id: pending_approvals
     priority: 1
     condition: "pending_approvals > 0"

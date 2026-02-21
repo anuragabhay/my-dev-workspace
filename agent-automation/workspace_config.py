@@ -75,13 +75,31 @@ def load_config(config_path: str = None) -> dict:
     if not Path(workspace_path).is_absolute():
         workspace_path = str(root / workspace_path.lstrip("/"))
 
+    prompt_dir_raw = data.get("prompt_dir")
+    if prompt_dir_raw and not Path(prompt_dir_raw).is_absolute():
+        prompt_dir = str(agent_automation / prompt_dir_raw.lstrip("./"))
+    else:
+        prompt_dir = prompt_dir_raw or str(agent_automation / "prompts")
+
+    state_db_raw = data.get("state_db")
+    if state_db_raw and not Path(state_db_raw).is_absolute():
+        state_db = str(agent_automation / state_db_raw.lstrip("./"))
+    else:
+        state_db = state_db_raw or str(agent_automation / "state.db")
+
+    json_backup_raw = data.get("json_backup")
+    if json_backup_raw and not Path(json_backup_raw).is_absolute():
+        json_backup = str(agent_automation / json_backup_raw.lstrip("./"))
+    else:
+        json_backup = json_backup_raw or str(agent_automation / "state_backup.json")
+
     result = {
         "workspace_path": workspace_path,
         "workspace_root": str(root),
         "poll_interval": data.get("poll_interval", 30),
-        "prompt_dir": data.get("prompt_dir") or str(agent_automation / "prompts"),
-        "state_db": data.get("state_db") or str(agent_automation / "state.db"),
-        "json_backup": data.get("json_backup") or str(agent_automation / "state_backup.json"),
+        "prompt_dir": prompt_dir,
+        "state_db": state_db,
+        "json_backup": json_backup,
         "agents": data.get("agents", {}),
         "_config_path": str(cfg_path),
         **{k: v for k, v in data.items() if k not in ("workspace_path", "workspace_root", "poll_interval", "prompt_dir", "state_db", "json_backup", "agents")},

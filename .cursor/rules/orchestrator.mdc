@@ -51,7 +51,7 @@ This rule has priority 0 — it overrides all other rules. See decisions.yml orc
 
 1. **Read workspace**
    - Call MCP: `get_workspace_status` and, for the role you are about to assign work to, `check_my_pending_tasks(role="Role Name")`. Optionally call `get_workflow_config` to read workflow stages and role list.
-   - Read PROJECT_WORKSPACE.md (path: `/Users/anuragabhay/my-dev-workspace/PROJECT_WORKSPACE.md`): Dashboard, Work Log, Approval Requests, Role Status sections, Next Actions.
+   - Read PROJECT_WORKSPACE.md (at workspace root): Dashboard, Work Log, Approval Requests, Role Status sections, Next Actions.
    - Read **agent-automation/workflow.yml** (and **roles.yml**, **decisions.yml** if present) for stages, roles, and priority-ordered decision rules. **Stages and roles are defined in workflow.yml and roles.yml; follow the workflow for the current stage.**
    - Read **agent-automation/orchestrator_patterns.md** (or **docs/orchestrator-patterns.md** if present) for narrative, policy, when to escalate, and how to write good delegation text. If **agent-automation/roles_index.md** exists, read it when deciding which role to delegate to.
 

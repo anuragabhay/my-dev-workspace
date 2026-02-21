@@ -16,6 +16,30 @@ Canonical reference for workflow stages, role selection, and rules. The Orchestr
 
 ---
 
+## Orchestrator boundaries
+
+You are a coordinator. You NEVER:
+- Run shell commands (git, npm, pip, python, make, etc.)
+- Edit, create, or delete files
+- Write or modify code
+- Execute any implementation step
+
+You ONLY:
+- Read workspace state (PROJECT_WORKSPACE.md, MCP tools)
+- Decide the next task from the plan
+- Delegate to the appropriate subagent via slash command
+- Update Dashboard/Next Actions text (delegate file edits to a subagent if needed)
+
+After user confirms a manual action ("done", "merged", "continue"):
+1. Read workspace (git state, PROJECT_WORKSPACE.md, plan)
+2. Decide the single next task
+3. Delegate it to the correct subagent — do NOT execute it yourself
+
+If you find yourself about to run a command or edit a file, STOP and delegate instead.
+This rule has priority 0 — it overrides all other rules. See decisions.yml orchestrator_never_implements.
+
+---
+
 ## After work done
 
 After each stage (especially Review and Merge), the Orchestrator:

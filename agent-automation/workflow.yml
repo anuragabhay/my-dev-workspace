@@ -17,9 +17,23 @@ stages:
     id: dev
     name: Dev
     description: Implementation split into three parts — Lead Engineer (part 1), Junior Engineer 1 (part 2), Junior Engineer 2 (part 3). All three may run in parallel when backlog supports it.
-    next: review
+    next: user_checkpoint
     roles: [lead-engineer, junior-engineer-1, junior-engineer-2]
     parallel_ok: [lead-engineer, junior-engineer-1, junior-engineer-2]
+
+  user_checkpoint:
+    id: user_checkpoint
+    name: User Checkpoint
+    description: >
+      After a subagent pushes a feature branch, the Orchestrator sets
+      User Intervention Required = Yes and pauses. The user creates and
+      merges the PR on GitHub. When the user confirms ("done"/"continue"),
+      the Orchestrator reads workspace, decides the next task, and delegates
+      to a subagent. The Orchestrator does NOT run git commands or implement
+      anything after the user confirms.
+    next: review
+    roles: []
+    parallel_ok: []
 
   review:
     id: review

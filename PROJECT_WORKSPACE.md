@@ -16,8 +16,8 @@
 **Active Agents**: Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect, PM, CTO, CFO  
 **Pending Approvals**: 0  
 **Blockers**: None  
-**Next Actions**: Task 1 complete (staging up to date with all Web UI work). Ready for Task 2 (platform-agnostic refactor).  
-**User Intervention Required**: Yes — Merge PR feature/pa-code-wiring → staging on GitHub.
+**Next Actions**: Objective 1 PR pushed. User must merge feature/orchestrator-rules → staging. Then continue with platform-agnostic Phases B, C, D.  
+**User Intervention Required**: Yes — Merge PR feature/orchestrator-rules → staging on GitHub.
 
 ---
 

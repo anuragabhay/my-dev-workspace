@@ -18,7 +18,7 @@ The Agent Automation System now includes an MCP (Model Context Protocol) server 
 **Create virtual environment and install dependencies:**
 
 ```bash
-cd /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server
+cd agent-automation/mcp-server
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
@@ -28,32 +28,32 @@ pip install -r requirements.txt
 
 ### 2. Configure Cursor
 
-Cursor MCP configuration is set up at `/Users/anuragabhay/my-dev-workspace/.cursor/mcp.json`:
+Cursor MCP configuration is set up at `.cursor/mcp.json` (at workspace root):
 
 ```json
 {
   "mcpServers": {
     "agent-automation": {
-      "command": "/Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server/venv/bin/python",
-      "args": ["/Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server/server.py"],
+      "command": "$(WORKSPACE_ROOT)/agent-automation/mcp-server/venv/bin/python",
+      "args": ["$(WORKSPACE_ROOT)/agent-automation/mcp-server/server.py"],
       "env": {
-        "PYTHONPATH": "/Users/anuragabhay/my-dev-workspace/agent-automation"
+        "PYTHONPATH": "$(WORKSPACE_ROOT)/agent-automation"
       }
     }
   }
 }
 ```
 
-**Important**: The configuration uses the virtual environment Python to ensure dependencies are available.
+**Important**: The configuration uses the virtual environment Python to ensure dependencies are available. Note: `.cursor/mcp.json` requires absolute paths at runtime; `$(WORKSPACE_ROOT)` is shown here as a template — replace it with your actual workspace root path.
 
 ### 3. Test MCP Server
 
 **Before restarting Cursor, test the server:**
 
 ```bash
-cd /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server
+cd agent-automation/mcp-server
 source venv/bin/activate
-PYTHONPATH=/Users/anuragabhay/my-dev-workspace/agent-automation python test_server.py
+PYTHONPATH=$(WORKSPACE_ROOT)/agent-automation python test_server.py
 ```
 
 This should output "✅ All tests passed! MCP server is ready."
@@ -202,29 +202,29 @@ The MCP server integrates seamlessly with existing automation components:
 
 1. **Missing Dependencies**
    ```bash
-   cd /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server
+   cd agent-automation/mcp-server
    source venv/bin/activate
    pip install -r requirements.txt
    ```
 
 2. **Virtual Environment Not Created**
    ```bash
-   cd /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server
+   cd agent-automation/mcp-server
    python3 -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
    ```
 
 3. **Wrong Python Path in Config**
-   - Verify `.cursor/mcp.json` uses: `/Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server/venv/bin/python`
-   - Check that the venv exists: `ls -la /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server/venv/bin/python`
+   - Verify `.cursor/mcp.json` uses the correct absolute path to: `agent-automation/mcp-server/venv/bin/python`
+   - Check that the venv exists: `ls -la agent-automation/mcp-server/venv/bin/python`
 
 4. **Import Errors**
-   - Test server manually: `cd mcp-server && source venv/bin/activate && PYTHONPATH=/Users/anuragabhay/my-dev-workspace/agent-automation python test_server.py`
+   - Test server manually: `cd agent-automation/mcp-server && source venv/bin/activate && PYTHONPATH=$(WORKSPACE_ROOT)/agent-automation python test_server.py`
    - Check for missing modules in error output
 
 5. **PYTHONPATH Not Set**
-   - Verify `.cursor/mcp.json` includes: `"PYTHONPATH": "/Users/anuragabhay/my-dev-workspace/agent-automation"` in env
+   - Verify `.cursor/mcp.json` includes `"PYTHONPATH"` pointing to the `agent-automation` directory in env
 
 6. **Cursor Not Restarted**
    - Completely quit Cursor (not just close window)
@@ -237,7 +237,7 @@ If MCP tools are not available after fixing errors:
 1. Check Cursor Settings → Tools & MCP → agent-automation status
 2. Review "Show Output" for error messages
 3. Run test script: `python test_server.py` in mcp-server directory
-4. Use fallback: Check prompt files manually at `/Users/anuragabhay/my-dev-workspace/agent-automation/prompts/`
+4. Use fallback: Check prompt files manually at `agent-automation/prompts/`
 
 ### Tool Errors
 
@@ -260,7 +260,7 @@ If tasks are not being tracked:
 
 Test the server manually:
 ```bash
-cd /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server
+cd agent-automation/mcp-server
 python server.py
 ```
 

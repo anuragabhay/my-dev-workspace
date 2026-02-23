@@ -15,7 +15,7 @@ The Agent Automation System monitors `PROJECT_WORKSPACE.md` and automatically tr
 ### 1. Navigate to Project Directory
 
 ```bash
-cd /Users/anuragabhay/my-dev-workspace/agent-automation
+cd agent-automation
 ```
 
 ### 2. Create Virtual Environment

@@ -85,9 +85,9 @@ python -c "import yaml; print('OK')"
 
 2. **Test Server Manually:**
    ```bash
-   cd /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server
+   cd agent-automation/mcp-server
    source venv/bin/activate
-   PYTHONPATH=/Users/anuragabhay/my-dev-workspace/agent-automation python test_server.py
+   PYTHONPATH=$(WORKSPACE_ROOT)/agent-automation python test_server.py
    ```
 
 3. **Verify Configuration:**
@@ -95,15 +95,15 @@ python -c "import yaml; print('OK')"
    cat .cursor/mcp.json
    ```
    
-   Should show:
+   Should show (with `$(WORKSPACE_ROOT)` replaced by your actual workspace root):
    ```json
    {
      "mcpServers": {
        "agent-automation": {
-         "command": "/Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server/venv/bin/python",
-         "args": ["/Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server/server.py"],
+         "command": "$(WORKSPACE_ROOT)/agent-automation/mcp-server/venv/bin/python",
+         "args": ["$(WORKSPACE_ROOT)/agent-automation/mcp-server/server.py"],
          "env": {
-           "PYTHONPATH": "/Users/anuragabhay/my-dev-workspace/agent-automation"
+           "PYTHONPATH": "$(WORKSPACE_ROOT)/agent-automation"
          }
        }
      }
@@ -112,7 +112,7 @@ python -c "import yaml; print('OK')"
 
 4. **Check Virtual Environment:**
    ```bash
-   ls -la /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server/venv/bin/python
+   ls -la agent-automation/mcp-server/venv/bin/python
    ```
    
    Should exist and be executable.
@@ -127,20 +127,19 @@ python -c "import yaml; print('OK')"
 
 1. **Test Tool Directly:**
    ```bash
-   cd /Users/anuragabhay/my-dev-workspace/agent-automation/mcp-server
+   cd agent-automation/mcp-server
    source venv/bin/activate
-   PYTHONPATH=/Users/anuragabhay/my-dev-workspace/agent-automation python -c "from tools.task_checker import check_my_pending_tasks; print(check_my_pending_tasks('Lead Engineer'))"
+   PYTHONPATH=$(WORKSPACE_ROOT)/agent-automation python -c "from tools.task_checker import check_my_pending_tasks; print(check_my_pending_tasks('Lead Engineer'))"
    ```
 
 2. **Check Config File:**
    ```bash
-   ls /Users/anuragabhay/my-dev-workspace/agent-automation/config.yaml
-   cat /Users/anuragabhay/my-dev-workspace/agent-automation/config.yaml | head -5
+   ls agent-automation/config.yaml
    ```
 
 3. **Check Workspace File:**
    ```bash
-   ls /Users/anuragabhay/my-dev-workspace/PROJECT_WORKSPACE.md
+   ls PROJECT_WORKSPACE.md
    ```
 
 ## Verification Checklist
@@ -169,7 +168,7 @@ If issues persist:
    - Manual tool execution output
 
 3. **Fallback:**
-   - Use prompt files manually: `/Users/anuragabhay/my-dev-workspace/agent-automation/prompts/{role}_action.md`
+   - Use prompt files manually: `agent-automation/prompts/{role}_action.md`
    - Automation system still works without MCP
 
 ## Test Commands
@@ -188,8 +187,8 @@ source venv/bin/activate
 python -c "from mcp.server import Server; print('MCP OK')"
 
 # Test tool imports
-PYTHONPATH=/Users/anuragabhay/my-dev-workspace/agent-automation python -c "from tools.task_checker import check_my_pending_tasks; print('Tools OK')"
+PYTHONPATH=$(WORKSPACE_ROOT)/agent-automation python -c "from tools.task_checker import check_my_pending_tasks; print('Tools OK')"
 
 # Test tool execution
-PYTHONPATH=/Users/anuragabhay/my-dev-workspace/agent-automation python -c "from tools.task_checker import check_my_pending_tasks; result = check_my_pending_tasks('Lead Engineer'); print(f'Execution OK: {result.get(\"task_count\", 0)} tasks')"
+PYTHONPATH=$(WORKSPACE_ROOT)/agent-automation python -c "from tools.task_checker import check_my_pending_tasks; result = check_my_pending_tasks('Lead Engineer'); print(f'Execution OK: {result.get(\"task_count\", 0)} tasks')"
 ```

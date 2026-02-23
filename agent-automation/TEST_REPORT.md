@@ -32,7 +32,7 @@ The Agent Automation System has been thoroughly tested. **The system is function
 - ✅ `requirements.txt` - Dependencies file present
 
 **Configuration Check**:
-- Workspace path: `/Users/anuragabhay/my-dev-workspace/PROJECT_WORKSPACE.md` ✅
+- Workspace path: `PROJECT_WORKSPACE.md (at workspace root)` ✅
 - Prompt directory: `./prompts` ✅
 - State database: `./state.db` ✅
 
@@ -101,7 +101,7 @@ The Agent Automation System has been thoroughly tested. **The system is function
 - ✅ Action required: Approval #001 review request
 - ✅ Context from workspace: Approval details included
 - ✅ Expected output format: Instructions for approval/rejection/revision
-- ✅ Workspace location: `/Users/anuragabhay/my-dev-workspace/PROJECT_WORKSPACE.md`
+- ✅ Workspace location: `PROJECT_WORKSPACE.md (at workspace root)`
 - ✅ Important instructions section included
 - ✅ Decision authority information included
 

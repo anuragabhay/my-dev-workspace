@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orchestrator A2A Brain</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --success: #3fb950;
+      --warning: #d29922;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 1.5rem;
+      line-height: 1.5;
+    }
+    h1 { font-size: 1.25rem; margin: 0 0 1rem; color: var(--accent); }
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .section h2 { font-size: 0.9rem; margin: 0 0 0.5rem; color: var(--muted); }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.25rem; }
+    input[type="password"], input[type="text"], textarea {
+      width: 100%;
+      padding: 0.5rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    button {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    button:hover { opacity: 0.9; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem; }
+    .status.ok { color: var(--success); }
+    .status.err { color: var(--warning); }
+    .flow-step {
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      background: var(--bg);
+      border-left: 3px solid var(--border);
+      border-radius: 0 4px 4px 0;
+    }
+    .flow-step.proposal { border-left-color: #58a6ff; }
+    .flow-step.critique { border-left-color: #d29922; }
+    .flow-step.synthesis { border-left-color: #3fb950; }
+    .flow-step.decision { border-left-color: #a371f7; }
+    .flow-step h3 { font-size: 0.85rem; margin: 0 0 0.5rem; color: var(--muted); }
+    .flow-step pre { white-space: pre-wrap; word-break: break-word; margin: 0; font-size: 0.8rem; }
+    .error { color: #f85149; }
+  </style>
+</head>
+<body>
+  <h1>Orchestrator A2A Brain</h1>
+  <p class="status" id="api-status">Checking API status…</p>
+
+  <div class="section">
+    <h2>Configuration</h2>
+    <label for="api-key">Anthropic API Key (leave empty to use env)</label>
+    <input type="password" id="api-key" placeholder="sk-ant-…" autocomplete="off">
+    <label for="workspace-snippet" style="margin-top: 0.5rem;">Optional: PROJECT_WORKSPACE.md snippet</label>
+    <textarea id="workspace-snippet" placeholder="Paste workspace snippet for context…"></textarea>
+  </div>
+
+  <div class="section">
+    <button id="run-btn">Run brain</button>
+  </div>
+
+  <div class="section" id="results" style="display: none;">
+    <h2>A2A Flow</h2>
+    <div id="flow-output"></div>
+  </div>
+
+  <div class="section" id="error-box" style="display: none;">
+    <h2>Error</h2>
+    <pre class="error" id="error-output"></pre>
+  </div>
+
+  <script>
+    const API_BASE = '';
+
+    async function checkStatus() {
+      const el = document.getElementById('api-status');
+      try {
+        const r = await fetch(API_BASE + '/api/status');
+        const d = await r.json();
+        el.textContent = `API: ${d.status} | Env API key: ${d.api_key_from_env ? 'set' : 'not set'} | Workspace: ${d.project_workspace_exists ? 'found' : 'not found'}`;
+        el.className = 'status ok';
+      } catch (e) {
+        el.textContent = 'API unreachable: ' + e.message;
+        el.className = 'status err';
+      }
+    }
+
+    async function runBrain() {
+      const btn = document.getElementById('run-btn');
+      const results = document.getElementById('results');
+      const flowOutput = document.getElementById('flow-output');
+      const errorBox = document.getElementById('error-box');
+      const errorOutput = document.getElementById('error-output');
+
+      btn.disabled = true;
+      results.style.display = 'none';
+      errorBox.style.display = 'none';
+
+      const apiKey = document.getElementById('api-key').value.trim();
+      const snippet = document.getElementById('workspace-snippet').value.trim();
+
+      const body = {};
+      if (apiKey) body.anthropic_api_key = apiKey;
+      if (snippet) body.workspace_snippet = snippet;
+
+      try {
+        const r = await fetch(API_BASE + '/api/run-brain', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const data = await r.json();
+
+        if (!r.ok) {
+          throw new Error(data.detail || data.message || 'Unknown error');
+        }
+
+        flowOutput.innerHTML = [
+          ['proposal', 'Proposal', data.proposal],
+          ['critique', 'Critique', data.critique],
+          ['synthesis', 'Synthesis', data.synthesis],
+          ['decision', 'Final Decision', data.final_decision],
+        ].map(([cls, label, text]) => `
+          <div class="flow-step ${cls}">
+            <h3>${label}</h3>
+            <pre>${escapeHtml(text || '(empty)')}</pre>
+          </div>
+        `).join('');
+
+        results.style.display = 'block';
+      } catch (e) {
+        errorOutput.textContent = e.message;
+        errorBox.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    document.getElementById('run-btn').addEventListener('click', runBrain);
+    checkStatus();
+  </script>
+</body>
+</html>

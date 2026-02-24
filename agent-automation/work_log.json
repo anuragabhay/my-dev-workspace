@@ -1,5 +1,12 @@
 [
   {
+    "timestamp": "2026-02-24 12:00 UTC",
+    "role": "Junior Engineer 1",
+    "task": "OBJECTIVE 2: History status filters, error states, UI improvements",
+    "status": "✅ COMPLETED",
+    "content": "- History: status filter (All, Completed, Failed, In progress, Pending); backend /api/history?status=; repository get_executions_count_filtered, get_last_executions_filtered\n- Dashboard: error state with Retry when health/history API fails\n- History: error state with Retry when API fails\n- API tests for history status filter\n- Fix .gitignore to allow frontend/src/lib/\n- Branch feature/ui-improvements pushed; User Intervention Required for PR merge"
+  },
+  {
     "timestamp": "2026-02-20T11:27:36Z",
     "role": "Orchestrator",
     "task": "Task A and B complete; merge via PRs",

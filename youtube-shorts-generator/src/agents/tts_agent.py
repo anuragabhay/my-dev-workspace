@@ -31,6 +31,11 @@ class TTSAgent(BaseAgent):
             out = Path("tmp") / "tts_output.mp3"
             path, cost = text_to_speech(script_for_voice, output_path=out)
             self.log_cost(context.execution_id, "tts", cost)
-            return AgentResult(success=True, data={"audio_path": str(path)})
+            return AgentResult(
+                success=True,
+                data={"audio_path": str(path)},
+                model_used="ElevenLabs",
+                action_summary="Generated voiceover",
+            )
         except Exception as e:
             return AgentResult(success=False, message=str(e))

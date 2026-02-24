@@ -11,7 +11,19 @@ from src.orchestration.message_queue import MessageQueue
 from src.database import repository
 from src.database import models
 
-ProgressCallback = Callable[[str, str, float, str], Awaitable[None]]
+ProgressCallback = Callable[[str, str, float, str, Optional[str], Optional[str]], Awaitable[None]]
+
+
+def _model_for_agent(agent_name: str, result: Optional[AgentResult] = None) -> Optional[str]:
+    """Resolve model label for progress display."""
+    if result and result.model_used:
+        return result.model_used
+    if agent_name in ("research", "script", "uniqueness"):
+        from src.services.llm_router import get_model_for_agent
+        return get_model_for_agent(agent_name, for_embeddings=(agent_name == "uniqueness"))
+    if agent_name == "tts":
+        return "ElevenLabs"
+    return None
 
 
 def _project_root() -> Path:
@@ -59,16 +71,21 @@ class Pipeline:
             save_stage(execution_id, agent.name, db_path=self.db_path)
             pct = (idx / total) * 100.0 if total else 0
             if progress_callback:
-                await progress_callback(agent.name, "start", pct, f"Starting {agent.name}")
+                model = _model_for_agent(agent.name, None)
+                await progress_callback(agent.name, "start", pct, f"Starting {agent.name}", model, None)
             result = await agent.execute(context)
             context.data[agent.name] = (result.data or {})
             pct = ((idx + 1) / total) * 100.0 if total else 100.0
             if progress_callback:
+                model = _model_for_agent(agent.name, result)
+                action_summary = result.action_summary if result else None
                 await progress_callback(
                     agent.name,
                     "complete" if result.success else "error",
                     pct,
                     result.message or (f"Completed {agent.name}" if result.success else str(result.message)),
+                    model,
+                    action_summary,
                 )
             if not result.success:
                 repository.update_execution(

@@ -5,6 +5,8 @@ export interface ProgressEvent {
   step: string
   percent: number
   log: string
+  model?: string
+  action_summary?: string
 }
 
 export function useWebSocket(executionId: number | null, enabled: boolean) {

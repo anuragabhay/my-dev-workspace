@@ -81,6 +81,26 @@ def test_history_returns_paginated(client):
     assert isinstance(data["total"], int)
 
 
+def test_history_filter_by_status(client):
+    """GET /api/history?status=completed returns only completed executions."""
+    resp = client.get("/api/history?limit=50&offset=0&status=completed")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "executions" in data
+    assert "total" in data
+    for ex in data["executions"]:
+        assert ex.get("status") == "completed"
+
+
+def test_history_filter_invalid_status_returns_empty(client):
+    """GET /api/history?status=nonexistent returns empty list (no match)."""
+    resp = client.get("/api/history?limit=10&offset=0&status=nonexistent")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["executions"] == []
+    assert data["total"] == 0
+
+
 def test_video_404_when_not_found(client):
     """GET /api/video/{id} returns 404 when video doesn't exist."""
     resp = client.get("/api/video/99999")

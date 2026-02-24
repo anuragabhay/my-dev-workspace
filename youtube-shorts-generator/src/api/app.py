@@ -148,12 +148,19 @@ async def get_status(execution_id: int) -> dict:
 async def get_history(
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0),
+    status: Optional[str] = Query(None, description="Filter by status: pending, in_progress, completed, failed"),
 ) -> dict:
-    """List past executions (paginated)."""
+    """List past executions (paginated, optionally filtered by status)."""
     run_migrations(_db_path())
-    total = repository.get_executions_count(db_path=_db_path())
-    rows = repository.get_last_executions(n=limit + offset, db_path=_db_path())
-    page = rows[offset : offset + limit]
+    if status:
+        total = repository.get_executions_count_filtered(status=status, db_path=_db_path())
+        page = repository.get_last_executions_filtered(
+            n=limit, offset=offset, status=status, db_path=_db_path()
+        )
+    else:
+        total = repository.get_executions_count(db_path=_db_path())
+        rows = repository.get_last_executions(n=limit + offset, db_path=_db_path())
+        page = rows[offset : offset + limit]
     return {"executions": page, "total": total}
 
 

@@ -83,9 +83,23 @@ async def _run_pipeline(execution_id: int, topic: Optional[str], config_override
     ]
     pipeline = Pipeline(agents=agents, db_path=_db_path())
 
-    async def progress_cb(agent_name: str, step: str, percent: float, log_message: str) -> None:
+    async def progress_cb(
+        agent_name: str,
+        step: str,
+        percent: float,
+        log_message: str,
+        model: Optional[str] = None,
+        action_summary: Optional[str] = None,
+    ) -> None:
         subs = _progress_subscribers.get(execution_id, set()).copy()
-        msg = {"agent": agent_name, "step": step, "percent": percent, "log": log_message}
+        msg = {
+            "agent": agent_name,
+            "step": step,
+            "percent": percent,
+            "log": log_message,
+            "model": model,
+            "action_summary": action_summary,
+        }
         for ws in subs:
             try:
                 await ws.send_json(msg)
@@ -103,7 +117,14 @@ async def _run_pipeline(execution_id: int, topic: Optional[str], config_override
         subs = _progress_subscribers.get(execution_id, set()).copy()
         for ws in subs:
             try:
-                await ws.send_json({"agent": "pipeline", "step": "error", "percent": 0, "log": str(e)})
+                await ws.send_json({
+                    "agent": "pipeline",
+                    "step": "error",
+                    "percent": 0,
+                    "log": str(e),
+                    "model": None,
+                    "action_summary": None,
+                })
             except Exception:
                 pass
     finally:

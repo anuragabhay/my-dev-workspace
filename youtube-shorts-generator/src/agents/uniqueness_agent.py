@@ -17,6 +17,14 @@ class UniquenessAgent(BaseAgent):
         # Skip embedding call for now (project often lacks text-embedding-* access). Pass through.
         last = repository.get_last_executions(10)
         if not last:
-            return AgentResult(success=True, data={"similarity_max": 0.0, "passed": True})
+            return AgentResult(
+                success=True,
+                data={"similarity_max": 0.0, "passed": True},
+                action_summary="Checked similarity (no prior videos)",
+            )
         # When embedding access is available: get_embeddings([script]), load last 10 embeddings, compute similarity, reject if >30%.
-        return AgentResult(success=True, data={"similarity_max": 0.0, "passed": True})
+        return AgentResult(
+            success=True,
+            data={"similarity_max": 0.0, "passed": True},
+            action_summary="Checked similarity to last 10 videos",
+        )

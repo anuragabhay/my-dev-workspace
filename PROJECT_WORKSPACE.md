@@ -34,6 +34,43 @@
 
 ---
 
+## Handoff: Flow steps + Orchestrator UI (Tasks A & B)
+
+### 1. What you need to know
+
+- **Task A:** YouTube Shorts Generator now has a "Flow steps" section on the Generate page showing each pipeline step with agent, model used, status, and action summary (thinking/actions).
+- **Task B:** Orchestrator UI is a standalone web app to run the A2A brain (propose → critique → synthesize) with your own API keys, no Cursor required.
+
+### 2. How to test each part
+
+- **Test Flow steps (Task A):**
+  1. `cd youtube-shorts-generator`
+  2. Run `./run_dev.sh` (or equivalent dev script)
+  3. Open the Generate page in the Web UI
+  4. Start a generation
+  5. **What to look for:** The Flow steps section shows each pipeline step with agent name, model used, status (e.g. running/completed), and expandable action_summary (thinking/actions).
+
+- **Test Orchestrator UI (Task B):**
+  1. `cd agent-automation/orchestrator_ui`
+  2. `pip install -r requirements.txt` (or `pip install anthropic fastapi uvicorn`)
+  3. `PYTHONPATH=.. python server.py`
+  4. Open http://localhost:8765 in a browser
+  5. Set your API key in the UI
+  6. Click "Run brain"
+  7. **What to look for:** Proposal, critique, synthesis, and decision outputs appear in sequence.
+
+### 3. What changed by area
+
+- **YT pipeline (Task A):** Backend: AgentResult, pipeline progress_callback, app.py WebSocket payload, llm_router get_model_for_agent. Frontend: ProgressEvent, Generate page Flow steps section.
+- **Orchestrator UI (Task B):** agent-automation/orchestrator_ui/ (server.py, static/index.html, README), brain.py run_brain_with_flow, context_loader.
+
+### 4. If something fails
+
+- **Flow steps:** Frontend build may fail if `@/lib/api` missing; check `frontend/src/lib/api.ts` exists. Backend tests: `pytest tests/ -v` (expect 75+ pass).
+- **Orchestrator UI:** `ANTHROPIC_API_KEY` or api_key in request body required. If context_loader fails, UI uses stub context (brain-only mode). Dependencies: anthropic, fastapi, uvicorn.
+
+---
+
 ## 🚀 Git Branching Strategy — Phase 3.2: Complete
 
 **Status:** ✅ Phase 3.2 complete. No publish to master for this batch. Staging is the default branch; release to master only when many features warrant a formal release (see `docs/git-branching-strategy.md`).
@@ -51,6 +88,9 @@
 ---
 
 ## 📝 Recent Work Log (last 10)
+
+### [2026-02-24] [Lead Engineer] [Task A: Flow steps section (YouTube Shorts Generator)] [✅ COMPLETED]
+- Backend: extended progress payload (model, action_summary), AgentResult, pipeline progress_callback, app.py WebSocket msg\n- Frontend: ProgressEvent extended, Flow steps section on Generate page (index, agent, model, status, expandable action_summary)\n- 75 tests pass; branch feature/flow-steps committed and pushed
 
 ### [2026-02-24 19:00 UTC] [Junior Engineer 1] [Task B: Orchestrator UI (platform-agnostic A2A brain)] [✅ COMPLETED]
 - Added run_brain_with_flow to brain.py returning proposal, critique, synthesis, final_decision; api_key_override support
@@ -87,9 +127,6 @@ Integration fixes complete: (1) CLI commands (cmd_health, cmd_status) now use UI
 
 ### [2026-02-20 08:43 UTC] [Junior Engineer 1] [Merge feature/ui to staging] [COMPLETED]
 Merged UI enhancements (rich library, colored output, progress indicators) to staging. Reviewer approved. Branches were already in sync (staging and feature/ui pointing to same commit 8d883a4). Verified merge status and pushed staging to origin.
-
-### [2026-02-20 08:43 UTC] [Junior Engineer 2] [Merge feature/platform-agnostic to staging] [✅ COMPLETED]
-Merged platform-agnostic improvements (retry utility, enhanced pipeline, ElevenLabs service) to staging. Reviewer approved. Branch already synchronized with staging (no merge needed).
 
 Full log: agent-automation/work_log.json
 

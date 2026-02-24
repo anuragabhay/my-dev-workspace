@@ -29,6 +29,8 @@ class AgentResult:
     success: bool
     message: Optional[str] = None
     data: Optional[dict] = None
+    model_used: Optional[str] = None
+    action_summary: Optional[str] = None
 
 
 @dataclass

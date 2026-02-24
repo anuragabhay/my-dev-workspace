@@ -1,12 +1,80 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, Zap } from 'lucide-react'
+import { Loader2, Zap, ChevronDown, ChevronRight } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
+
+const STEP_STATUS_LABELS: Record<string, string> = {
+  running: 'Running',
+  done: 'Done',
+  error: 'Error',
+}
+
+function StepRow({
+  index,
+  agent,
+  model,
+  status,
+  action_summary,
+}: {
+  index: number
+  agent: string
+  model?: string
+  status: string
+  action_summary?: string
+}) {
+  const [expanded, setExpanded] = useState(false)
+  const isLong = (action_summary?.length ?? 0) > 80
+  const displaySummary = action_summary
+    ? expanded || !isLong
+      ? action_summary
+      : `${action_summary.slice(0, 80)}...`
+    : null
+
+  return (
+    <div className="flex flex-col gap-1 rounded-md border border-zinc-800 bg-zinc-950/50 px-3 py-2">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs text-zinc-500">#{index}</span>
+          <span className="font-medium text-zinc-300">{agent}</span>
+          {model && (
+            <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs text-zinc-400">
+              {model}
+            </span>
+          )}
+          <span
+            className={`rounded px-1.5 py-0.5 text-xs font-medium ${
+              status === 'done'
+                ? 'bg-emerald-500/20 text-emerald-400'
+                : status === 'error'
+                  ? 'bg-red-500/20 text-red-400'
+                  : 'bg-amber-500/20 text-amber-400'
+            }`}
+          >
+            {STEP_STATUS_LABELS[status] ?? status}
+          </span>
+        </div>
+        {action_summary && isLong && (
+          <button
+            type="button"
+            onClick={() => setExpanded((e) => !e)}
+            className="text-zinc-500 hover:text-zinc-300"
+            aria-label={expanded ? 'Collapse' : 'Expand'}
+          >
+            {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          </button>
+        )}
+      </div>
+      {displaySummary && (
+        <p className="text-xs text-zinc-500">{displaySummary}</p>
+      )}
+    </div>
+  )
+}
 
 export function Generate() {
   const [topic, setTopic] = useState('')
@@ -17,6 +85,33 @@ export function Generate() {
   const { events, connected } = useWebSocket(executionId, !!executionId && loading)
 
   const percent = events.length > 0 ? events[events.length - 1].percent : 0
+
+  const flowSteps = useMemo(() => {
+    const order: string[] = []
+    const byAgent = new Map<
+      string,
+      { agent: string; model?: string; status: string; action_summary?: string }
+    >()
+    for (const ev of events) {
+      const status =
+        ev.step === 'start' ? 'running' : ev.step === 'complete' ? 'done' : 'error'
+      if (!byAgent.has(ev.agent)) {
+        order.push(ev.agent)
+        byAgent.set(ev.agent, {
+          agent: ev.agent,
+          model: ev.model,
+          status,
+          action_summary: ev.action_summary,
+        })
+      } else {
+        const s = byAgent.get(ev.agent)!
+        s.model = ev.model ?? s.model
+        s.action_summary = ev.action_summary ?? s.action_summary
+        s.status = status
+      }
+    }
+    return order.map((agent, i) => ({ ...byAgent.get(agent)!, index: i + 1 }))
+  }, [events])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -101,6 +196,23 @@ export function Generate() {
               </div>
               <Progress value={percent} />
             </div>
+            {flowSteps.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-zinc-400">Flow steps</h4>
+                <div className="max-h-64 space-y-2 overflow-y-auto">
+                  {flowSteps.map((s) => (
+                    <StepRow
+                      key={s.agent}
+                      index={s.index}
+                      agent={s.agent}
+                      model={s.model}
+                      status={s.status}
+                      action_summary={s.action_summary}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs">
               {events.length === 0 ? (
                 <span className="text-zinc-600">Waiting for pipeline events...</span>

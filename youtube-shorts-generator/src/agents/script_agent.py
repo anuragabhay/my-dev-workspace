@@ -2,7 +2,7 @@
 ScriptAgent (US-1.2): Generate 10-second script from research data. GPT-4.
 """
 from src.agents.base_agent import BaseAgent, ExecutionContext, AgentResult
-from src.services.openai_service import chat_completion
+from src.services.llm_router import chat_completion, get_model_for_agent
 
 class ScriptAgent(BaseAgent):
     name = "script"
@@ -13,6 +13,7 @@ class ScriptAgent(BaseAgent):
         topic_line = topics[0]["title"] if topics else "trending topic"
         try:
             content, cost = chat_completion(
+                agent_name="script",
                 messages=[
                     {"role": "user", "content": (
                         f"Write a script for a 10-second YouTube Short on: {topic_line}. "
@@ -24,6 +25,11 @@ class ScriptAgent(BaseAgent):
                 ],
             )
             self.log_cost(context.execution_id, "script", cost)
-            return AgentResult(success=True, data={"script": content, "topic": topic_line})
+            return AgentResult(
+                success=True,
+                data={"script": content, "topic": topic_line},
+                model_used=get_model_for_agent("script"),
+                action_summary=f"Generated script for: {topic_line}",
+            )
         except Exception as e:
             return AgentResult(success=False, message=str(e))

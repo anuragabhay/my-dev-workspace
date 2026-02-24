@@ -1,0 +1,10 @@
+# Orchestrator client - platform-agnostic one-cycle runner
+# MCP client (same as mcp-server)
+mcp>=0.9.0
+PyYAML>=6.0
+
+# LLM provider
+anthropic>=0.39.0
+
+# Config
+python-dotenv>=1.0.0

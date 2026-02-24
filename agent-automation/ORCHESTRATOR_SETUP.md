@@ -133,9 +133,39 @@ The stop hook treats this as a signal to return a `followup_message` (subject to
 
 ---
 
-## 8. Summary
+## 8. Orchestrator client (standalone) — environment variables
 
-- **Orchestrator**: `.cursor/rules/orchestrator.mdc` — one parent agent in one chat.  
-- **Subagents**: `.cursor/agents/{lead-engineer,junior-engineer-1,junior-engineer-2,architect,cto,reviewer,tester,cfo,pm}.md` — invoked via `/lead-engineer`, `/junior-engineer-1`, `/junior-engineer-2`, etc.  
-- **Hooks**: `.cursor/hooks.json` + `.cursor/hooks/stop_hook.py` — optional auto-continue until done or user intervention.  
+When running the orchestrator client (`agent-automation/orchestrator_client/cycle_runner.py`) outside Cursor:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `ANTHROPIC_API_KEY` | Anthropic API key (or use `ORCHESTRATOR_LLM_API_KEY`) | — |
+| `ORCHESTRATOR_LLM_MODEL` | Fallback model for Proposer and Critic | `claude-sonnet-4-20250514` |
+| `ORCHESTRATOR_PROPOSER_MODEL` | Model for Proposer (Phase 1 and 3) | `ORCHESTRATOR_LLM_MODEL` |
+| `ORCHESTRATOR_CRITIC_MODEL` | Model for Critic (Phase 2) | `ORCHESTRATOR_LLM_MODEL` |
+
+For MVP, both Proposer and Critic use the same model. Set different models to use a dedicated critic (e.g. a smaller/faster model for critique).
+
+---
+
+## 9. Orchestrator UI (brain-only, outside Cursor)
+
+A web UI to run the A2A brain without Cursor:
+
+```bash
+cd agent-automation/orchestrator_ui
+pip install -r requirements.txt
+PYTHONPATH=.. python server.py
+```
+
+Open http://localhost:8765. Set API key via env or in the UI, click "Run brain", and see proposal → critique → synthesis → final decision. See `orchestrator_ui/README.md` for details and limitations (brain-only; no MCP).
+
+---
+
+## 10. Summary
+
+- **Orchestrator**: `.cursor/rules/orchestrator.mdc` — one parent agent in one chat.
+- **Subagents**: `.cursor/agents/{lead-engineer,junior-engineer-1,junior-engineer-2,architect,cto,reviewer,tester,cfo,pm}.md` — invoked via `/lead-engineer`, `/junior-engineer-1`, `/junior-engineer-2`, etc.
+- **Hooks**: `.cursor/hooks.json` + `.cursor/hooks/stop_hook.py` — optional auto-continue until done or user intervention.
+- **Brain**: `orchestrator_client/brain.py` — propose → critique → synthesize (A2A-style) when running cycle_runner.
 - **Authority**: No User approval for implementation/design/tech within the approved plan; Architect for design, CTO for tech/architecture; User only for budget, phase, strategy, blockers.

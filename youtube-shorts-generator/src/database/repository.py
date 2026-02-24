@@ -112,6 +112,26 @@ def get_executions_count(db_path: Optional[Path] = None) -> int:
         conn.close()
 
 
+def get_executions_count_filtered(
+    status: Optional[str] = None,
+    db_path: Optional[Path] = None,
+) -> int:
+    """Total count of executions, optionally filtered by status."""
+    ensure_schema(db_path)
+    conn = _get_conn(db_path)
+    try:
+        if status:
+            row = conn.execute(
+                "SELECT COUNT(*) FROM executions WHERE status = ?",
+                (status,),
+            ).fetchone()
+        else:
+            row = conn.execute("SELECT COUNT(*) FROM executions").fetchone()
+        return int(row[0]) if row else 0
+    finally:
+        conn.close()
+
+
 def get_last_executions(n: int = 10, db_path: Optional[Path] = None) -> List[dict]:
     ensure_schema(db_path)
     conn = _get_conn(db_path)
@@ -121,6 +141,32 @@ def get_last_executions(n: int = 10, db_path: Optional[Path] = None) -> List[dic
             "SELECT * FROM executions ORDER BY id DESC LIMIT ?",
             (n,),
         ).fetchall()
+        return [dict(r) for r in rows]
+    finally:
+        conn.close()
+
+
+def get_last_executions_filtered(
+    n: int = 10,
+    offset: int = 0,
+    status: Optional[str] = None,
+    db_path: Optional[Path] = None,
+) -> List[dict]:
+    """Get executions with optional status filter, paginated."""
+    ensure_schema(db_path)
+    conn = _get_conn(db_path)
+    try:
+        conn.row_factory = sqlite3.Row
+        if status:
+            rows = conn.execute(
+                "SELECT * FROM executions WHERE status = ? ORDER BY id DESC LIMIT ? OFFSET ?",
+                (status, n, offset),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM executions ORDER BY id DESC LIMIT ? OFFSET ?",
+                (n, offset),
+            ).fetchall()
         return [dict(r) for r in rows]
     finally:
         conn.close()

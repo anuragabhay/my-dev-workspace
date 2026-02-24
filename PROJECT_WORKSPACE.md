@@ -34,6 +34,43 @@
 
 ---
 
+## Handoff: Flow steps + Orchestrator UI (Tasks A & B)
+
+### 1. What you need to know
+
+- **Task A:** YouTube Shorts Generator now has a "Flow steps" section on the Generate page showing each pipeline step with agent, model used, status, and action summary (thinking/actions).
+- **Task B:** Orchestrator UI is a standalone web app to run the A2A brain (propose → critique → synthesize) with your own API keys, no Cursor required.
+
+### 2. How to test each part
+
+- **Test Flow steps (Task A):**
+  1. `cd youtube-shorts-generator`
+  2. Run `./run_dev.sh` (or equivalent dev script)
+  3. Open the Generate page in the Web UI
+  4. Start a generation
+  5. **What to look for:** The Flow steps section shows each pipeline step with agent name, model used, status (e.g. running/completed), and expandable action_summary (thinking/actions).
+
+- **Test Orchestrator UI (Task B):**
+  1. `cd agent-automation/orchestrator_ui`
+  2. `pip install -r requirements.txt` (or `pip install anthropic fastapi uvicorn`)
+  3. `PYTHONPATH=.. python server.py`
+  4. Open http://localhost:8765 in a browser
+  5. Set your API key in the UI
+  6. Click "Run brain"
+  7. **What to look for:** Proposal, critique, synthesis, and decision outputs appear in sequence.
+
+### 3. What changed by area
+
+- **YT pipeline (Task A):** Backend: AgentResult, pipeline progress_callback, app.py WebSocket payload, llm_router get_model_for_agent. Frontend: ProgressEvent, Generate page Flow steps section.
+- **Orchestrator UI (Task B):** agent-automation/orchestrator_ui/ (server.py, static/index.html, README), brain.py run_brain_with_flow, context_loader.
+
+### 4. If something fails
+
+- **Flow steps:** Frontend build may fail if `@/lib/api` missing; check `frontend/src/lib/api.ts` exists. Backend tests: `pytest tests/ -v` (expect 75+ pass).
+- **Orchestrator UI:** `ANTHROPIC_API_KEY` or api_key in request body required. If context_loader fails, UI uses stub context (brain-only mode). Dependencies: anthropic, fastapi, uvicorn.
+
+---
+
 ## 🚀 Git Branching Strategy — Phase 3.2: Complete
 
 **Status:** ✅ Phase 3.2 complete. No publish to master for this batch. Staging is the default branch; release to master only when many features warrant a formal release (see `docs/git-branching-strategy.md`).

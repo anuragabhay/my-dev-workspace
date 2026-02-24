@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Film } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Film, AlertCircle } from 'lucide-react'
 import { api, type Execution } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,23 +8,38 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 
 const PAGE_SIZE = 10
+const STATUS_OPTIONS = [
+  { value: '', label: 'All statuses' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'failed', label: 'Failed' },
+  { value: 'in_progress', label: 'In progress' },
+  { value: 'pending', label: 'Pending' },
+]
 
 export function History() {
   const [executions, setExecutions] = useState<Execution[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(0)
+  const [statusFilter, setStatusFilter] = useState<string>('')
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     setLoading(true)
+    setError(null)
     api
-      .history(PAGE_SIZE, page * PAGE_SIZE)
+      .history(PAGE_SIZE, page * PAGE_SIZE, statusFilter || undefined)
       .then(({ executions: ex, total: t }) => {
         setExecutions(ex)
         setTotal(t)
       })
+      .catch((err) => {
+        setError(err instanceof Error ? err.message : 'Failed to load history')
+        setExecutions([])
+        setTotal(0)
+      })
       .finally(() => setLoading(false))
-  }, [page])
+  }, [page, statusFilter])
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
@@ -37,11 +52,61 @@ export function History() {
 
       <Card className="border-zinc-800 bg-zinc-900/50">
         <CardHeader>
-          <CardTitle>Executions</CardTitle>
-          <CardDescription>{total} total</CardDescription>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <CardTitle>Executions</CardTitle>
+              <CardDescription>{total} total</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <label htmlFor="status-filter" className="text-sm text-zinc-500">
+                Filter:
+              </label>
+              <select
+                id="status-filter"
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value)
+                  setPage(0)
+                }}
+                className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                aria-label="Filter executions by status"
+              >
+                {STATUS_OPTIONS.map((opt) => (
+                  <option key={opt.value || 'all'} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          {loading ? (
+          {error ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <AlertCircle className="mb-4 h-12 w-12 text-red-500/80" />
+              <p className="text-lg font-medium text-zinc-400">Failed to load history</p>
+              <p className="mt-1 text-sm text-zinc-500">{error}</p>
+              <Button
+                variant="outline"
+                className="mt-4 border-zinc-700"
+                onClick={() => {
+                  setError(null)
+                  setLoading(true)
+                  api
+                    .history(PAGE_SIZE, page * PAGE_SIZE, statusFilter || undefined)
+                    .then(({ executions: ex, total: t }) => {
+                      setExecutions(ex)
+                      setTotal(t)
+                      setError(null)
+                    })
+                    .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load'))
+                    .finally(() => setLoading(false))
+                }}
+              >
+                Retry
+              </Button>
+            </div>
+          ) : loading ? (
             <div className="space-y-3">
               {[1, 2, 3, 4, 5].map((i) => (
                 <Skeleton key={i} className="h-12 w-full" />

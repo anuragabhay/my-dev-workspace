@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CheckCircle, XCircle, Zap, Film, Activity } from 'lucide-react'
+import { CheckCircle, XCircle, Zap, Film, Activity, AlertCircle } from 'lucide-react'
 import { api, type HealthResult, type Execution } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,14 +11,20 @@ export function Dashboard() {
   const [health, setHealth] = useState<HealthResult | null>(null)
   const [recent, setRecent] = useState<Execution[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    setError(null)
     Promise.all([api.health(), api.history(5, 0)])
       .then(([h, { executions }]) => {
         setHealth(h)
         setRecent(executions)
       })
-      .catch(() => setHealth({ ok: false, checks: {} }))
+      .catch((err) => {
+        setHealth(null)
+        setRecent([])
+        setError(err instanceof Error ? err.message : 'Failed to load dashboard')
+      })
       .finally(() => setLoading(false))
   }, [])
 
@@ -33,7 +39,37 @@ export function Dashboard() {
         <p className="mt-1 text-zinc-400">System overview and quick actions</p>
       </div>
 
-      {loading ? (
+      {error ? (
+        <Card className="border-red-500/30 bg-red-500/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-red-400">
+              <AlertCircle className="h-5 w-5" />
+              Failed to load dashboard
+            </CardTitle>
+            <CardDescription className="text-red-400/70">{error}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              variant="outline"
+              className="border-zinc-700"
+              onClick={() => {
+                setError(null)
+                setLoading(true)
+                Promise.all([api.health(), api.history(5, 0)])
+                  .then(([h, { executions }]) => {
+                    setHealth(h)
+                    setRecent(executions)
+                    setError(null)
+                  })
+                  .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load'))
+                  .finally(() => setLoading(false))
+              }}
+            >
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      ) : loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <Card key={i} className="border-zinc-800 bg-zinc-900/50">

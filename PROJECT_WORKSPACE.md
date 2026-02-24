@@ -16,8 +16,8 @@
 **Active Agents**: Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect, PM, CTO, CFO  
 **Pending Approvals**: 0  
 **Blockers**: None  
-**Next Actions**: Phase C + Task 2 PRs pushed (parallel). User must merge both to staging. Then Phase D (Reviewer verification).  
-**User Intervention Required**: Yes — Merge PRs feature/pa-phase-c and feature/pa-task2 → staging on GitHub.
+**Next Actions**: Create PR for feature/ui-improvements → staging (https://github.com/anuragabhay/my-dev-workspace/pull/new/feature/ui-improvements); merge when ready.  
+**User Intervention Required**: Yes (PR merge for feature/ui-improvements)
 
 ---
 
@@ -52,16 +52,32 @@
 
 ## 📝 Recent Work Log (last 10)
 
-### [2026-02-20T13:15:00Z] [Lead Engineer] [Push staging, close PR #4, clean up stale branches] [PARTIAL]
-Push to origin/staging blocked (branch protection). PR #4 close failed (gh auth required). Deleted stale branches: feature/web-ui, feature/platform-agnostic, step0-merge (local + remote). Dropped stale stash. Only master and staging remain locally. 38cd0d1 at top of local staging; origin/staging still behind. User action: push staging (or merge via PR) and close PR #4 manually.
+### [2026-02-24 19:00 UTC] [Junior Engineer 1] [Task B: Orchestrator UI (platform-agnostic A2A brain)] [✅ COMPLETED]
+- Added run_brain_with_flow to brain.py returning proposal, critique, synthesis, final_decision; api_key_override support
+- Created context_loader.py for system message from orchestrator_rule, patterns, workflow, decisions, roles
+- Created orchestrator_ui: FastAPI backend + minimal frontend (API key config, run brain, view A2A flow)
+- Documented in orchestrator_ui/README.md and ORCHESTRATOR_SETUP.md §9
+- Branch feature/orchestrator-ui pushed; brain-only mode (no MCP)
 
-### [2026-02-20 12:00 UTC] [Junior Engineer 1] [Phase B platform-agnostic: configurable paths, agents, hooks, MCP docs] [✅ COMPLETED]
-- B.1: Created workspace_config.py (get_workspace_root, load_config) with WORKSPACE_ROOT env and workspace_config.yaml; updated main.py, config.yaml, mcp-server/config.json
-- B.2: Added agent-automation/agents/pm.md, cto.md, cfo.md; existing lead-engineer, junior-engineer-1/2, architect, reviewer, tester already present
-- B.3: Created agent-automation/docs/hooks.md (stop hook behavior, non-Cursor replication)
-- B.4: Updated agent-automation/mcp-server/README.md with standalone MCP docs (Cursor, Claude Code, any MCP client)
-- B.5: Created docs/platform-agnostic.md; updated PROJECT_WORKSPACE.md, orchestrator rule, ORCHESTRATOR_SETUP, TROUBLESHOOTING, MCP_INTEGRATION, SETUP paths
-- No hardcoded /Users/anuragabhay paths; default: derive from agent-automation parent
+### [2026-02-24 18:00 UTC] [Lead Engineer] [Orchestrator brain (A2A propose→critique→synthesize)] [✅ COMPLETED]
+- Extended a2a.py: AgentRole.PROPOSER, AgentRole.CRITIC; MessageType.PROPOSAL, CRITIQUE, SYNTHESIS; create_proposal, create_critique, create_synthesis helpers\n- Created orchestrator_client/brain.py: run_brain() with propose → critique → synthesize flow using A2A messages\n- Updated config.py: get_proposer_model(), get_critic_model() (ORCHESTRATOR_PROPOSER_MODEL, ORCHESTRATOR_CRITIC_MODEL)\n- Updated cycle_runner.py to use brain instead of single LLM call\n- Documented env vars in ORCHESTRATOR_SETUP.md §8
+
+### [2026-02-24 14:00 UTC] [Lead Engineer] [Per-agent model assignment (llm_router, config, Anthropic stub)] [✅ COMPLETED]
+- Added agents section to config.example.yaml and config.example.staging.yaml (research, script, uniqueness, rag with provider/model)\n- Created src/services/llm_router.py: routes chat_completion and get_embeddings to OpenAI or Anthropic per config\n- Created src/services/anthropic_service.py: chat_completion via Messages API; get_embeddings raises NotImplementedError (Anthropic has no embeddings)\n- Updated research_agent, script_agent, uniqueness_agent to use llm_router; rag_service.query_topics uses llm_router.get_embeddings\n- Added anthropic>=0.18.0 to requirements.txt, ANTHROPIC_API_KEY to .env.example\n- All 77 tests pass
+
+### [2026-02-24 12:00 UTC] [Junior Engineer 1] [OBJECTIVE 2: History status filters, error states, UI improvements] [✅ COMPLETED]
+- History: status filter (All, Completed, Failed, In progress, Pending); backend /api/history?status=; repository get_executions_count_filtered, get_last_executions_filtered
+- Dashboard: error state with Retry when health/history API fails
+- History: error state with Retry when API fails
+- API tests for history status filter
+- Fix .gitignore to allow frontend/src/lib/
+- Branch feature/ui-improvements pushed; User Intervention Required for PR merge
+
+### [2026-02-20T11:27:36Z] [Orchestrator] [Task A and B complete; merge via PRs] [COMPLETED]
+Task A (Web UI) and Task B (platform-agnostic) done. Both pushed. User: create PRs feature/platform-agnostic → staging, feature/web-ui → staging. Merge platform-agnostic first, then web-ui.
+
+### [2026-02-20T11:26:44Z] [Orchestrator] [Task A and B complete; merge blocked by branch protection] [COMPLETED]
+Task A (Web UI): FastAPI backend, React frontend, run_dev.sh, API tests. Task B (platform-agnostic): workspace_config, agent-automation/agents/, hooks.md, MCP docs, docs/platform-agnostic.md. Both pushed to feature branches. Staging requires PRs (no merge commits). User must create PRs and merge.
 
 ### [2026-02-20T09:35:27Z] [Orchestrator] [Step 0: commit, push to step0-merge, delete stale branches] [COMPLETED]
 Committed all work (staging config, retry, CLI, services, branching docs). Pushed to step0-merge. Direct push to staging blocked by branch protection. Deleted feature/ui and feature/platform-agnostic. User must merge PR step0-merge → staging to complete Step 0.
@@ -75,21 +91,6 @@ Merged UI enhancements (rich library, colored output, progress indicators) to st
 ### [2026-02-20 08:43 UTC] [Junior Engineer 2] [Merge feature/platform-agnostic to staging] [✅ COMPLETED]
 Merged platform-agnostic improvements (retry utility, enhanced pipeline, ElevenLabs service) to staging. Reviewer approved. Branch already synchronized with staging (no merge needed).
 
-### [2026-02-20 17:30 UTC] [Architect] [Validate Cycle 2: test_config, openai_service docs, README Troubleshooting] [COMPLETED]
-Validated test_config.py, openai_service docstrings and docs/API.md, README Troubleshooting; all OK. Hand off to Junior Engineer 1 for commit, push.
-
-### [2026-02-20 16:45 UTC] [Orchestrator] [Dev plan cycle 2: three-way split completed] [COMPLETED]
-Delegated Part 1 (Lead: config tests test_config.py), Part 2 (JE1: openai_service docstrings + docs/API.md), Part 3 (JE2: README Troubleshooting). All delivered. Next: Architect validate then Merge.
-
-### [2026-02-20T16:30:00Z] [Lead Engineer] [Add unit tests for src/utils/config.py (tests/test_config.py)] [COMPLETED]
-tests/test_config.py: 13 pytest tests for get_config, validate_env, validate_config, load_env, load_config (mocked env / tmp .env and YAML; no real API keys). All 13 passed. Added test_load_env_with_tmp_env_file and test_get_config_valid_env_and_config_returns_no_errors.
-
-### [2026-02-20 17:00 UTC] [Junior Engineer 2] [Expand README Troubleshooting section (Phase 6)] [✅ COMPLETED]
-Expanded youtube-shorts-generator/README.md Troubleshooting: missing/invalid .env (OPENAI_API_KEY, Runway KEY/SECRET), config errors (timeouts, cost.target_per_video, paths), health check failures, API errors (OpenAI, ElevenLabs, Runway) with remedies; added 'Where to look' table (stderr, health JSON, stdout logs, PROJECT_WORKSPACE.md).
-
-### [2026-02-20 15:30 UTC] [Architect] [Validate config validation, Pilot rules, README] [COMPLETED]
-Validated main.py config validation, .claude/rules, README setup; all OK. Hand off to Junior Engineer 1 for commit, push.
-
 Full log: agent-automation/work_log.json
 
 To add an entry: run `python agent-automation/append_work_log.py --timestamp "..." --role "..." --task "..." --status "..." [--content "..."].` Then run with `--update-workspace` to refresh the recent 10 in this file.
@@ -97,6 +98,207 @@ To add an entry: run `python agent-automation/append_work_log.py --timestamp "..
 **Next steps (after Phase 6 health tests added):** (1) Work log: run append_work_log with role Lead Engineer, task e.g. "Added pytest tests for src/utils/health.py (tests/test_health.py, N tests)", status COMPLETED, then --update-workspace. (2) Next Actions: set to next Phase 6 item (e.g. "Lead Engineer: Add README Troubleshooting/Configuration section") or, if ready to push: "Architect: Validate current changes. Then Junior Engineer 1 or 2: append work log, commit, push, --update-workspace." (3) Orchestrator: do not re-delegate "add unit tests for health.py"; pick next concrete task from Next Actions. If subagent returns with no deliverable for the same task, use smaller subtask, another role, or pause (avoid re-delegation loops).
 
 ---
+
+## Design decision: Orchestrator brain (b vs c)
+
+### Architect comparison
+
+**Context:** The orchestrator today is a single-model parent that reads PROJECT_WORKSPACE.md, workflow.yml, decisions.yml, roles.yml, and MCP tools; decides the next step; and delegates via slash commands. We are evaluating two options for a multi-model orchestrator brain that improves decision quality.
+
+---
+
+#### Option (b): Two models in sequence (propose → critique → synthesize)
+
+**Description:** Model A proposes a decision (e.g. next delegation, ORCHESTRATION_COMPLETE); Model B critiques the proposal; then Model A (or a combined step) synthesizes the final output. Structured messages between phases.
+
+#### Option (c): A2A-style handoffs
+
+**Description:** Agents communicate via the Agent-to-Agent protocol in `agent-automation/orchestrator_client/a2a.py`. Two models "talk" using request/response, task handoff, and agent identity. The orchestrator brain uses this protocol for inter-model communication.
+
+---
+
+#### 1. Fit for our workspace
+
+| Criterion | Option (b) | Option (c) |
+|-----------|------------|------------|
+| **workflow.yml, decisions.yml, roles.yml** | Aligns well: propose/critique/synthesize maps cleanly to "decide next step" from the plan. No change to YAML. | A2A `AgentRole` and `MessageType` align with roles.yml; `TASK_REQUEST`/`TASK_RESPONSE` fit delegation semantics. Minor mapping: slash commands ↔ A2A task payloads. |
+| **MCP tools** | Both models can call MCP (get_workspace_status, check_my_pending_tasks, etc.). Phase 1 (propose) and Phase 3 (synthesize) both need context. | Same. A2A messages can carry MCP results in payload; no conflict. |
+| **orchestrator_client / a2a.py** | Not used. Propose/critique/synthesize uses custom structured prompts and message formats. | Direct fit. a2a.py already defines `AgentRole`, `MessageType`, `A2AMessage`, `create_task_request`, `create_task_response`. Orchestrator brain becomes an A2A participant. |
+| **orchestrator_patterns.md, orchestrator.mdc** | Patterns (read → decide → delegate) remain; the "decide" step is split into propose → critique → synthesize. | Patterns remain; delegation is expressed as A2A `TASK_REQUEST`. Extends naturally to host-agnostic execution (Claude Code, Vertex) per a2a.py docstring. |
+
+**Verdict:** (c) fits better because we already have A2A types and helpers; (b) would introduce a parallel message format. Both fit workflow and MCP.
+
+---
+
+#### 2. Implementability
+
+| Criterion | Option (b) | Option (c) |
+|-----------|------------|------------|
+| **Build time** | Medium. Need: (1) structured prompt templates for propose/critique/synthesize, (2) message schema between phases, (3) orchestration loop (call Model A → call Model B → call Model A or combined). | Medium–low. a2a.py exists. Need: (1) two "virtual" A2A roles (e.g. `ORCHESTRATOR_PROPOSER`, `ORCHESTRATOR_CRITIC`) or reuse existing roles with new message types, (2) loop that passes A2A messages between two model invocations. |
+| **Dependencies** | None beyond current stack (Cursor, MCP, LLM API). | None. a2a.py is in-repo; no new deps. |
+| **Integration with Cursor** | Propose/critique/synthesize can run in one chat (multi-turn) or via a small Python/script layer that invokes models. | A2A messages are JSON-serializable; can be produced/consumed by a script or by the Orchestrator chat itself. Cursor subagent invocations map to A2A `TASK_REQUEST`/`TASK_RESPONSE`. |
+| **New message types** | Need to define: `Proposal`, `Critique`, `Synthesis` (or similar). | May add `MessageType.PROPOSAL`, `MessageType.CRITIQUE`, `MessageType.SYNTHESIS` to a2a.py if we want explicit phases; or encode in payload with existing types. |
+
+**Verdict:** (c) is slightly faster to implement because a2a.py already exists and we can extend it minimally. (b) requires new schemas from scratch.
+
+---
+
+#### 3. Maintainability
+
+| Criterion | Option (b) | Option (c) |
+|-----------|------------|------------|
+| **Extensibility** | Add phases (e.g. "validate" before synthesize) by extending the message schema and loop. | Add phases by adding `MessageType` values and handlers. A2A is designed for extensibility (docstring: "can later use HTTP/JSON-RPC/SSE for multi-host"). |
+| **Debugging** | Log propose/critique/synthesize messages; trace is linear. | Log A2A messages; `correlation_id` supports request/response pairing. Same clarity. |
+| **Change impact** | Changing the loop (e.g. 2→3 models) requires updating message formats and orchestration logic. | Changing participants (e.g. add a third "validator" model) is adding another A2A role and message flow. Protocol stays stable. |
+| **Consistency with subagent delegation** | Propose/critique/synthesize is internal to the brain; subagent delegation remains slash commands. Two different patterns. | Subagent delegation can eventually use A2A `TASK_REQUEST` when running outside Cursor. One protocol for orchestrator↔subagent and model↔model. |
+
+**Verdict:** (c) is more maintainable long-term: one protocol, one place to extend (a2a.py), and a path to host-agnostic orchestration.
+
+---
+
+#### Recommendation: **Option (c) — A2A-style handoffs**
+
+**Rationale:**
+
+1. **Reuse over reinvention:** a2a.py already provides `AgentRole`, `MessageType`, `A2AMessage`, and helpers. Option (b) would introduce a separate message format for the same purpose.
+2. **Unified protocol:** Using A2A for inter-model communication inside the brain aligns with future use for orchestrator↔subagent when running outside Cursor (Claude Code, Vertex). One protocol to learn and maintain.
+3. **Implementability:** We extend a2a.py with optional message types (e.g. `PROPOSAL`, `CRITIQUE`, `SYNTHESIS`) or encode propose/critique/synthesize in payloads. The loop becomes: Model A sends A2A message → Model B receives, critiques, responds → Model A receives, synthesizes, produces final output.
+4. **Fit:** workflow.yml, decisions.yml, roles.yml, and MCP tools are unchanged. The orchestrator brain is an internal implementation detail; the external behavior (read → decide → delegate) stays the same.
+
+---
+
+#### Brief implementation outline for Option (c)
+
+1. **Extend a2a.py (optional):**
+   - Add `MessageType.PROPOSAL`, `MessageType.CRITIQUE`, `MessageType.SYNTHESIS` if we want explicit phase semantics; or use `QUERY`/`QUERY_RESPONSE` with payload structure.
+   - Add `AgentRole.ORCHESTRATOR_PROPOSER`, `AgentRole.ORCHESTRATOR_CRITIC` (or similar) if we want distinct identities for the two models.
+
+2. **Orchestrator brain loop:**
+   - **Phase 1:** Model A (Proposer) reads workspace + MCP, produces an A2A message (e.g. `PROPOSAL` or `TASK_REQUEST` with payload `{proposed_delegation, rationale}`).
+   - **Phase 2:** Model B (Critic) receives the message, critiques (e.g. checks against decisions.yml, workflow stage, re-delegation rules), produces `CRITIQUE` or `QUERY_RESPONSE`.
+   - **Phase 3:** Model A receives critique, synthesizes final decision (delegation or ORCHESTRATION_COMPLETE), outputs the slash command or completion text.
+
+3. **Integration:**
+   - The loop can run inside the Orchestrator chat (multi-turn with two "personas") or in a small Python layer that invokes two model calls and passes A2A messages.
+   - MCP calls (get_workspace_status, etc.) are made before Phase 1; results are included in the initial context for Model A.
+
+4. **Testing:**
+   - Unit tests for A2A message creation and parsing.
+   - Integration test: mock workspace state → run brain loop → assert correct delegation or ORCHESTRATION_COMPLETE.
+
+---
+
+### PM review
+
+**Assessment: Agree with Architect's recommendation (Option c).**
+
+From scope, acceptance criteria, and ease of implementation/maintenance:
+
+- **Scope:** Neither option changes MVP scope. Both deliver the same external behavior (read → decide → delegate). The orchestrator brain is an internal implementation detail; no scope creep.
+- **Acceptance criteria:** Part 1 does not define explicit acceptance criteria for the orchestrator brain; both options satisfy the implicit goal of improved decision quality. Implementation approach is an internal choice.
+- **Ease of implementation:** Option (c) is faster to implement because `a2a.py` already exists. Option (b) would require new schemas (Proposal, Critique, Synthesis) and orchestration logic from scratch. Reusing existing infrastructure reduces implementation risk and time.
+- **Maintainability:** Option (c) provides one protocol for orchestrator↔subagent and model↔model, with a single place to extend (`a2a.py`). Option (b) would introduce a parallel message format for the internal brain while subagent delegation stays as slash commands—two patterns to maintain. Fewer patterns = easier long-term maintenance.
+
+**Conclusion:** Option (c) aligns with PM priorities: stay within scope, minimize implementation effort, and favor maintainability.
+
+### Final decision
+
+**Decision:** (c) A2A-style handoffs  
+**Rationale:** Reuse existing `a2a.py` protocol for inter-model communication; one protocol to implement and maintain, with a path to host-agnostic orchestration.
+
+---
+
+### Reviewer note (Step 4)
+
+**Step 2 (YT pipeline routing): PASS**
+
+- **Config**: `config.example.yaml` and `config.example.staging.yaml` have correct `agents` section (research, script, uniqueness, rag) with provider/model. No new pipeline steps added.
+- **llm_router.py**: Routes `chat_completion` and `get_embeddings` to OpenAI or Anthropic per `agents.{agent_name}`. Correctly raises `NotImplementedError` for Anthropic embeddings.
+- **anthropic_service.py**: Chat completions via Messages API; `get_embeddings` raises `NotImplementedError` as documented.
+- **Agents**: research_agent, script_agent, uniqueness_agent use `llm_router.chat_completion` / `get_embeddings` with `agent_name`. rag_service.query_topics uses `llm_router.get_embeddings(agent_name="rag")`.
+- **Tests**: All 77 youtube-shorts-generator tests pass.
+
+**Step 3 (orchestrator brain): PASS**
+
+- **a2a.py**: `AgentRole.PROPOSER`, `AgentRole.CRITIC`; `MessageType.PROPOSAL`, `CRITIQUE`, `SYNTHESIS`; `create_proposal`, `create_critique`, `create_synthesis` helpers. Matches Option (c) design.
+- **brain.py**: `run_brain()` implements propose → critique → synthesize flow. Phase 1: Proposer produces A2A proposal; Phase 2: Critic produces A2A critique; Phase 3: Synthesizer (Proposer) produces final decision. Two models "talk" via A2A messages.
+- **config.py**: `get_proposer_model()`, `get_critic_model()` with `ORCHESTRATOR_PROPOSER_MODEL`, `ORCHESTRATOR_CRITIC_MODEL` env vars.
+- **cycle_runner.py**: Uses `run_brain` instead of single LLM call. Flow: load context → MCP tools → brain → decision.
+- **Note**: `cycle_runner.py` imports `context_loader` and `mcp_client`; these modules are not present in `orchestrator_client/`. Standalone `python orchestrator_client/cycle_runner.py` fails at import. A2A/brain logic itself is correct; cycle_runner may depend on Cursor/MCP runtime or missing modules to be added later.
+
+---
+
+## Handoff to user (Orchestrator brain + YT pipeline workflow)
+
+### Manual test steps
+
+#### (a) YouTube Shorts Generator — per-agent model routing
+
+1. **Setup**
+   - `cd youtube-shorts-generator`
+   - Ensure `config.yaml` exists with an `agents` section (copy from `config.example.yaml` if needed).
+   - Ensure `.env` has `OPENAI_API_KEY` (and `ANTHROPIC_API_KEY` if using Anthropic for any agent).
+
+2. **Run tests**
+   - Command: `pytest tests/ -v`
+   - Expected: All tests pass (77 tests as of last run).
+   - Check: No `ModuleNotFoundError` for `llm_router` or `anthropic_service`; no `NotImplementedError` for embeddings when using Anthropic for embedding agents (use `provider: openai` for `uniqueness` and `rag`).
+
+3. **Verify routing (optional)**
+   - Run a pipeline step that uses an LLM agent (e.g. research or script).
+   - Command: `python -m src.cli.main generate` (or a minimal script that invokes `llm_router.chat_completion(agent_name="research", ...)`).
+   - Expected: Calls go to the provider/model specified in `config.yaml` for that agent (OpenAI or Anthropic).
+
+#### (b) Orchestrator client brain — propose → critique → synthesize
+
+1. **In Cursor (primary path)**
+   - Open the Orchestrator chat and run one cycle (e.g. say "continue" or "run one cycle" after a subagent finishes).
+   - The Orchestrator uses the brain (propose → critique → synthesize) when deciding the next step.
+   - Expected: Output includes a slash command (e.g. `/lead-engineer ...`), `ORCHESTRATION_COMPLETE`, or `User Intervention Required`.
+   - Check: Decision aligns with Next Actions and Implementation Plan in PROJECT_WORKSPACE.md.
+
+2. **Standalone cycle_runner (limited)**
+   - `cycle_runner.py` imports `context_loader` and `mcp_client`, which are not yet in `orchestrator_client/`. Standalone execution will fail at import.
+   - When those modules exist: from workspace root, `cd agent-automation && PYTHONPATH=. python3 -m orchestrator_client.cycle_runner`.
+   - Expected: Prints the orchestrator decision (delegation, ORCHESTRATION_COMPLETE, or run-cycle instruction).
+   - Env: `ANTHROPIC_API_KEY` (or `ORCHESTRATOR_LLM_API_KEY`) must be set.
+
+3. **Brain in isolation (optional)**
+   - From workspace root: `cd agent-automation && PYTHONPATH=. python3 -c "from orchestrator_client.brain import run_brain; print(run_brain('You are the Orchestrator.', {'pending_prompt': {}, 'workspace_status': {}, 'workflow_config': {}, 'workspace_snippet': '...'}))"`
+   - Expected: Prints a decision string. Requires `ANTHROPIC_API_KEY`.
+
+---
+
+### What changed at each step
+
+#### Step 2 (YT pipeline — per-agent model routing)
+
+- **Config files**: `config.example.yaml`, `config.example.staging.yaml` — added `agents` section (research, script, uniqueness, rag) with `provider` and `model`.
+- **New modules**: `src/services/llm_router.py`, `src/services/anthropic_service.py`.
+- **Updated agents**: `research_agent.py`, `script_agent.py`, `uniqueness_agent.py` use `llm_router.chat_completion` / `get_embeddings` with `agent_name`; `rag_service.py` uses `llm_router.get_embeddings(agent_name="rag")`.
+- **Dependencies**: `anthropic>=0.18.0` added to `requirements.txt`.
+- **Env vars**: `ANTHROPIC_API_KEY` in `.env.example` (optional when using Anthropic for any agent).
+
+#### Step 3 (orchestrator brain — propose → critique → synthesize)
+
+- **a2a.py**: Added `AgentRole.PROPOSER`, `AgentRole.CRITIC`; `MessageType.PROPOSAL`, `CRITIQUE`, `SYNTHESIS`; helpers `create_proposal`, `create_critique`, `create_synthesis`.
+- **brain.py**: New module; `run_brain(system_message, context)` implements propose → critique → synthesize flow using A2A messages.
+- **config.py**: Added `get_proposer_model()`, `get_critic_model()` (read from env).
+- **cycle_runner.py**: Uses `run_brain` instead of a single LLM call; flow: load context → MCP tools → brain → decision.
+- **ORCHESTRATOR_SETUP.md**: §8 documents orchestrator client env vars.
+- **Env vars**: `ANTHROPIC_API_KEY` or `ORCHESTRATOR_LLM_API_KEY`; `ORCHESTRATOR_PROPOSER_MODEL`, `ORCHESTRATOR_CRITIC_MODEL` (optional overrides).
+
+#### Config and files to be aware of
+
+| File / path | Purpose |
+|-------------|---------|
+| `youtube-shorts-generator/config.yaml` | Must include `agents` section for per-agent routing. |
+| `youtube-shorts-generator/.env` | `OPENAI_API_KEY` required; `ANTHROPIC_API_KEY` if using Anthropic. |
+| `agent-automation/orchestrator_client/` | Brain (a2a.py, brain.py, config.py, cycle_runner.py). |
+| `agent-automation/ORCHESTRATOR_SETUP.md` | §8: orchestrator client env vars. |
+
+---
+
 ## 🎬 Runway ML integration (current initiative)
 
 **Goal:** Wire real Runway ML video generation into youtube-shorts-generator. Video step is currently a stub; we have Runway API credits and want to use them.

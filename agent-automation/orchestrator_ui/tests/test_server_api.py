@@ -48,7 +48,14 @@ class TestChatEndpointErrors:
 
     def test_500_no_api_key(self):
         """No API key in env → 500."""
-        with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "", "ORCHESTRATOR_LLM_API_KEY": ""}, clear=False):
+        env_patch = {
+            "ANTHROPIC_API_KEY": "",
+            "ORCHESTRATOR_LLM_API_KEY": "",
+            "OPENAI_API_KEY": "",
+            "ORCHESTRATOR_OPENAI_API_KEY": "",
+            "ORCHESTRATOR_LLM_PROVIDER": "anthropic",  # Use anthropic so we get API key error (not import error)
+        }
+        with patch.dict(os.environ, env_patch, clear=False):
             r = _chat_request([{"role": "user", "content": "hello"}])
             assert r.status_code == 500
             data = r.json()
@@ -62,7 +69,8 @@ class TestChatEndpointModeRouting:
 
     @pytest.fixture(autouse=True)
     def ensure_api_key(self):
-        """Ensure API key is set so handlers run."""
+        """Ensure API key is set so handlers run (provider=anthropic to use ANTHROPIC_API_KEY)."""
+        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "anthropic"
         os.environ["ANTHROPIC_API_KEY"] = "sk-test-fake-key-for-testing"
         yield
         # Don't clear - other tests may need it
@@ -117,6 +125,27 @@ class TestChatEndpointModeRouting:
             mock_orch.assert_called_once()
 
 
+class TestRunBrainEndpoint:
+    """Test POST /api/run-brain provider abstraction and key resolution."""
+
+    def test_500_no_api_key_openai(self):
+        """provider=openai, no OPENAI_API_KEY → 500 with appropriate error."""
+        env_patch = {
+            "ANTHROPIC_API_KEY": "",
+            "ORCHESTRATOR_LLM_API_KEY": "",
+            "OPENAI_API_KEY": "",
+            "ORCHESTRATOR_OPENAI_API_KEY": "",
+            "ORCHESTRATOR_LLM_PROVIDER": "openai",
+        }
+        with patch.dict(os.environ, env_patch, clear=False):
+            r = client.post("/api/run-brain", json={})
+            assert r.status_code == 500
+            data = r.json()
+            detail = data.get("detail", "")
+            assert "API key" in detail or "key" in detail.lower()
+            assert "OPENAI" in detail.upper() or "openai" in detail
+
+
 class TestConfigStatus:
     """Test GET /api/config-status."""
 
@@ -132,7 +161,11 @@ class TestConfigStatus:
 
     def test_config_status_ok_when_key_and_workspace(self):
         """When both configured, values are True."""
-        with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "sk-test"}):
+        with patch.dict(
+            os.environ,
+            {"ORCHESTRATOR_LLM_PROVIDER": "anthropic", "ANTHROPIC_API_KEY": "sk-test"},
+            clear=False,
+        ):
             with patch("orchestrator_ui.server.get_workspace_root") as mock_root:
                 mock_root.return_value = Path(__file__).parent.parent.parent.parent
                 r = client.get("/api/config-status")
@@ -162,6 +195,7 @@ class TestServerErrorPropagation:
 
     @pytest.fixture(autouse=True)
     def ensure_api_key(self):
+        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "anthropic"
         os.environ["ANTHROPIC_API_KEY"] = "sk-test-fake-key"
         yield
 
@@ -191,6 +225,7 @@ class TestIncludeFlow:
 
     @pytest.fixture(autouse=True)
     def ensure_api_key(self):
+        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "anthropic"
         os.environ["ANTHROPIC_API_KEY"] = "sk-test-fake-key"
         yield
 
@@ -217,6 +252,7 @@ class TestStreamingSSE:
 
     @pytest.fixture(autouse=True)
     def ensure_api_key(self):
+        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "anthropic"
         os.environ["ANTHROPIC_API_KEY"] = "sk-test-fake-key"
         yield
 
@@ -580,6 +616,7 @@ class TestMCPFallback:
 
     @pytest.fixture(autouse=True)
     def ensure_api_key(self):
+        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "anthropic"
         os.environ["ANTHROPIC_API_KEY"] = "sk-test-fake-key"
         yield
 

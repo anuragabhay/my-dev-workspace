@@ -19,39 +19,20 @@ from orchestrator_client.a2a import (
 )
 from orchestrator_client.config import (
     get_anthropic_api_key,
+    get_openai_api_key,
+    get_openai_model,
+    get_llm_provider,
     get_proposer_model,
     get_critic_model,
 )
+from orchestrator_client.llm_provider import chat_sync, chat_stream
 
 
-def _call_llm(
-    model: str, system: str, user: str, api_key_override: Optional[str] = None
-) -> str:
-    """Call Anthropic API with system and user messages."""
-    api_key = api_key_override or get_anthropic_api_key()
-    if not api_key:
-        raise RuntimeError(
-            "ANTHROPIC_API_KEY or ORCHESTRATOR_LLM_API_KEY not set. "
-            "Set one of these env vars to run the orchestrator brain."
-        )
-
-    from anthropic import Anthropic
-
-    client = Anthropic(api_key=api_key)
-    response = client.messages.create(
-        model=model,
-        max_tokens=2048,
-        system=system,
-        messages=[{"role": "user", "content": user}],
-    )
-
-    if not response.content:
-        return ""
-    parts = []
-    for block in response.content:
-        if hasattr(block, "text"):
-            parts.append(block.text)
-    return "\n".join(parts)
+def _resolve_keys(api_key_override: Optional[str]) -> tuple[Optional[str], Optional[str]]:
+    """Resolve anthropic_key and openai_key, applying override when provided."""
+    anthropic_key = api_key_override or get_anthropic_api_key()
+    openai_key = api_key_override or get_openai_api_key()
+    return anthropic_key, openai_key
 
 
 def _proposer_prompt(context: dict[str, Any]) -> str:
@@ -192,11 +173,20 @@ def run_brain_with_flow(
     task_id = f"brain-{uuid.uuid4().hex[:8]}"
     proposer_model = get_proposer_model()
     critic_model = get_critic_model()
+    provider = get_llm_provider()
+    anthropic_key, openai_key = _resolve_keys(api_key_override)
+    openai_model = get_openai_model()
 
     # Phase 1: Proposer produces initial proposal
     proposer_user = _proposer_prompt(context)
-    proposal_text = _call_llm(
-        proposer_model, system_message, proposer_user, api_key_override
+    proposal_text = chat_sync(
+        system=system_message,
+        user=proposer_user,
+        model=proposer_model,
+        anthropic_key=anthropic_key,
+        openai_key=openai_key,
+        provider=provider,
+        openai_fallback_model=openai_model,
     )
     proposal_text = proposal_text.strip()
 
@@ -210,8 +200,14 @@ def run_brain_with_flow(
 
     # Phase 2: Critic critiques the proposal
     critic_user = _critic_prompt(proposal_msg, context)
-    critique_text = _call_llm(
-        critic_model, system_message, critic_user, api_key_override
+    critique_text = chat_sync(
+        system=system_message,
+        user=critic_user,
+        model=critic_model,
+        anthropic_key=anthropic_key,
+        openai_key=openai_key,
+        provider=provider,
+        openai_fallback_model=openai_model,
     )
     critique_text = critique_text.strip()
 
@@ -223,8 +219,14 @@ def run_brain_with_flow(
 
     # Phase 3: Synthesizer produces final decision
     synthesizer_user = _synthesizer_prompt(proposal_msg, critique_msg, context)
-    final_decision = _call_llm(
-        proposer_model, system_message, synthesizer_user, api_key_override
+    final_decision = chat_sync(
+        system=system_message,
+        user=synthesizer_user,
+        model=proposer_model,
+        anthropic_key=anthropic_key,
+        openai_key=openai_key,
+        provider=provider,
+        openai_fallback_model=openai_model,
     )
     final_decision = final_decision.strip()
 
@@ -252,33 +254,29 @@ async def run_brain_with_flow_stream(
     Phases 1–2 stream flow.proposal.chunk, flow.critique.chunk; Phase 3 streams
     reply.chunk token-by-token, then reply.done.
     """
-    api_key = api_key_override or get_anthropic_api_key()
-    if not api_key:
-        raise RuntimeError(
-            "ANTHROPIC_API_KEY or ORCHESTRATOR_LLM_API_KEY not set. "
-            "Set one of these env vars to run the orchestrator brain."
-        )
-
-    from anthropic import AsyncAnthropic
-
-    client = AsyncAnthropic(api_key=api_key)
     task_id = f"brain-{uuid.uuid4().hex[:8]}"
     proposer_model = get_proposer_model()
     critic_model = get_critic_model()
+    provider = get_llm_provider()
+    anthropic_key, openai_key = _resolve_keys(api_key_override)
+    openai_model = get_openai_model()
 
     # Phase 1: Proposer — stream token-by-token
     proposer_user = _proposer_prompt(context)
+    proposer_messages = [{"role": "user", "content": proposer_user}]
     proposal_text = ""
-    async with client.messages.stream(
-        model=proposer_model,
-        max_tokens=2048,
+    async for text in chat_stream(
         system=system_message,
-        messages=[{"role": "user", "content": proposer_user}],
-    ) as stream:
-        async for text in stream.text_stream:
-            if text:
-                proposal_text += text
-                yield ("flow.proposal.chunk", text)
+        messages=proposer_messages,
+        model=proposer_model,
+        anthropic_key=anthropic_key,
+        openai_key=openai_key,
+        provider=provider,
+        openai_fallback_model=openai_model,
+    ):
+        if text:
+            proposal_text += text
+            yield ("flow.proposal.chunk", text)
     proposal_text = proposal_text.strip()
 
     proposal_msg = create_proposal(
@@ -290,17 +288,20 @@ async def run_brain_with_flow_stream(
 
     # Phase 2: Critic — stream token-by-token
     critic_user = _critic_prompt(proposal_msg, context)
+    critic_messages = [{"role": "user", "content": critic_user}]
     critique_text = ""
-    async with client.messages.stream(
-        model=critic_model,
-        max_tokens=2048,
+    async for text in chat_stream(
         system=system_message,
-        messages=[{"role": "user", "content": critic_user}],
-    ) as stream:
-        async for text in stream.text_stream:
-            if text:
-                critique_text += text
-                yield ("flow.critique.chunk", text)
+        messages=critic_messages,
+        model=critic_model,
+        anthropic_key=anthropic_key,
+        openai_key=openai_key,
+        provider=provider,
+        openai_fallback_model=openai_model,
+    ):
+        if text:
+            critique_text += text
+            yield ("flow.critique.chunk", text)
     critique_text = critique_text.strip()
 
     critique_msg = create_critique(
@@ -312,13 +313,16 @@ async def run_brain_with_flow_stream(
     # Phase 3: Synthesizer — stream token-by-token
     yield ("flow.synthesis", "")  # phase marker
     synthesizer_user = _synthesizer_prompt(proposal_msg, critique_msg, context)
-    async with client.messages.stream(
-        model=proposer_model,
-        max_tokens=2048,
+    synthesizer_messages = [{"role": "user", "content": synthesizer_user}]
+    async for text in chat_stream(
         system=system_message,
-        messages=[{"role": "user", "content": synthesizer_user}],
-    ) as stream:
-        async for text in stream.text_stream:
-            if text:
-                yield ("reply.chunk", text)
+        messages=synthesizer_messages,
+        model=proposer_model,
+        anthropic_key=anthropic_key,
+        openai_key=openai_key,
+        provider=provider,
+        openai_fallback_model=openai_model,
+    ):
+        if text:
+            yield ("reply.chunk", text)
     yield ("reply.done", "")

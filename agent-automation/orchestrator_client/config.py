@@ -33,8 +33,8 @@ def get_mcp_server_env() -> dict[str, str]:
 
 
 def get_llm_provider() -> str:
-    """LLM provider: anthropic or vertex (vertex not yet implemented)."""
-    return os.environ.get("ORCHESTRATOR_LLM_PROVIDER", "anthropic").lower()
+    """LLM provider: openai (default) or anthropic."""
+    return os.environ.get("ORCHESTRATOR_LLM_PROVIDER", "openai").lower()
 
 
 def get_llm_model() -> str:
@@ -64,3 +64,13 @@ def get_critic_model() -> str:
 def get_anthropic_api_key() -> Optional[str]:
     """Anthropic API key from env."""
     return os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ORCHESTRATOR_LLM_API_KEY")
+
+
+def get_openai_api_key() -> Optional[str]:
+    """OpenAI API key from env."""
+    return os.environ.get("OPENAI_API_KEY") or os.environ.get("ORCHESTRATOR_OPENAI_API_KEY")
+
+
+def get_openai_model() -> str:
+    """OpenAI model when provider=openai and requested model is Anthropic-specific (claude-*)."""
+    return os.environ.get("ORCHESTRATOR_OPENAI_MODEL", "gpt-4o-mini")

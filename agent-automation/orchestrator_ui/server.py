@@ -191,12 +191,7 @@ async def _chat_handler_stream(messages: list, api_key: str):
         system=CHAT_SYSTEM_PROMPT,
         messages=[{"role": m.role, "content": m.content} for m in messages],
     ) as stream:
-        async for event in stream:
-            text = ""
-            if getattr(event, "type", None) == "content_block_delta":
-                delta = getattr(event, "delta", None)
-                if delta and getattr(delta, "type", None) == "text_delta":
-                    text = getattr(delta, "text", "") or ""
+        async for text in stream.text_stream:
             if text:
                 yield f"data: {_json.dumps({'type': 'reply.chunk', 'content': text})}\n\n"
     yield f"data: {_json.dumps({'type': 'reply.done'})}\n\n"

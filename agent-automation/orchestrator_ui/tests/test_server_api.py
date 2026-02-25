@@ -6,6 +6,7 @@ streaming SSE, and MCP fallback.
 
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from unittest.mock import patch, MagicMock
@@ -492,6 +493,34 @@ class TestPhase5APIs:
                 if isinstance(cmd, dict):
                     assert cmd.get("slash", "").startswith("/")
 
+    def test_slash_commands_each_has_slash_field(self):
+        """Regression: every command has slash field for display."""
+        with patch("orchestrator_ui.server.get_workspace_root") as mock_root:
+            mock_root.return_value = Path(__file__).resolve().parent.parent.parent.parent
+            r = client.get("/api/slash-commands")
+            assert r.status_code == 200
+            data = r.json()
+            commands = data.get("commands", [])
+            for cmd in commands:
+                assert isinstance(cmd, dict), f"Command must be dict: {cmd}"
+                assert "slash" in cmd, f"Command missing 'slash' field: {cmd}"
+                assert isinstance(cmd["slash"], str), f"slash must be string: {cmd}"
+                assert cmd["slash"].startswith("/"), f"slash must start with /: {cmd}"
+
+    def test_slash_commands_format_for_display(self):
+        """Regression: cmd.slash format used correctly for display (as in index.html)."""
+        with patch("orchestrator_ui.server.get_workspace_root") as mock_root:
+            mock_root.return_value = Path(__file__).resolve().parent.parent.parent.parent
+            r = client.get("/api/slash-commands")
+            assert r.status_code == 200
+            data = r.json()
+            commands = data.get("commands", [])
+            for cmd in commands:
+                # Mimic index.html: const slash = (cmd && typeof cmd.slash === 'string') ? cmd.slash : String(cmd)
+                slash = cmd.get("slash") if isinstance(cmd.get("slash"), str) else str(cmd)
+                assert slash.startswith("/"), f"Display slash must start with /: {slash}"
+                assert len(slash) > 1, "Display slash must be more than just '/'"
+
     def test_skills_returns_list(self):
         """GET /api/skills returns skills from .cursor/skills/."""
         with patch("orchestrator_ui.server.get_workspace_root") as mock_root:
@@ -614,3 +643,85 @@ class TestMCPFallback:
                 assert "reply.done" in types
 
 
+def _parse_sse_stream_reply_chunks(sse_text: str) -> list[str]:
+    """
+    Python equivalent of processSSEStream reply.chunk parsing (index.html).
+    Mirrors the JS: EVENT_BOUNDARY = /\\r?\\n\\r?\\n/, processOneEvent per event,
+    extract data line, parse JSON, append content for reply.chunk.
+    Returns list of chunk contents in order.
+    """
+    chunks = []
+    boundary = re.compile(r"\r?\n\r?\n")
+    buffer = sse_text
+
+    def process_one_event(event_str: str) -> None:
+        for line in event_str.split("\n"):
+            if line.startswith("data: "):
+                json_str = line[6:]
+                if json_str.strip() in ("[DONE]", ""):
+                    return
+                try:
+                    data = json.loads(json_str)
+                    if data.get("type") == "reply.chunk":
+                        content = data.get("content")
+                        if content is not None:
+                            chunks.append(str(content))
+                except json.JSONDecodeError:
+                    pass
+                return
+
+    while True:
+        match = boundary.search(buffer)
+        if match is None:
+            break
+        sep = match.group(0)
+        idx = buffer.index(sep)
+        event_str = buffer[:idx]
+        buffer = buffer[idx + len(sep) :]
+        process_one_event(event_str)
+
+    if buffer.strip():
+        process_one_event(buffer)
+
+    return chunks
+
+
+class TestSSENoDoubleProcess:
+    """Regression: processSSEStream (or equivalent) does not double-process reply.chunk events."""
+
+    def test_reply_chunks_appear_exactly_once(self):
+        """Mock SSE with multiple chunks; assert each chunk appears exactly once in output."""
+        sse = (
+            'data: {"type": "reply.chunk", "content": "A"}\n\n'
+            'data: {"type": "reply.chunk", "content": "B"}\n\n'
+            'data: {"type": "reply.chunk", "content": "C"}\n\n'
+            'data: {"type": "reply.done"}\n\n'
+        )
+        chunks = _parse_sse_stream_reply_chunks(sse)
+        assert chunks == ["A", "B", "C"]
+        output = "".join(chunks)
+        assert output == "ABC"
+        assert output.count("A") == 1
+        assert output.count("B") == 1
+        assert output.count("C") == 1
+
+    def test_mixed_events_only_chunks_collected(self):
+        """Flow events and reply.done do not affect chunk collection; no duplication."""
+        sse = (
+            'data: {"type": "flow.proposal", "content": "Proposal"}\n\n'
+            'data: {"type": "reply.chunk", "content": "X"}\n\n'
+            'data: {"type": "flow.critique", "content": "Critique"}\n\n'
+            'data: {"type": "reply.chunk", "content": "Y"}\n\n'
+            'data: {"type": "reply.done"}\n\n'
+        )
+        chunks = _parse_sse_stream_reply_chunks(sse)
+        assert chunks == ["X", "Y"]
+        assert "".join(chunks) == "XY"
+
+    def test_empty_and_single_chunk(self):
+        """Edge cases: no chunks, single chunk."""
+        sse_done = 'data: {"type": "reply.done"}\n\n'
+        assert _parse_sse_stream_reply_chunks(sse_done) == []
+
+        sse_single = 'data: {"type": "reply.chunk", "content": "only"}\n\n'
+        assert _parse_sse_stream_reply_chunks(sse_single) == ["only"]

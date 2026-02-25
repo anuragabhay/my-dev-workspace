@@ -14,10 +14,10 @@ _agent_automation = _ui_dir.parent
 if str(_agent_automation) not in sys.path:
     sys.path.insert(0, str(_agent_automation))
 
-from typing import Optional
+from typing import Literal, Optional
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -61,6 +61,20 @@ class RunBrainRequest(BaseModel):
     )
 
 
+class ChatMessage(BaseModel):
+    """Single chat message. Role and content only; no API key or workspace in body."""
+
+    role: Literal["user", "assistant"]
+    content: str
+
+
+class ChatRequest(BaseModel):
+    """Request for POST /api/chat. API key and workspace read only from env."""
+
+    messages: list[ChatMessage] = Field(..., description="Conversation history")
+    include_flow: bool = Field(default=True, description="Include proposal, critique, synthesis in response")
+
+
 def _stub_context() -> dict:
     """Build stub context when MCP unavailable (brain-only mode)."""
     return {
@@ -99,20 +113,87 @@ async def index():
     )
 
 
-@app.get("/api/status")
-async def status():
-    """API status and config availability."""
-    api_key_set = bool(
+def _api_key_configured() -> bool:
+    return bool(
         os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ORCHESTRATOR_LLM_API_KEY")
     )
+
+
+def _workspace_configured() -> bool:
     root = get_workspace_root()
-    workspace_exists = (root / "PROJECT_WORKSPACE.md").exists()
+    return (root / "PROJECT_WORKSPACE.md").exists()
+
+
+@app.get("/api/status")
+async def status():
+    """API status (legacy). Prefer GET /api/config-status for UI."""
     return {
         "status": "ok",
-        "api_key_from_env": api_key_set,
-        "workspace_root": str(root),
-        "project_workspace_exists": workspace_exists,
+        "api_key_from_env": _api_key_configured(),
+        "project_workspace_exists": _workspace_configured(),
     }
+
+
+@app.get("/api/config-status")
+async def config_status():
+    """Config status for UI: booleans only, no secrets."""
+    return {
+        "api_key_configured": _api_key_configured(),
+        "workspace_configured": _workspace_configured(),
+    }
+
+
+@app.post("/api/chat")
+async def chat(req: ChatRequest):
+    """
+    Run one orchestrator cycle: build context from env, run brain, return reply and flow.
+    API key and workspace are read only from env; no key or snippet in request body.
+    Returns 400 for invalid request (e.g. empty messages), 500 on brain/context failure
+    with body { "error": "human-readable message" }.
+    """
+    if not req.messages or len(req.messages) == 0:
+        return JSONResponse(
+            status_code=400,
+            content={"error": "At least one message is required."},
+        )
+    api_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ORCHESTRATOR_LLM_API_KEY")
+    if not api_key:
+        return JSONResponse(
+            status_code=500,
+            content={"error": "API key not configured. Set ANTHROPIC_API_KEY (or ORCHESTRATOR_LLM_API_KEY) in the environment."},
+        )
+    context = _stub_context()
+    root = get_workspace_root()
+    if (root / "PROJECT_WORKSPACE.md").exists():
+        context["workspace_snippet"] = _get_project_workspace_snippet()
+    try:
+        ctx = load_context()
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to load context: {e!s}"},
+        )
+    try:
+        result = run_brain_with_flow(
+            ctx.system_message, context, api_key_override=api_key
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Brain run failed: {e!s}"},
+        )
+    reply = result.get("final_decision", "")
+    out = {
+        "reply": reply,
+        "flow": {
+            "proposal": result.get("proposal", ""),
+            "critique": result.get("critique", ""),
+            "synthesis": result.get("synthesis", ""),
+        },
+    }
+    if req.include_flow is False:
+        out.pop("flow", None)
+    return out
 
 
 @app.post("/api/run-brain")

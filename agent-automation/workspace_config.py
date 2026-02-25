@@ -12,8 +12,8 @@ def get_workspace_root() -> Path:
     Resolve workspace root (directory containing PROJECT_WORKSPACE.md).
     Priority: WORKSPACE_ROOT env -> workspace_config.yaml workspace_root -> agent-automation parent.
     """
-    # 1. Environment variable
-    env_root = os.environ.get("WORKSPACE_ROOT")
+    # 1. Environment variable (WORKSPACE_PATH or WORKSPACE_ROOT)
+    env_root = os.environ.get("WORKSPACE_PATH") or os.environ.get("WORKSPACE_ROOT")
     if env_root and env_root.strip():
         p = Path(env_root).resolve()
         if p.exists():

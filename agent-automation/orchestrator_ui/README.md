@@ -28,19 +28,19 @@ cd agent-automation
 pip install orchestrator_ui/requirements.txt
 ```
 
-### 2. Set API Keys
+### 2. Environment (required for chat)
 
-**Option A: Environment (recommended)**
+The app reads **only from environment**; no API key or workspace path in the UI or request body.
+
+- **ANTHROPIC_API_KEY** (or **ORCHESTRATOR_LLM_API_KEY**) — Required to run the brain.
+- **WORKSPACE_PATH** or **WORKSPACE_ROOT** (optional) — Workspace root (directory containing `PROJECT_WORKSPACE.md`). If unset, the app derives from the agent-automation parent.
+
+Example: copy `orchestrator_ui/.env.example` to `.env` and set values, or:
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...
-# or
-export ORCHESTRATOR_LLM_API_KEY=sk-ant-...
+# optional: export WORKSPACE_PATH=/path/to/your-workspace
 ```
-
-**Option B: UI**
-
-Enter your Anthropic API key in the UI before clicking "Run brain". The key is never logged or stored.
 
 ### 3. Start the UI
 
@@ -57,13 +57,13 @@ PYTHONPATH=agent-automation python agent-automation/orchestrator_ui/server.py
 
 The UI runs at **http://localhost:8765**.
 
-### 4. Run the Brain
+### 4. Use the revamped UI
 
 1. Open http://localhost:8765 in a browser.
-2. (Optional) Enter your API key if not set via env.
-3. (Optional) Paste a PROJECT_WORKSPACE.md snippet for richer context.
-4. Click **Run brain**.
-5. View the A2A flow: **Proposal** → **Critique** → **Synthesis** → **Final Decision**.
+2. Check the status line: **Config: OK** or a message like **Config: missing (set ANTHROPIC_API_KEY in env)**.
+3. Type a message in the chat input and click **Send**. The backend runs one orchestrator cycle (context + brain) and returns the reply.
+4. The main chat shows only user messages and assistant replies. Open the **Reasoning** panel (sidebar) to see Proposal, Critique, Synthesis and tool calls for the latest turn.
+5. On 400/500 errors, the UI shows the error and you can retry (no key or snippet in the UI).
 
 ## What to Look For
 
@@ -86,5 +86,7 @@ The UI runs at **http://localhost:8765**.
 ## API
 
 - `GET /` — Serve the UI.
-- `GET /api/status` — Check API status, env API key, workspace.
-- `POST /api/run-brain` — Run the brain. Body: `{ "anthropic_api_key": "…", "workspace_snippet": "…", "pending_prompt": {}, "workspace_status": {}, "workflow_config": {} }`. Returns `{ "proposal", "critique", "synthesis", "final_decision" }`.
+- `GET /api/status` — Legacy API status.
+- `GET /api/config-status` — Booleans only: `api_key_configured`, `workspace_configured` (no secrets). Use for UI status line.
+- `POST /api/chat` — Chat endpoint. Body: `{ "messages": [{ "role": "user"|"assistant", "content": "..." }], "include_flow": true }`. API key and workspace from env only. Returns `{ "reply", "flow": { "proposal", "critique", "synthesis" }, "tool_calls"?: [...] }`. 400 if invalid (e.g. empty messages), 500 with `{ "error": "..." }` on failure.
+- `POST /api/run-brain` — Legacy. Body may include `anthropic_api_key`, `workspace_snippet`. Returns `{ "proposal", "critique", "synthesis", "final_decision" }`.

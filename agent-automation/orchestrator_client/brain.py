@@ -242,16 +242,6 @@ def run_brain_with_flow(
     }
 
 
-def _extract_text_from_stream_event(event) -> str:
-    """Extract text from Anthropic stream event (content_block_delta only)."""
-    text = ""
-    if getattr(event, "type", None) == "content_block_delta":
-        delta = getattr(event, "delta", None)
-        if delta and getattr(delta, "type", None) == "text_delta":
-            text = getattr(delta, "text", "") or ""
-    return text
-
-
 async def run_brain_with_flow_stream(
     system_message: str,
     context: dict[str, Any],
@@ -285,8 +275,7 @@ async def run_brain_with_flow_stream(
         system=system_message,
         messages=[{"role": "user", "content": proposer_user}],
     ) as stream:
-        async for event in stream:
-            text = _extract_text_from_stream_event(event)
+        async for text in stream.text_stream:
             if text:
                 proposal_text += text
                 yield ("flow.proposal.chunk", text)
@@ -308,8 +297,7 @@ async def run_brain_with_flow_stream(
         system=system_message,
         messages=[{"role": "user", "content": critic_user}],
     ) as stream:
-        async for event in stream:
-            text = _extract_text_from_stream_event(event)
+        async for text in stream.text_stream:
             if text:
                 critique_text += text
                 yield ("flow.critique.chunk", text)
@@ -330,8 +318,7 @@ async def run_brain_with_flow_stream(
         system=system_message,
         messages=[{"role": "user", "content": synthesizer_user}],
     ) as stream:
-        async for event in stream:
-            text = _extract_text_from_stream_event(event)
+        async for text in stream.text_stream:
             if text:
                 yield ("reply.chunk", text)
     yield ("reply.done", "")

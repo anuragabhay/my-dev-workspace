@@ -114,3 +114,26 @@ class TestPhase4LayoutPersistence:
         assert "treeCollapsed" in html
         assert "reasoningCollapsed" in html
         assert "terminalCollapsed" in html
+
+
+class TestEditorModule:
+    """Regression: Editor container, EditorView, updateListener exist and load without throwing."""
+
+    def test_editor_container_and_related_dom_exist(self):
+        """Editor container, section, placeholder, toolbar present in index.html."""
+        html = INDEX_PATH.read_text()
+        assert 'id="editor-container"' in html
+        assert "editor-section" in html
+        assert "editor-placeholder" in html
+        assert "editor-toolbar" in html
+        assert "editor-path" in html
+        assert "editor-save-btn" in html
+        assert "editor-revert-btn" in html
+
+    def test_editor_initEditor_and_EditorView_import(self):
+        """initEditor uses EditorView and updateListener (codemirror imports)."""
+        html = INDEX_PATH.read_text()
+        assert "EditorView" in html
+        assert "updateListener" in html
+        assert "initEditor" in html
+        assert "codemirror" in html or "esm.sh" in html

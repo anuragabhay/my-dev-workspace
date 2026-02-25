@@ -13,8 +13,18 @@ from dotenv import load_dotenv
 # Add agent-automation to path for orchestrator_client
 _ui_dir = Path(__file__).resolve().parent
 _agent_automation = _ui_dir.parent
-load_dotenv(_ui_dir / ".env")
-load_dotenv(_agent_automation / ".env")
+load_dotenv(_ui_dir / ".env", override=True)
+load_dotenv(_agent_automation / ".env", override=True)
+
+# Diagnostic: log if API key still unset after load_dotenv (remove after verification)
+_env_ui = _ui_dir / ".env"
+_env_aa = _agent_automation / ".env"
+if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ORCHESTRATOR_LLM_API_KEY")):
+    print(
+        "[Orchestrator UI] ANTHROPIC_API_KEY/ORCHESTRATOR_LLM_API_KEY unset after load_dotenv. "
+        f"orchestrator_ui/.env exists={_env_ui.exists()}, agent-automation/.env exists={_env_aa.exists()}",
+        file=sys.stderr,
+    )
 if str(_agent_automation) not in sys.path:
     sys.path.insert(0, str(_agent_automation))
 

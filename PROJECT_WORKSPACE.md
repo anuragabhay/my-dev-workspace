@@ -151,6 +151,9 @@ The Orchestrator UI revamp is in scope for: a **chat-first UX** where the user�
 
 ## 📝 Recent Work Log (last 10)
 
+### [2026-02-25] [Architect] [Validate Orchestrator UI fixes (Editor, Chat duplication, Tree consolidation)] [✅ COMPLETED]
+- Editor: CodeMirror version fix for proper load\n- Chat: single stream path to prevent duplication\n- Tree: consolidation in index.html
+
 ### [2026-02-25] [Junior Engineer 1] [Custom Vibe Coding IDE initiative completion (Phases 1–5)] [✅ COMPLETED]
 - Phase 1: MCP client, streaming chat/orchestration, SSE frontend\n- Phase 2: Project structure panel (tree.py, GET /api/tree)\n- Phase 3: Code editor (GET/PUT /api/file, CodeMirror 6)\n- Phase 4: Full IDE shell (layout, terminal panel, persistence)\n- Phase 5: Hooks, slash-commands, skills, rules APIs\n- Branch feature/orchestrator-ui-redesign pushed; User: create PR → staging and merge
 
@@ -181,9 +184,6 @@ Added agent-automation/orchestrator_ui/intent.py with CHAT_KEYWORDS, ORCHESTRATI
 
 ### [2026-02-24 18:00 UTC] [Lead Engineer] [Orchestrator brain (A2A propose→critique→synthesize)] [✅ COMPLETED]
 - Extended a2a.py: AgentRole.PROPOSER, AgentRole.CRITIC; MessageType.PROPOSAL, CRITIQUE, SYNTHESIS; create_proposal, create_critique, create_synthesis helpers\n- Created orchestrator_client/brain.py: run_brain() with propose → critique → synthesize flow using A2A messages\n- Updated config.py: get_proposer_model(), get_critic_model() (ORCHESTRATOR_PROPOSER_MODEL, ORCHESTRATOR_CRITIC_MODEL)\n- Updated cycle_runner.py to use brain instead of single LLM call\n- Documented env vars in ORCHESTRATOR_SETUP.md §8
-
-### [2026-02-24 14:00 UTC] [Lead Engineer] [Per-agent model assignment (llm_router, config, Anthropic stub)] [✅ COMPLETED]
-- Added agents section to config.example.yaml and config.example.staging.yaml (research, script, uniqueness, rag with provider/model)\n- Created src/services/llm_router.py: routes chat_completion and get_embeddings to OpenAI or Anthropic per config\n- Created src/services/anthropic_service.py: chat_completion via Messages API; get_embeddings raises NotImplementedError (Anthropic has no embeddings)\n- Updated research_agent, script_agent, uniqueness_agent to use llm_router; rag_service.query_topics uses llm_router.get_embeddings\n- Added anthropic>=0.18.0 to requirements.txt, ANTHROPIC_API_KEY to .env.example\n- All 77 tests pass
 
 Full log: agent-automation/work_log.json
 

@@ -197,8 +197,6 @@ async def _chat_handler_stream(messages: list, api_key: str):
                 delta = getattr(event, "delta", None)
                 if delta and getattr(delta, "type", None) == "text_delta":
                     text = getattr(delta, "text", "") or ""
-            elif getattr(event, "type", None) == "text":
-                text = getattr(event, "text", "") or ""
             if text:
                 yield f"data: {_json.dumps({'type': 'reply.chunk', 'content': text})}\n\n"
     yield f"data: {_json.dumps({'type': 'reply.done'})}\n\n"

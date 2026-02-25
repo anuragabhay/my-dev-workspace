@@ -1360,38 +1360,34 @@
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      const EVENT_BOUNDARY = /\r?\n\r?\n/;
+      function processOneEvent(eventStr) {
+        const dataLine = eventStr.split('\n').find(l => l.startsWith('data: '));
+        if (!dataLine) return;
+        try {
+          const jsonStr = dataLine.slice(6);
+          if (jsonStr === '[DONE]' || jsonStr.trim() === '') return;
+          const data = JSON.parse(jsonStr);
+          processSSEEvent(data, flow, modeRef, appendChunkToStreamingMessage, finalizeStreamingMessage, showReasoning);
+        } catch (_) { /* skip malformed event */ }
+      }
       try {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
           buffer += decoder.decode(value, { stream: true });
-          // Process complete events one-by-one; consume from buffer to avoid double-processing
-          let idx;
-          while ((idx = buffer.indexOf('\n\n')) !== -1) {
+          let match;
+          while ((match = buffer.match(EVENT_BOUNDARY)) !== null) {
+            const sep = match[0];
+            const idx = buffer.indexOf(sep);
             const eventStr = buffer.slice(0, idx);
-            buffer = buffer.slice(idx + 2);
-            const dataLine = eventStr.split('\n').find(l => l.startsWith('data: '));
-            if (!dataLine) continue;
-            try {
-              const jsonStr = dataLine.slice(6);
-              if (jsonStr === '[DONE]' || jsonStr.trim() === '') continue;
-              const data = JSON.parse(jsonStr);
-              processSSEEvent(data, flow, modeRef, appendChunkToStreamingMessage, finalizeStreamingMessage, showReasoning);
-            } catch (_) { /* skip malformed event */ }
+            buffer = buffer.slice(idx + sep.length);
+            processOneEvent(eventStr);
           }
         }
-        // Process any remainder (incomplete final event)
+        // Process remainder only if buffer has content (last event may lack trailing newline)
         if (buffer.trim()) {
-          const dataLine = buffer.split('\n').find(l => l.startsWith('data: '));
-          if (dataLine) {
-            try {
-              const jsonStr = dataLine.slice(6);
-              if (jsonStr !== '[DONE]' && jsonStr.trim() !== '') {
-                const data = JSON.parse(jsonStr);
-                processSSEEvent(data, flow, modeRef, appendChunkToStreamingMessage, finalizeStreamingMessage, showReasoning);
-              }
-            } catch (_) {}
-          }
+          processOneEvent(buffer);
         }
         const lastMsg = threadEl.querySelector('.chat-msg.assistant:last-child');
         const content = lastMsg ? (lastMsg.querySelector('pre')?.textContent || '') : '';
@@ -1549,11 +1545,12 @@
           const commands = d.commands || [];
           if (commands.length) {
             slashLabel.style.display = 'inline';
-            slashContainer.innerHTML = commands.map((cmd) =>
-              '<button type="button" class="quick-action-btn" data-cmd="' + escapeHtml(cmd) + '" title="Inject ' + escapeHtml(cmd) + '">' + escapeHtml(cmd) + '</button>'
-            ).join('');
+            slashContainer.innerHTML = commands.map((cmd) => {
+              const slash = (cmd && typeof cmd.slash === 'string') ? cmd.slash : String(cmd);
+              return '<button type="button" class="quick-action-btn" data-cmd="' + escapeHtml(slash) + '" title="Inject ' + escapeHtml(slash) + '">' + escapeHtml(slash) + '</button>';
+            }).join('');
             slashContainer.querySelectorAll('.quick-action-btn').forEach((btn) => {
-              btn.addEventListener('click', () => injectIntoInput(btn.dataset.cmd + ' '));
+              btn.addEventListener('click', () => injectIntoInput((btn.dataset.cmd || '') + ' '));
             });
           }
         }
@@ -1584,138 +1581,20 @@
     // --- Project tree (Phase 2) ---
     let treeCollapsed = false;
     let selectedFilePath = null;
-    let expandedPaths = new Set(['.']);
     const treePanel = document.getElementById('tree-panel');
+    const treeContent = document.getElementById('tree-content');
     const treeToggle = document.getElementById('tree-toggle');
     const treeRoot = document.getElementById('tree-root');
     const treeLoading = document.getElementById('tree-loading');
     const treeError = document.getElementById('tree-error');
-
-    const FILE_ICONS = {
-      '.py': '🐍', '.js': '📜', '.ts': '📘', '.tsx': '⚛️', '.jsx': '⚛️',
-      '.md': '📝', '.json': '📋', '.yaml': '⚙️', '.yml': '⚙️',
-      '.html': '🌐', '.css': '🎨', '.svg': '🖼️', '.png': '🖼️', '.jpg': '🖼️',
-    };
-
-    function getFileIcon(name) {
-      const ext = name.includes('.') ? '.' + name.split('.').pop().toLowerCase() : '';
-      return FILE_ICONS[ext] || '📄';
-    }
-
-    function renderTreeNode(node, depth, expanded) {
-      const indent = depth * 12;
-      const isDir = node.type === 'dir';
-      const hasChildren = isDir && node.children && node.children.length > 0;
-      const isExpanded = expanded.has(node.path || '.');
-      const icon = isDir ? '📁' : getFileIcon(node.name);
-
-      let html = '<div class="tree-item' + (selectedFilePath === node.path && !isDir ? ' selected' : '') + '" data-path="' + escapeHtml(node.path || '.') + '" data-type="' + node.type + '" style="padding-left: ' + (indent + 0.75) + 'rem;">';
-      if (isDir) {
-        html += '<span class="tree-arrow' + (hasChildren ? (isExpanded ? ' expanded' : '') : ' placeholder') + '" data-path="' + escapeHtml(node.path || '.') + '">▶</span>';
-      } else {
-        html += '<span class="tree-arrow placeholder"></span>';
-      }
-      html += '<span class="tree-icon">' + icon + '</span>';
-      html += '<span class="tree-label">' + escapeHtml(node.name) + '</span>';
-      html += '</div>';
-
-      if (isDir && hasChildren && isExpanded) {
-        for (const child of node.children) {
-          html += renderTreeNode(child, depth + 1, expanded);
-        }
-      }
-      return html;
-    }
-
-    function loadTree() {
-      treeLoading.style.display = 'block';
-      treeRoot.style.display = 'none';
-      treeError.style.display = 'none';
-      fetch(API_BASE + '/api/tree')
-        .then(r => {
-          if (!r.ok) throw new Error(r.status === 404 ? 'Workspace not found' : 'Failed to load tree');
-          return r.json();
-        })
-        .then(data => {
-          treeLoading.style.display = 'none';
-          treeError.style.display = 'none';
-          if (expandedPaths.size === 0) expandedPaths.add('.');
-          const root = Array.isArray(data)
-            ? { name: 'Workspace', path: '.', type: 'dir', children: data }
-            : data;
-          treeRoot.innerHTML = renderTreeNode(root, 0, expandedPaths);
-          treeRoot.style.display = 'block';
-          bindTreeEvents();
-        })
-        .catch(e => {
-          treeLoading.style.display = 'none';
-          treeRoot.style.display = 'none';
-          treeError.textContent = e.message || 'Failed to load project tree';
-          treeError.style.display = 'block';
-        });
-    }
-
-    function bindTreeEvents() {
-      treeRoot.querySelectorAll('.tree-arrow:not(.placeholder)').forEach(el => {
-        el.onclick = (e) => {
-          e.stopPropagation();
-          const path = el.dataset.path || '.';
-          if (expandedPaths.has(path)) {
-            expandedPaths.delete(path);
-          } else {
-            expandedPaths.add(path);
-          }
-          loadTree();
-        };
-      });
-      treeRoot.querySelectorAll('.tree-item').forEach(el => {
-        el.onclick = (e) => {
-          if (el.querySelector('.tree-arrow:not(.placeholder)')?.contains(e.target)) return;
-          const path = el.dataset.path || '.';
-          const type = el.dataset.type;
-          if (type === 'file') {
-            selectedFilePath = path;
-            treeRoot.querySelectorAll('.tree-item').forEach(i => i.classList.remove('selected'));
-            el.classList.add('selected');
-            window.dispatchEvent(new CustomEvent('file-selected', { detail: { path } }));
-          } else if (type === 'dir') {
-            if (expandedPaths.has(path)) {
-              expandedPaths.delete(path);
-            } else {
-              expandedPaths.add(path);
-            }
-            loadTree();
-          }
-        };
-      });
-    }
-
-    function toggleTree() {
-      treeCollapsed = !treeCollapsed;
-      treePanel.classList.toggle('collapsed', treeCollapsed);
-      treeToggle.textContent = treeCollapsed ? '▶' : '◀';
-      treeToggle.title = treeCollapsed ? 'Expand project tree' : 'Collapse project tree';
-      saveLayout({ treeCollapsed });
-    }
-
-    treeToggle.addEventListener('click', toggleTree);
-    loadTree();
+    const treeErrorMsg = document.getElementById('tree-error-msg');
+    const treeRetryBtn = document.getElementById('tree-retry-btn');
 
     setupResize();
     setupCenterTabs();
     checkConfigStatus();
 
     // --- Project tree (Phase 2: virtualization via lazy-load, icons, loading, error) ---
-    const treePanel = document.getElementById('tree-panel');
-    const treeContent = document.getElementById('tree-content');
-    const treeLoading = document.getElementById('tree-loading');
-    const treeRoot = document.getElementById('tree-root');
-    const treeError = document.getElementById('tree-error');
-    const treeErrorMsg = document.getElementById('tree-error-msg');
-    const treeRetryBtn = document.getElementById('tree-retry-btn');
-    const treeToggle = document.getElementById('tree-toggle');
-    let treeCollapsed = false;
-
     function getIconForNode(node) {
       if (node.type === 'dir') return '📁';
       const ext = (node.name.split('.').pop() || '').toLowerCase();
@@ -1975,7 +1854,7 @@
     }
 
     async function initEditor(content, path) {
-      const { EditorView, basicSetup } = await import('https://esm.sh/codemirror@6.65.7');
+      const { EditorView, basicSetup } = await import('https://esm.sh/codemirror@6.0.1');
       const lang = getLangFromPath(path);
       const langExt = await getLanguageExtension(lang);
 

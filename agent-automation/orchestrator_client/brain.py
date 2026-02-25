@@ -243,14 +243,12 @@ def run_brain_with_flow(
 
 
 def _extract_text_from_stream_event(event) -> str:
-    """Extract text from Anthropic stream event (content_block_delta or text)."""
+    """Extract text from Anthropic stream event (content_block_delta only)."""
     text = ""
     if getattr(event, "type", None) == "content_block_delta":
         delta = getattr(event, "delta", None)
         if delta and getattr(delta, "type", None) == "text_delta":
             text = getattr(delta, "text", "") or ""
-    elif getattr(event, "type", None) == "text":
-        text = getattr(event, "text", "") or ""
     return text
 
 

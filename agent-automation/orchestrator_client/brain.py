@@ -56,6 +56,16 @@ def _call_llm(
 
 def _proposer_prompt(context: dict[str, Any]) -> str:
     """Build the user prompt for the Proposer (Phase 1)."""
+    user_msg = context.get("user_message", "")
+    user_msg_section = ""
+    if user_msg:
+        user_msg_section = f"""
+## User message (if any)
+```
+{user_msg}
+```
+
+"""
     return f"""Run one orchestrator cycle.
 
 ## MCP Tool Results
@@ -79,7 +89,7 @@ def _proposer_prompt(context: dict[str, Any]) -> str:
 ```
 {context.get("workspace_snippet", "(not provided)")}
 ```
-
+{user_msg_section}
 ---
 
 Apply the workflow and decision rules from the system context. Propose the single next action. Output exactly one of:

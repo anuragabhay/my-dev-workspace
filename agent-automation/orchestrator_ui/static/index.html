@@ -4,108 +4,445 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Orchestrator A2A Brain</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0f1419;
-      --surface: #1a2332;
-      --border: #2d3a4d;
+      --bg: #0a0a0f;
+      --bg-elevated: #12121a;
+      --surface: rgba(18, 18, 26, 0.7);
+      --surface-solid: #12121a;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.12);
       --text: #e6edf3;
       --muted: #8b949e;
       --accent: #58a6ff;
       --success: #3fb950;
       --warning: #d29922;
+      --error: #f85149;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --blur: 12px;
     }
+
     * { box-sizing: border-box; }
+
     body {
-      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-family: var(--font-sans);
       background: var(--bg);
       color: var(--text);
       margin: 0;
-      padding: 1.5rem;
-      line-height: 1.5;
+      padding: 0;
+      min-height: 100vh;
+      line-height: 1.6;
     }
-    h1 { font-size: 1.25rem; margin: 0 0 1rem; color: var(--accent); }
-    .section {
-      background: var(--surface);
+
+    /* Glass panel base */
+    .glass {
+      background: rgba(18, 18, 26, 0.6);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 1rem;
+      border-radius: var(--radius);
+    }
+
+    .glass-elevated {
+      background: rgba(18, 18, 26, 0.75);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    /* Header + config status */
+    .header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-elevated);
+    }
+    .header h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 0.25rem;
+      color: var(--text);
+    }
+    .status {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 0;
+    }
+    .status.ok { color: var(--success); }
+    .status.err { color: var(--error); }
+
+    /* Main layout: chat-first + collapsible reasoning panel */
+    .layout {
+      display: flex;
+      flex-direction: row;
+      min-height: calc(100vh - 80px);
+    }
+
+    .chat-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem 1.5rem;
+    }
+
+    .chat-thread {
+      flex: 1;
+      min-height: 200px;
+      overflow-y: auto;
+      padding: 0.5rem 0;
       margin-bottom: 1rem;
     }
-    .section h2 { font-size: 0.9rem; margin: 0 0 0.5rem; color: var(--muted); }
-    label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.25rem; }
-    input[type="password"], input[type="text"], textarea {
-      width: 100%;
-      padding: 0.5rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.85rem;
+
+    .chat-msg {
+      margin-bottom: 1rem;
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius);
+      max-width: 85%;
     }
-    textarea { min-height: 80px; resize: vertical; }
-    button {
+    .chat-msg.user {
+      margin-left: auto;
+      background: rgba(88, 166, 255, 0.12);
+      border: 1px solid rgba(88, 166, 255, 0.3);
+      border-radius: var(--radius) var(--radius) 4px var(--radius);
+    }
+    .chat-msg.assistant {
+      margin-right: auto;
+      background: rgba(63, 185, 80, 0.08);
+      border: 1px solid rgba(63, 185, 80, 0.25);
+      border-radius: var(--radius) var(--radius) var(--radius) 4px;
+    }
+    .chat-msg .mode-badge {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+      text-transform: capitalize;
+    }
+    .chat-msg pre,
+    .chat-msg .content {
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+      font-size: 0.9rem;
+      font-family: var(--font-sans);
+    }
+    .chat-msg code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+    }
+
+    /* Thinking indicator */
+    .thinking-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+      margin-right: auto;
+      background: rgba(63, 185, 80, 0.08);
+      border: 1px solid rgba(63, 185, 80, 0.25);
+      border-radius: var(--radius) var(--radius) var(--radius) 4px;
+      max-width: 200px;
+    }
+    .thinking-indicator .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 1.4s ease-in-out infinite both;
+    }
+    .thinking-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
+    .thinking-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse {
+      0%, 80%, 100% { opacity: 0.4; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1); }
+    }
+    .thinking-indicator span {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    /* Mode toggle */
+    .mode-toggle {
+      display: flex;
+      gap: 0;
+      margin-bottom: 0.5rem;
+      background: var(--surface);
+      backdrop-filter: blur(var(--blur));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 2px;
+      width: fit-content;
+    }
+    .mode-toggle button {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      transition: color 0.15s, background 0.15s;
+    }
+    .mode-toggle button.active {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+    .mode-toggle button:hover:not(.active) { color: var(--text); }
+
+    /* Input area */
+    .chat-input-area {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0.5rem 0;
+    }
+    .chat-input-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-end;
+      flex: 1;
+      min-width: 0;
+    }
+    .chat-input-area textarea {
+      flex: 1;
+      min-height: 56px;
+      max-height: 160px;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      resize: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .chat-input-area textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+    }
+    .chat-input-area textarea::placeholder {
+      color: var(--muted);
+    }
+    .chat-input-area button {
+      height: 56px;
+      padding: 0 1.25rem;
       background: var(--accent);
       color: var(--bg);
       border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
+      border-radius: var(--radius);
       font-weight: 600;
+      font-size: 0.9rem;
       cursor: pointer;
-      font-family: inherit;
+      font-family: var(--font-sans);
+      transition: opacity 0.15s, transform 0.1s;
     }
-    button:hover { opacity: 0.9; }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .status { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem; }
-    .status.ok { color: var(--success); }
-    .status.err { color: var(--warning); }
+    .chat-input-area button:hover:not(:disabled) {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+    .chat-input-area button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .chat-error {
+      color: var(--error);
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Reasoning panel (sidebar) */
+    .reasoning-panel {
+      width: 360px;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--border);
+      background: var(--bg-elevated);
+      transition: transform 0.25s ease, width 0.25s ease;
+    }
+
+    .reasoning-panel.collapsed {
+      width: 48px;
+      min-width: 48px;
+    }
+
+    .reasoning-panel.collapsed .reasoning-content,
+    .reasoning-panel.collapsed .reasoning-hint {
+      display: none !important;
+    }
+
+    .reasoning-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .reasoning-header h2 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .reasoning-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: background 0.15s, color 0.15s;
+    }
+    .reasoning-toggle:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+    .reasoning-panel.collapsed .reasoning-toggle {
+      margin: 0 auto;
+    }
+    .reasoning-panel.collapsed .reasoning-header h2 {
+      display: none;
+    }
+
+    .reasoning-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+
+    .reasoning-hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin: 0;
+      padding: 1rem;
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      border: 1px dashed var(--border);
+    }
+
     .flow-step {
       margin-bottom: 1rem;
-      padding: 0.75rem;
-      background: var(--bg);
+      padding: 1rem;
+      background: var(--surface);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
       border-left: 3px solid var(--border);
-      border-radius: 0 4px 4px 0;
     }
-    .flow-step.proposal { border-left-color: #58a6ff; }
-    .flow-step.critique { border-left-color: #d29922; }
-    .flow-step.synthesis { border-left-color: #3fb950; }
+    .flow-step.proposal { border-left-color: var(--accent); }
+    .flow-step.critique { border-left-color: var(--warning); }
+    .flow-step.synthesis { border-left-color: var(--success); }
     .flow-step.decision { border-left-color: #a371f7; }
-    .flow-step h3 { font-size: 0.85rem; margin: 0 0 0.5rem; color: var(--muted); }
-    .flow-step pre { white-space: pre-wrap; word-break: break-word; margin: 0; font-size: 0.8rem; }
-    .error { color: #f85149; }
-    .layout { display: flex; gap: 1rem; flex-wrap: wrap; }
-    .chat-main { flex: 1; min-width: 280px; }
-    .chat-thread { min-height: 200px; margin-bottom: 1rem; }
-    .chat-msg { margin-bottom: 0.75rem; padding: 0.5rem; border-radius: 6px; }
-    .chat-msg.user { background: var(--surface); border-left: 3px solid var(--accent); }
-    .chat-msg.assistant { background: var(--surface); border-left: 3px solid var(--success); }
-    .chat-msg pre { white-space: pre-wrap; word-break: break-word; margin: 0; font-size: 0.85rem; }
-    .chat-input-row { display: flex; gap: 0.5rem; align-items: flex-end; }
-    .chat-input-row textarea { flex: 1; min-height: 60px; }
-    .chat-error { color: #f85149; font-size: 0.85rem; margin-top: 0.5rem; }
-    .reasoning-panel { width: 320px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; }
-    .reasoning-panel h2 { font-size: 0.9rem; margin: 0 0 0.5rem; color: var(--muted); }
+    .flow-step h3 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .flow-step pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
     .muted { font-size: 0.8rem; color: var(--muted); }
+
+    /* Responsive: narrow viewport → bottom drawer */
+    @media (max-width: 768px) {
+      .layout {
+        flex-direction: column;
+      }
+
+      .reasoning-panel {
+        width: 100%;
+        min-width: 0;
+        max-height: 40vh;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        position: relative;
+      }
+
+      .reasoning-panel.collapsed {
+        width: 100%;
+        min-width: 0;
+        max-height: 48px;
+        overflow: hidden;
+      }
+
+      .reasoning-panel.collapsed .reasoning-body {
+        display: none;
+      }
+
+      .chat-msg {
+        max-width: 95%;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Orchestrator Chat</h1>
-  <p class="status" id="config-status">Checking config…</p>
+  <header class="header">
+    <h1>Orchestrator Chat</h1>
+    <p class="status" id="config-status">Checking config…</p>
+  </header>
 
   <div class="layout">
-    <div class="chat-main">
+    <main class="chat-main">
       <div class="chat-thread" id="chat-thread"></div>
-      <div class="chat-input-row">
-        <textarea id="chat-input" placeholder="Send a message…" rows="2"></textarea>
-        <button id="send-btn">Send</button>
+      <div class="chat-input-area">
+        <div class="mode-toggle" role="group" aria-label="Chat mode">
+          <button type="button" class="mode-btn active" data-mode="auto">Auto</button>
+          <button type="button" class="mode-btn" data-mode="chat">Chat</button>
+          <button type="button" class="mode-btn" data-mode="orchestration">Orchestrate</button>
+        </div>
+        <div class="chat-input-row">
+          <textarea id="chat-input" placeholder="Send a message…" rows="2"></textarea>
+          <button id="send-btn">Send</button>
+        </div>
       </div>
       <p class="chat-error" id="chat-error" style="display: none;"></p>
-    </div>
+    </main>
+
     <aside class="reasoning-panel" id="reasoning-panel">
-      <h2>Reasoning</h2>
-      <p class="muted" id="reasoning-hint">Send a message to see proposal, critique, synthesis.</p>
-      <div id="reasoning-content" style="display: none;"></div>
+      <div class="reasoning-header">
+        <h2>Reasoning</h2>
+        <button type="button" class="reasoning-toggle" id="reasoning-toggle" title="Toggle reasoning panel" aria-label="Toggle reasoning panel">◀</button>
+      </div>
+      <div class="reasoning-body">
+        <p class="reasoning-hint" id="reasoning-hint">Send a message to see proposal, critique, synthesis.</p>
+        <div id="reasoning-content" style="display: none;"></div>
+      </div>
     </aside>
   </div>
 
@@ -127,12 +464,16 @@
     }
 
     let messages = [];
+    let reasoningCollapsed = false;
+    let selectedMode = 'auto';
     const threadEl = document.getElementById('chat-thread');
     const inputEl = document.getElementById('chat-input');
     const sendBtn = document.getElementById('send-btn');
     const chatErrorEl = document.getElementById('chat-error');
+    const reasoningPanel = document.getElementById('reasoning-panel');
     const reasoningContent = document.getElementById('reasoning-content');
     const reasoningHint = document.getElementById('reasoning-hint');
+    const reasoningToggle = document.getElementById('reasoning-toggle');
 
     function escapeHtml(s) {
       const div = document.createElement('div');
@@ -140,22 +481,68 @@
       return div.innerHTML;
     }
 
-    function renderThread() {
-      threadEl.innerHTML = messages.map(m => '<div class="chat-msg ' + m.role + '"><pre>' + escapeHtml(m.content) + '</pre></div>').join('');
+    function renderThread(showThinking) {
+      let html = messages.map(m => {
+        const badge = m.role === 'assistant' && m.modeUsed
+          ? '<div class="mode-badge">' + escapeHtml(m.modeUsed) + '</div>'
+          : '';
+        return '<div class="chat-msg ' + m.role + '">' + badge + '<pre>' + escapeHtml(m.content) + '</pre></div>';
+      }).join('');
+      if (showThinking) {
+        html += '<div class="thinking-indicator"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>Thinking…</span></div>';
+      }
+      threadEl.innerHTML = html;
       threadEl.scrollTop = threadEl.scrollHeight;
     }
 
-    function showReasoning(flow, toolCalls) {
-      reasoningHint.style.display = 'none';
-      reasoningContent.style.display = 'block';
-      const steps = [
-        ['proposal', 'Proposal', flow && flow.proposal],
-        ['critique', 'Critique', flow && flow.critique],
-        ['synthesis', 'Synthesis', flow && flow.synthesis],
-      ];
-      reasoningContent.innerHTML = steps.map(([cls, label, text]) =>
-        '<div class="flow-step ' + cls + '"><h3>' + label + '</h3><pre>' + escapeHtml(text || '(empty)') + '</pre></div>'
-      ).join('') + (toolCalls && toolCalls.length ? '<div class="flow-step"><h3>Tool calls</h3><pre>' + escapeHtml(JSON.stringify(toolCalls, null, 2)) + '</pre></div>' : '');
+    function showReasoning(flow, modeUsed) {
+      const hasFlow = flow && (flow.proposal || flow.critique || flow.synthesis);
+      if (hasFlow) {
+        reasoningHint.style.display = 'none';
+        reasoningContent.style.display = 'block';
+        const steps = [
+          ['proposal', 'Proposal', flow.proposal],
+          ['critique', 'Critique', flow.critique],
+          ['synthesis', 'Synthesis', flow.synthesis],
+        ];
+        reasoningContent.innerHTML = steps.map(([cls, label, text]) =>
+          '<div class="flow-step ' + cls + '"><h3>' + label + '</h3><pre>' + escapeHtml(text || '(empty)') + '</pre></div>'
+        ).join('');
+        if (!reasoningCollapsed) reasoningPanel.classList.remove('collapsed');
+      } else {
+        reasoningContent.style.display = 'none';
+        reasoningHint.style.display = 'block';
+        reasoningHint.textContent = modeUsed === 'chat'
+          ? 'Chat mode — no reasoning flow.'
+          : 'Send a message to see proposal, critique, synthesis.';
+        if (!reasoningCollapsed) reasoningPanel.classList.remove('collapsed');
+      }
+      if (reasoningCollapsed) reasoningPanel.classList.add('collapsed');
+    }
+
+    function toggleReasoning() {
+      reasoningCollapsed = !reasoningCollapsed;
+      reasoningPanel.classList.toggle('collapsed', reasoningCollapsed);
+      reasoningToggle.textContent = reasoningCollapsed ? '▶' : '◀';
+      reasoningToggle.title = reasoningCollapsed ? 'Expand reasoning panel' : 'Collapse reasoning panel';
+    }
+
+    function getUserFriendlyError(status, data) {
+      if (status === 400) {
+        if (data && typeof data.error === 'string') return data.error;
+        if (data && data.detail) {
+          if (typeof data.detail === 'string') return data.detail;
+          if (Array.isArray(data.detail) && data.detail[0] && data.detail[0].msg)
+            return data.detail[0].msg;
+        }
+        return 'Invalid request. Please check your message and try again.';
+      }
+      if (status >= 500) {
+        if (data && typeof data.error === 'string') return data.error;
+        if (data && data.detail) return typeof data.detail === 'string' ? data.detail : 'Server error';
+        return 'Server error. Please try again later.';
+      }
+      return 'Request failed. Please try again.';
     }
 
     async function sendChat() {
@@ -163,7 +550,7 @@
       if (!text) return;
       messages.push({ role: 'user', content: text });
       inputEl.value = '';
-      renderThread();
+      renderThread(true);
       chatErrorEl.style.display = 'none';
       chatErrorEl.textContent = '';
       sendBtn.disabled = true;
@@ -171,31 +558,55 @@
         const r = await fetch(API_BASE + '/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: messages, include_flow: true }),
+          body: JSON.stringify({
+            messages: messages,
+            mode: selectedMode,
+            include_flow: true,
+          }),
         });
-        const data = await r.json();
+        let data = {};
+        try {
+          const responseText = await r.text();
+          data = responseText ? JSON.parse(responseText) : {};
+        } catch (_) {
+          data = {};
+        }
         if (!r.ok) {
-          const errMsg = data.error || data.detail || 'Request failed';
-          chatErrorEl.textContent = errMsg;
+          chatErrorEl.textContent = getUserFriendlyError(r.status, data);
           chatErrorEl.style.display = 'block';
           messages.pop();
-          renderThread();
+          renderThread(false);
           return;
         }
-        messages.push({ role: 'assistant', content: data.reply || '' });
-        renderThread();
-        showReasoning(data.flow, data.tool_calls);
+        const modeUsed = data.mode_used || 'orchestration';
+        messages.push({ role: 'assistant', content: data.reply || '', modeUsed });
+        renderThread(false);
+        showReasoning(data.flow, modeUsed);
       } catch (e) {
-        chatErrorEl.textContent = e.message || 'Network error';
+        chatErrorEl.textContent = e.message || 'Network error. Please check your connection.';
         chatErrorEl.style.display = 'block';
         messages.pop();
-        renderThread();
+        renderThread(false);
       } finally {
         sendBtn.disabled = false;
       }
     }
 
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedMode = btn.dataset.mode;
+      });
+    });
+    reasoningToggle.addEventListener('click', toggleReasoning);
     document.getElementById('send-btn').addEventListener('click', sendChat);
+    inputEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChat();
+      }
+    });
     checkConfigStatus();
   </script>
 </body>

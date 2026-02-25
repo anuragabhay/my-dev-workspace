@@ -25,6 +25,8 @@ from orchestrator_client.brain import run_brain_with_flow
 from orchestrator_client.context_loader import load_context
 from workspace_config import get_workspace_root
 
+from orchestrator_ui.intent import detect_intent, get_slash_commands_for_workspace
+
 app = FastAPI(
     title="Orchestrator UI",
     description="Run the A2A brain (propose → critique → synthesize) outside Cursor",
@@ -72,6 +74,10 @@ class ChatRequest(BaseModel):
     """Request for POST /api/chat. API key and workspace read only from env."""
 
     messages: list[ChatMessage] = Field(..., description="Conversation history")
+    mode: Literal["auto", "chat", "orchestration"] = Field(
+        default="auto",
+        description="Force mode or let server infer (auto)",
+    )
     include_flow: bool = Field(default=True, description="Include proposal, critique, synthesis in response")
 
 
@@ -99,6 +105,62 @@ def _get_project_workspace_snippet(max_chars: int = 8000) -> str:
     if len(text) <= max_chars:
         return text
     return text[:max_chars] + "\n\n[... truncated ...]"
+
+
+CHAT_SYSTEM_PROMPT = """You are the Orchestrator assistant. Reply briefly to greetings, thanks, and simple questions. For task-related requests, suggest the user say 'run one cycle' or use a slash command like /lead-engineer to get started. Do not delegate or run cycles yourself; suggest the user do so."""
+
+
+def _chat_handler(messages: list, api_key: str) -> dict:
+    """Single LLM call for chat mode. Returns { reply, mode_used: "chat" }."""
+    from anthropic import Anthropic
+
+    from orchestrator_client.config import get_proposer_model
+
+    client = Anthropic(api_key=api_key)
+    response = client.messages.create(
+        model=get_proposer_model(),
+        max_tokens=1024,
+        system=CHAT_SYSTEM_PROMPT,
+        messages=[{"role": m.role, "content": m.content} for m in messages],
+    )
+    reply = ""
+    if response.content:
+        parts = [b.text for b in response.content if hasattr(b, "text")]
+        reply = "\n".join(parts) if parts else ""
+    return {"reply": reply, "mode_used": "chat"}
+
+
+def _orchestration_handler(
+    messages: list,
+    api_key: str,
+    include_flow: bool,
+) -> dict:
+    """Build context, inject user_message, call run_brain_with_flow. Returns { reply, mode_used, flow }."""
+    context = _stub_context()
+    root = get_workspace_root()
+    if (root / "PROJECT_WORKSPACE.md").exists():
+        context["workspace_snippet"] = _get_project_workspace_snippet()
+    if messages:
+        context["user_message"] = messages[-1].content
+    try:
+        ctx = load_context()
+    except Exception as e:
+        raise RuntimeError(f"Failed to load context: {e!s}") from e
+    result = run_brain_with_flow(
+        ctx.system_message, context, api_key_override=api_key
+    )
+    reply = result.get("final_decision", "")
+    out = {
+        "reply": reply,
+        "mode_used": "orchestration",
+    }
+    if include_flow:
+        out["flow"] = {
+            "proposal": result.get("proposal", ""),
+            "critique": result.get("critique", ""),
+            "synthesis": result.get("synthesis", ""),
+        }
+    return out
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -146,10 +208,9 @@ async def config_status():
 @app.post("/api/chat")
 async def chat(req: ChatRequest):
     """
-    Run one orchestrator cycle: build context from env, run brain, return reply and flow.
-    API key and workspace are read only from env; no key or snippet in request body.
-    Returns 400 for invalid request (e.g. empty messages), 500 on brain/context failure
-    with body { "error": "human-readable message" }.
+    Dual-mode: chat (1 LLM) or orchestration (run_brain_with_flow).
+    mode=auto: run intent detection and route. mode=chat|orchestration: force.
+    Returns { reply, mode_used } and optionally flow when orchestration.
     """
     if not req.messages or len(req.messages) == 0:
         return JSONResponse(
@@ -162,37 +223,24 @@ async def chat(req: ChatRequest):
             status_code=500,
             content={"error": "API key not configured. Set ANTHROPIC_API_KEY (or ORCHESTRATOR_LLM_API_KEY) in the environment."},
         )
-    context = _stub_context()
-    root = get_workspace_root()
-    if (root / "PROJECT_WORKSPACE.md").exists():
-        context["workspace_snippet"] = _get_project_workspace_snippet()
+
+    mode = req.mode
+    if mode == "auto":
+        root = get_workspace_root()
+        slash_commands = get_slash_commands_for_workspace(root)
+        last_content = req.messages[-1].content if req.messages else ""
+        mode = detect_intent(last_content, slash_commands)
+
     try:
-        ctx = load_context()
+        if mode == "chat":
+            out = _chat_handler(req.messages, api_key)
+        else:
+            out = _orchestration_handler(req.messages, api_key, req.include_flow)
     except Exception as e:
         return JSONResponse(
             status_code=500,
-            content={"error": f"Failed to load context: {e!s}"},
+            content={"error": str(e)},
         )
-    try:
-        result = run_brain_with_flow(
-            ctx.system_message, context, api_key_override=api_key
-        )
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"error": f"Brain run failed: {e!s}"},
-        )
-    reply = result.get("final_decision", "")
-    out = {
-        "reply": reply,
-        "flow": {
-            "proposal": result.get("proposal", ""),
-            "critique": result.get("critique", ""),
-            "synthesis": result.get("synthesis", ""),
-        },
-    }
-    if req.include_flow is False:
-        out.pop("flow", None)
     return out
 
 

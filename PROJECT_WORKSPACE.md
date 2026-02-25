@@ -16,7 +16,7 @@
 **Active Agents**: Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect, PM, CTO, CFO  
 **Pending Approvals**: 0  
 **Blockers**: None  
-**Next Actions**: Custom Vibe Coding IDE Phases 1–5 complete. User: Create PR for feature/orchestrator-ui-redesign → staging; merge when ready. User Intervention Required for PR merge.  
+**Next Actions**: User: Create PR for feature/orchestrator-ui-redesign → staging; merge when ready. User Intervention Required for PR merge.  
 **User Intervention Required**: Yes (PR merge for feature/orchestrator-ui-redesign)
 
 ---
@@ -151,18 +151,6 @@ The Orchestrator UI revamp is in scope for: a **chat-first UX** where the user�
 
 ## 📝 Recent Work Log (last 10)
 
-### [2026-02-25] [Architect] [Validate Orchestrator UI fixes (Editor, Chat duplication, Tree consolidation)] [✅ COMPLETED]
-- Editor: CodeMirror version fix for proper load\n- Chat: single stream path to prevent duplication\n- Tree: consolidation in index.html
-
-### [2026-02-25] [Junior Engineer 1] [Custom Vibe Coding IDE initiative completion (Phases 1–5)] [✅ COMPLETED]
-- Phase 1: MCP client, streaming chat/orchestration, SSE frontend\n- Phase 2: Project structure panel (tree.py, GET /api/tree)\n- Phase 3: Code editor (GET/PUT /api/file, CodeMirror 6)\n- Phase 4: Full IDE shell (layout, terminal panel, persistence)\n- Phase 5: Hooks, slash-commands, skills, rules APIs\n- Branch feature/orchestrator-ui-redesign pushed; User: create PR → staging and merge
-
-### [2026-02-25] [Junior Engineer 2] [Phase 5 (Custom User Actions) polish] [✅ COMPLETED]
-- Hooks: Documented lifecycle hooks (before_cycle, after_cycle, before_delegate, after_delegate) in orchestrator_ui/README.md; added GET /api/hooks returning hooks config from .cursor/hooks.json and lifecycle definitions\n- Tests: Added TestPhase5APIs for GET /api/slash-commands, GET /api/skills, GET /api/rules, GET /api/hooks\n- Work log: Phase 5 entry appended; ready for final push after all phases
-
-### [2026-02-25] [Junior Engineer 2] [Phase 1 (MCP + Streaming): tests, MCP fallback verification, work log] [✅ COMPLETED]
-- Added streaming tests: POST /api/chat with Accept: text/event-stream returns SSE; chat mode (reply.chunk, reply.done); orchestration mode (flow.proposal, flow.critique, flow.synthesis, reply.chunk, reply.done)\n- Verified MCP fallback: _orchestration_handler and _orchestration_handler_stream fall back to stub context when MCP unavailable (create_mcp_session raises); brain runs with stub context\n- Work log entry for Phase 1 implementation (MCP client, streaming chat, streaming orchestration, frontend SSE)
-
 ### [2026-02-25] [Junior Engineer 1] [Orchestrator UI Redesign initiative completion (Phase 6 Merge)] [✅ COMPLETED]
 - Researcher, Architect, PM, Lead Engineer, Junior Engineers 1&2, Reviewer, Tester, Architect, QA/UI review completed.\n- Quick fixes: intent.py docstring (removed 'Cached per process'), redundant t.split() fix, Enter-to-send for textarea.\n- Branch feature/orchestrator-ui-redesign pushed; User to create PR → staging and merge.
 
@@ -184,6 +172,23 @@ Added agent-automation/orchestrator_ui/intent.py with CHAT_KEYWORDS, ORCHESTRATI
 
 ### [2026-02-24 18:00 UTC] [Lead Engineer] [Orchestrator brain (A2A propose→critique→synthesize)] [✅ COMPLETED]
 - Extended a2a.py: AgentRole.PROPOSER, AgentRole.CRITIC; MessageType.PROPOSAL, CRITIQUE, SYNTHESIS; create_proposal, create_critique, create_synthesis helpers\n- Created orchestrator_client/brain.py: run_brain() with propose → critique → synthesize flow using A2A messages\n- Updated config.py: get_proposer_model(), get_critic_model() (ORCHESTRATOR_PROPOSER_MODEL, ORCHESTRATOR_CRITIC_MODEL)\n- Updated cycle_runner.py to use brain instead of single LLM call\n- Documented env vars in ORCHESTRATOR_SETUP.md §8
+
+### [2026-02-24 14:00 UTC] [Lead Engineer] [Per-agent model assignment (llm_router, config, Anthropic stub)] [✅ COMPLETED]
+- Added agents section to config.example.yaml and config.example.staging.yaml (research, script, uniqueness, rag with provider/model)\n- Created src/services/llm_router.py: routes chat_completion and get_embeddings to OpenAI or Anthropic per config\n- Created src/services/anthropic_service.py: chat_completion via Messages API; get_embeddings raises NotImplementedError (Anthropic has no embeddings)\n- Updated research_agent, script_agent, uniqueness_agent to use llm_router; rag_service.query_topics uses llm_router.get_embeddings\n- Added anthropic>=0.18.0 to requirements.txt, ANTHROPIC_API_KEY to .env.example\n- All 77 tests pass
+
+### [2026-02-24 12:00 UTC] [Junior Engineer 1] [OBJECTIVE 2: History status filters, error states, UI improvements] [✅ COMPLETED]
+- History: status filter (All, Completed, Failed, In progress, Pending); backend /api/history?status=; repository get_executions_count_filtered, get_last_executions_filtered
+- Dashboard: error state with Retry when health/history API fails
+- History: error state with Retry when API fails
+- API tests for history status filter
+- Fix .gitignore to allow frontend/src/lib/
+- Branch feature/ui-improvements pushed; User Intervention Required for PR merge
+
+### [2026-02-20T11:27:36Z] [Orchestrator] [Task A and B complete; merge via PRs] [COMPLETED]
+Task A (Web UI) and Task B (platform-agnostic) done. Both pushed. User: create PRs feature/platform-agnostic → staging, feature/web-ui → staging. Merge platform-agnostic first, then web-ui.
+
+### [2026-02-20T11:26:44Z] [Orchestrator] [Task A and B complete; merge blocked by branch protection] [COMPLETED]
+Task A (Web UI): FastAPI backend, React frontend, run_dev.sh, API tests. Task B (platform-agnostic): workspace_config, agent-automation/agents/, hooks.md, MCP docs, docs/platform-agnostic.md. Both pushed to feature branches. Staging requires PRs (no merge commits). User must create PRs and merge.
 
 Full log: agent-automation/work_log.json
 
@@ -939,8 +944,8 @@ Junior Engineer (Implementation, Documentation, Testing)
 
 ## 👨‍💻 Lead Engineer Status
 
-**Current Status**: ✅ Orchestrator UI .env loading fix done; hand off to Junior Engineer 1 or 2 for commit/push  
-**Last Updated**: 2026-02-25  
+**Current Status**: 🟡 Phase 6 code quality in progress (config tests done)  
+**Last Updated**: 2026-02-20 16:30 UTC  
 **Senior**: Architect (for design questions), CTO (for tech decisions)  
 **Junior**: Junior Engineer (assigns tasks to)
 

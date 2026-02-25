@@ -74,100 +74,65 @@
     .flow-step h3 { font-size: 0.85rem; margin: 0 0 0.5rem; color: var(--muted); }
     .flow-step pre { white-space: pre-wrap; word-break: break-word; margin: 0; font-size: 0.8rem; }
     .error { color: #f85149; }
+    .layout { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .chat-main { flex: 1; min-width: 280px; }
+    .chat-thread { min-height: 200px; margin-bottom: 1rem; }
+    .chat-msg { margin-bottom: 0.75rem; padding: 0.5rem; border-radius: 6px; }
+    .chat-msg.user { background: var(--surface); border-left: 3px solid var(--accent); }
+    .chat-msg.assistant { background: var(--surface); border-left: 3px solid var(--success); }
+    .chat-msg pre { white-space: pre-wrap; word-break: break-word; margin: 0; font-size: 0.85rem; }
+    .chat-input-row { display: flex; gap: 0.5rem; align-items: flex-end; }
+    .chat-input-row textarea { flex: 1; min-height: 60px; }
+    .chat-error { color: #f85149; font-size: 0.85rem; margin-top: 0.5rem; }
+    .reasoning-panel { width: 320px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; }
+    .reasoning-panel h2 { font-size: 0.9rem; margin: 0 0 0.5rem; color: var(--muted); }
+    .muted { font-size: 0.8rem; color: var(--muted); }
   </style>
 </head>
 <body>
-  <h1>Orchestrator A2A Brain</h1>
-  <p class="status" id="api-status">Checking API status…</p>
+  <h1>Orchestrator Chat</h1>
+  <p class="status" id="config-status">Checking config…</p>
 
-  <div class="section">
-    <h2>Configuration</h2>
-    <label for="api-key">Anthropic API Key (leave empty to use env)</label>
-    <input type="password" id="api-key" placeholder="sk-ant-…" autocomplete="off">
-    <label for="workspace-snippet" style="margin-top: 0.5rem;">Optional: PROJECT_WORKSPACE.md snippet</label>
-    <textarea id="workspace-snippet" placeholder="Paste workspace snippet for context…"></textarea>
-  </div>
-
-  <div class="section">
-    <button id="run-btn">Run brain</button>
-  </div>
-
-  <div class="section" id="results" style="display: none;">
-    <h2>A2A Flow</h2>
-    <div id="flow-output"></div>
-  </div>
-
-  <div class="section" id="error-box" style="display: none;">
-    <h2>Error</h2>
-    <pre class="error" id="error-output"></pre>
+  <div class="layout">
+    <div class="chat-main">
+      <div class="chat-thread" id="chat-thread"></div>
+      <div class="chat-input-row">
+        <textarea id="chat-input" placeholder="Send a message…" rows="2"></textarea>
+        <button id="send-btn">Send</button>
+      </div>
+      <p class="chat-error" id="chat-error" style="display: none;"></p>
+    </div>
+    <aside class="reasoning-panel" id="reasoning-panel">
+      <h2>Reasoning</h2>
+      <p class="muted" id="reasoning-hint">Send a message to see proposal, critique, synthesis.</p>
+      <div id="reasoning-content" style="display: none;"></div>
+    </aside>
   </div>
 
   <script>
     const API_BASE = '';
 
-    async function checkStatus() {
-      const el = document.getElementById('api-status');
+    async function checkConfigStatus() {
+      const el = document.getElementById('config-status');
       try {
-        const r = await fetch(API_BASE + '/api/status');
+        const r = await fetch(API_BASE + '/api/config-status');
         const d = await r.json();
-        el.textContent = `API: ${d.status} | Env API key: ${d.api_key_from_env ? 'set' : 'not set'} | Workspace: ${d.project_workspace_exists ? 'found' : 'not found'}`;
-        el.className = 'status ok';
+        const ok = d.api_key_configured && d.workspace_configured;
+        el.textContent = ok ? 'Config: OK' : (!d.api_key_configured ? 'Config: missing (set ANTHROPIC_API_KEY in env)' : 'Config: workspace not found');
+        el.className = ok ? 'status ok' : 'status err';
       } catch (e) {
-        el.textContent = 'API unreachable: ' + e.message;
+        el.textContent = 'Config: unreachable - ' + e.message;
         el.className = 'status err';
       }
     }
 
-    async function runBrain() {
-      const btn = document.getElementById('run-btn');
-      const results = document.getElementById('results');
-      const flowOutput = document.getElementById('flow-output');
-      const errorBox = document.getElementById('error-box');
-      const errorOutput = document.getElementById('error-output');
-
-      btn.disabled = true;
-      results.style.display = 'none';
-      errorBox.style.display = 'none';
-
-      const apiKey = document.getElementById('api-key').value.trim();
-      const snippet = document.getElementById('workspace-snippet').value.trim();
-
-      const body = {};
-      if (apiKey) body.anthropic_api_key = apiKey;
-      if (snippet) body.workspace_snippet = snippet;
-
-      try {
-        const r = await fetch(API_BASE + '/api/run-brain', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
-        const data = await r.json();
-
-        if (!r.ok) {
-          throw new Error(data.detail || data.message || 'Unknown error');
-        }
-
-        flowOutput.innerHTML = [
-          ['proposal', 'Proposal', data.proposal],
-          ['critique', 'Critique', data.critique],
-          ['synthesis', 'Synthesis', data.synthesis],
-          ['decision', 'Final Decision', data.final_decision],
-        ].map(([cls, label, text]) => `
-          <div class="flow-step ${cls}">
-            <h3>${label}</h3>
-            <pre>${escapeHtml(text || '(empty)')}</pre>
-          </div>
-        `).join('');
-
-        results.style.display = 'block';
-      } catch (e) {
-        errorOutput.textContent = e.message;
-        errorBox.style.display = 'block';
-      } finally {
-        btn.disabled = false;
-      }
-    }
+    let messages = [];
+    const threadEl = document.getElementById('chat-thread');
+    const inputEl = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+    const chatErrorEl = document.getElementById('chat-error');
+    const reasoningContent = document.getElementById('reasoning-content');
+    const reasoningHint = document.getElementById('reasoning-hint');
 
     function escapeHtml(s) {
       const div = document.createElement('div');
@@ -175,8 +140,63 @@
       return div.innerHTML;
     }
 
-    document.getElementById('run-btn').addEventListener('click', runBrain);
-    checkStatus();
+    function renderThread() {
+      threadEl.innerHTML = messages.map(m => '<div class="chat-msg ' + m.role + '"><pre>' + escapeHtml(m.content) + '</pre></div>').join('');
+      threadEl.scrollTop = threadEl.scrollHeight;
+    }
+
+    function showReasoning(flow, toolCalls) {
+      reasoningHint.style.display = 'none';
+      reasoningContent.style.display = 'block';
+      const steps = [
+        ['proposal', 'Proposal', flow && flow.proposal],
+        ['critique', 'Critique', flow && flow.critique],
+        ['synthesis', 'Synthesis', flow && flow.synthesis],
+      ];
+      reasoningContent.innerHTML = steps.map(([cls, label, text]) =>
+        '<div class="flow-step ' + cls + '"><h3>' + label + '</h3><pre>' + escapeHtml(text || '(empty)') + '</pre></div>'
+      ).join('') + (toolCalls && toolCalls.length ? '<div class="flow-step"><h3>Tool calls</h3><pre>' + escapeHtml(JSON.stringify(toolCalls, null, 2)) + '</pre></div>' : '');
+    }
+
+    async function sendChat() {
+      const text = inputEl.value.trim();
+      if (!text) return;
+      messages.push({ role: 'user', content: text });
+      inputEl.value = '';
+      renderThread();
+      chatErrorEl.style.display = 'none';
+      chatErrorEl.textContent = '';
+      sendBtn.disabled = true;
+      try {
+        const r = await fetch(API_BASE + '/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: messages, include_flow: true }),
+        });
+        const data = await r.json();
+        if (!r.ok) {
+          const errMsg = data.error || data.detail || 'Request failed';
+          chatErrorEl.textContent = errMsg;
+          chatErrorEl.style.display = 'block';
+          messages.pop();
+          renderThread();
+          return;
+        }
+        messages.push({ role: 'assistant', content: data.reply || '' });
+        renderThread();
+        showReasoning(data.flow, data.tool_calls);
+      } catch (e) {
+        chatErrorEl.textContent = e.message || 'Network error';
+        chatErrorEl.style.display = 'block';
+        messages.pop();
+        renderThread();
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+
+    document.getElementById('send-btn').addEventListener('click', sendChat);
+    checkConfigStatus();
   </script>
 </body>
 </html>

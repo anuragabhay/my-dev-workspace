@@ -612,5 +612,3 @@ class TestMCPFallback:
                 types = [e.get("type") for e in events]
                 assert "flow.proposal" in types
                 assert "reply.done" in types
-
-

@@ -151,6 +151,11 @@ The Orchestrator UI revamp is in scope for: a **chat-first UX** where the user�
 
 ## 📝 Recent Work Log (last 10)
 
+### [2026-02-25] [Lead Engineer] [Orchestrator UI .env loading regression fix] [✅ COMPLETED]
+- server.py had python-dotenv in requirements.txt but never called load_dotenv(); ANTHROPIC_API_KEY from .env was not loaded, UI showed "Config: missing".
+- Added `from dotenv import load_dotenv` and `load_dotenv(_ui_dir / ".env")`, `load_dotenv(_agent_automation / ".env")` after path setup so .env in either orchestrator_ui/ or agent-automation/ works.
+- Verified with clean env: api_key_configured=True when key is in orchestrator_ui/.env. Hand off: Junior Engineer 1 or 2 for commit and push on feature/orchestrator-ui-redesign.
+
 ### [2026-02-25] [Junior Engineer 1] [Orchestrator UI Redesign initiative completion (Phase 6 Merge)] [✅ COMPLETED]
 - Researcher, Architect, PM, Lead Engineer, Junior Engineers 1&2, Reviewer, Tester, Architect, QA/UI review completed.\n- Quick fixes: intent.py docstring (removed 'Cached per process'), redundant t.split() fix, Enter-to-send for textarea.\n- Branch feature/orchestrator-ui-redesign pushed; User to create PR → staging and merge.
 
@@ -944,8 +949,8 @@ Junior Engineer (Implementation, Documentation, Testing)
 
 ## 👨‍💻 Lead Engineer Status
 
-**Current Status**: 🟡 Phase 6 code quality in progress (config tests done)  
-**Last Updated**: 2026-02-20 16:30 UTC  
+**Current Status**: ✅ Orchestrator UI .env loading fix done; hand off to Junior Engineer 1 or 2 for commit/push  
+**Last Updated**: 2026-02-25  
 **Senior**: Architect (for design questions), CTO (for tech decisions)  
 **Junior**: Junior Engineer (assigns tasks to)
 

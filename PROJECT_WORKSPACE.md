@@ -16,7 +16,7 @@
 **Active Agents**: Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect, PM, CTO, CFO  
 **Pending Approvals**: 0  
 **Blockers**: None  
-**Next Actions**: Create PR for feature/ui-improvements → staging (https://github.com/anuragabhay/my-dev-workspace/pull/new/feature/ui-improvements); merge when ready.  
+**Next Actions**: Orchestrator UI revamp complete on feature/orchestrator-ui-revamp; create PR when ready (https://github.com/anuragabhay/my-dev-workspace/compare/staging...feature/orchestrator-ui-revamp). Also: create PR for feature/ui-improvements → staging when ready (https://github.com/anuragabhay/my-dev-workspace/pull/new/feature/ui-improvements).  
 **User Intervention Required**: Yes (PR merge for feature/ui-improvements)
 
 ---
@@ -71,6 +71,68 @@
 
 ---
 
+## Handoff: Orchestrator UI revamp
+
+### What you need to know
+
+- **Chat-first UI:** Main view is a conversation thread (user message → assistant reply). One cycle per message via POST /api/chat.
+- **Config is env-only:** No API key or workspace inputs in the UI. Set `ANTHROPIC_API_KEY` (required) and optionally `WORKSPACE_PATH` or `WORKSPACE_ROOT` (defaults to parent of agent-automation).
+
+### How to test
+
+1. `cd agent-automation/orchestrator_ui`
+2. Copy `.env.example` to `.env` and set `ANTHROPIC_API_KEY`
+3. Run `PYTHONPATH=.. python server.py`
+4. Open http://localhost:8765
+5. **Check:** Status line shows "Config: OK" or "missing key"
+6. Send a message; confirm reply in chat and Proposal/Critique/Synthesis in the Reasoning panel
+7. **API:** `GET /api/config-status` returns only booleans (`has_api_key`, `has_workspace`)
+
+### What changed
+
+- **Backend:** Env-only config, `GET /api/config-status`, `POST /api/chat` (400/500 with `{ "error": "..." }`)
+- **Frontend:** Chat thread + input, reasoning sidebar, no key/snippet fields
+
+### If something fails
+
+- **Missing key** → Set `ANTHROPIC_API_KEY` in `.env`
+- **400** → e.g. empty messages; check request body
+- **500** → Context or brain failure; check server logs
+- **CORS** → Same-origin; serve from same host as API
+
+---
+
+## Scope: Orchestrator UI revamp
+
+### Architect — high-level design
+
+See Design: Orchestrator UI revamp.
+
+### PM — scope and acceptance criteria
+
+**1. Scope summary**
+
+The Orchestrator UI revamp is in scope for: a **chat-first UX** where the user’s main view is a single conversation thread (user message → assistant reply); **reasoning and progress** (proposal, critique, synthesis, tool calls) are moved out of the main thread into a **secondary area** (sidebar, panel, or tab). Configuration is **env-only**: no API key or workspace path inputs in the UI; the app reads from environment variables (and/or a server-side env file). **MCP and context** are used when available: the UI (or the server backing it) consumes MCP tools/context when the runtime provides them (e.g. Cursor/automation MCP); we do not require the UI server to host or implement MCP in this revamp—we use MCP “when available” from the surrounding environment.
+
+**2. Out-of-scope**
+
+- **Full MCP hosting in the UI server** — Deferred. The UI does not implement or host MCP servers; it uses MCP only when provided by the environment.
+- **Auth / OAuth / login** — No user authentication, OAuth, or multi-tenant identity in this revamp.
+- **Multi-user or tenant isolation** — Single-user/single-session assumption; no tenant model or user management.
+- **Replacing or rewriting the existing brain/orchestrator logic** — Behavioral contract of propose → critique → synthesize is unchanged; only UX and where outputs are shown change.
+- **New orchestration features** (e.g. new phases, new MCP tools) — Out of scope unless explicitly added to the Implementation Plan later.
+
+**3. Acceptance criteria**
+
+1. **Chat-first main view:** The user can conduct a conversation in the main chat area. The primary thread shows only user messages and assistant replies (final answer/synthesis or high-level response). Raw proposal, critique, and intermediate reasoning do not appear in the main thread.
+2. **Progress/reasoning in secondary area:** Proposal, critique, synthesis, and tool calls (e.g. MCP calls) are visible in a dedicated secondary area (sidebar, panel, or tab). The user can open this area to inspect progress and reasoning without scrolling through the main chat.
+3. **Env-only config:** There is no UI control for API key or workspace path. Configuration is read from the environment (e.g. `ANTHROPIC_API_KEY`, workspace path env vars). If the server needs a key, it is supplied via env or server-side config, not via a form in the UI.
+4. **MCP when available:** When MCP is available in the runtime (e.g. workspace status, pending tasks, role guidance), the UI or its backend can show or use that context (e.g. display workspace status, reflect MCP-backed state). “When available” means: if the process that serves the UI has access to MCP (e.g. via Cursor/agent-automation), the UI may consume it; if not, the UI still works in brain-only mode without MCP.
+5. **No regression of brain behavior:** Running the brain through the revamped UI produces the same propose → critique → synthesize flow and outputs as the current Orchestrator UI; only the presentation (chat-first + secondary area) changes.
+6. **Clear separation of “chat” vs “details”:** A first-time user can complete a run and see the final decision in the main chat; they can optionally open the secondary area to see how that decision was reached.
+
+---
+
 ## 🚀 Git Branching Strategy — Phase 3.2: Complete
 
 **Status:** ✅ Phase 3.2 complete. No publish to master for this batch. Staging is the default branch; release to master only when many features warrant a formal release (see `docs/git-branching-strategy.md`).
@@ -88,6 +150,9 @@
 ---
 
 ## 📝 Recent Work Log (last 10)
+
+### [2026-02-24] [Lead Engineer] [Resolve conflicts on feature/flow-steps, push, PR ready] [✅ COMPLETED]
+Merged staging into feature/flow-steps; resolved PROJECT_WORKSPACE.md and agent-automation/work_log.json (kept flow-steps + orchestrator UI handoff, work log entries); pushed. PR: User create at https://github.com/anuragabhay/my-dev-workspace/compare/staging...feature/flow-steps. Added youtube-shorts-generator/frontend/src/lib/utils.ts (cn) for Flow steps UI.
 
 ### [2026-02-24] [Lead Engineer] [Task A: Flow steps section (YouTube Shorts Generator)] [✅ COMPLETED]
 - Backend: extended progress payload (model, action_summary), AgentResult, pipeline progress_callback, app.py WebSocket msg\n- Frontend: ProgressEvent extended, Flow steps section on Generate page (index, agent, model, status, expandable action_summary)\n- 75 tests pass; branch feature/flow-steps committed and pushed
@@ -125,14 +190,173 @@ Committed all work (staging config, retry, CLI, services, branching docs). Pushe
 ### [2026-02-20 08:45 UTC] [Lead Engineer] [Complete integration fixes identified in Phase 3.1 review] [COMPLETED]
 Integration fixes complete: (1) CLI commands (cmd_health, cmd_status) now use UI utilities (format_health_check_result, format_status_result) with --json flag support for raw JSON output. (2) Replaced custom _retry decorator in openai_service.py with retry_decorator from src/utils/retry.py for chat_completion and get_embeddings. (3) Added retry logic to elevenlabs_service.py text_to_speech using retry_decorator. (4) Added rich>=13.0.0 to requirements.txt. Tested: health command shows formatted colored output (unless --json), imports work correctly.
 
-### [2026-02-20 08:43 UTC] [Junior Engineer 1] [Merge feature/ui to staging] [COMPLETED]
-Merged UI enhancements (rich library, colored output, progress indicators) to staging. Reviewer approved. Branches were already in sync (staging and feature/ui pointing to same commit 8d883a4). Verified merge status and pushed staging to origin.
-
 Full log: agent-automation/work_log.json
 
 To add an entry: run `python agent-automation/append_work_log.py --timestamp "..." --role "..." --task "..." --status "..." [--content "..."].` Then run with `--update-workspace` to refresh the recent 10 in this file.
 
 **Next steps (after Phase 6 health tests added):** (1) Work log: run append_work_log with role Lead Engineer, task e.g. "Added pytest tests for src/utils/health.py (tests/test_health.py, N tests)", status COMPLETED, then --update-workspace. (2) Next Actions: set to next Phase 6 item (e.g. "Lead Engineer: Add README Troubleshooting/Configuration section") or, if ready to push: "Architect: Validate current changes. Then Junior Engineer 1 or 2: append work log, commit, push, --update-workspace." (3) Orchestrator: do not re-delegate "add unit tests for health.py"; pick next concrete task from Next Actions. If subagent returns with no deliverable for the same task, use smaller subtask, another role, or pause (avoid re-delegation loops).
+
+---
+
+## Design: Orchestrator UI revamp
+
+### Architect — high-level design
+
+**Goal:** Revamp the Orchestrator UI into a **chat-first** experience: main view is a conversation (user messages, assistant replies). Proposal, critique, synthesis, and tool outputs live outside the main chat. Config is env-only; no secrets in the UI.
+
+---
+
+#### 1. Chat-first layout
+
+- **Main view:** A single chat thread: user messages and assistant (orchestrator) replies only. Each assistant reply is the **final decision** (or a short summary of it), e.g. delegation line, ORCHESTRATION_COMPLETE, or “User Intervention: …”. No form for “Run brain” as the primary action; the primary action is “send a message” (e.g. “Run one cycle” or a custom instruction).
+- **One cycle per turn (MVP):** Each user message triggers one orchestrator cycle (context load → optional MCP → run_brain_with_flow). The **reply** shown in the chat is the `final_decision` (and optionally a one-line summary). History is a linear list of user/assistant message pairs.
+- **Optional later:** Multi-turn refinement (e.g. “run again with this hint”) can be added by appending to conversation history and re-running; not required for the revamp.
+
+---
+
+#### 2. Where progress / reasoning lives (Proposal, Critique, Synthesis, tool calls)
+
+**Options:**
+
+| Option | Description | Pros | Cons |
+|--------|-------------|------|------|
+| **A. Sidebar** | Second column (e.g. right) with a selector or accordion: “Proposal”, “Critique”, “Synthesis”, “Tool calls”. Selecting a message in the chat shows that message’s reasoning in the sidebar. | Clear separation; chat stays clean; familiar (IDE sidebar). | Uses horizontal space; less ideal on small screens. |
+| **B. Collapsible panel (below chat)** | Below the chat area, a panel that expands to show “Proposal / Critique / Synthesis / Tools” for the **last** (or selected) turn. | Keeps one column; full width for long text. | Pushes chat up when open; “selected turn” adds state. |
+| **C. Tab (same area as chat)** | Tabs: “Chat” | “Reasoning”. “Reasoning” shows Proposal, Critique, Synthesis, and any tool call results for the selected/latest turn. | Simple model; no extra layout. | User must switch tabs to see reasoning; chat and reasoning not visible together. |
+
+**Recommendation: A (Sidebar), with B as fallback for narrow viewports.**
+
+- **Rationale:** Chat-first means the main content is the conversation. Reasoning (proposal, critique, synthesis, MCP/tool results) is secondary but important for debugging and trust. A **sidebar** keeps both visible at once without cluttering the chat; “for this message” scoping is natural (click a message → sidebar shows that turn’s flow). If we add streaming later, the sidebar can show “Proposal (streaming…)” then “Critique”, etc.
+- **Fallback:** On narrow screens, the sidebar can collapse to a bottom drawer (collapsible panel) or a “Details” button that opens a modal/overlay, reusing the same data and UI components.
+
+**Data shape per turn:** Backend returns (or frontend stores) for each turn: `{ message_id, user_message, assistant_reply (final_decision), flow: { proposal, critique, synthesis }, tool_calls?: [...] }`. Sidebar shows `flow` + `tool_calls` for the selected `message_id`.
+
+---
+
+#### 3. Frontend ↔ backend: API and streaming
+
+- **Single chat endpoint (MVP):** One endpoint, e.g. `POST /api/chat`, that accepts the current **conversation** (list of `{ role, content }`) and optional “run one cycle” hint. Backend runs one cycle (load context, optional MCP, run_brain_with_flow), returns one response.
+- **Request:** `{ "messages": [ { "role": "user", "content": "Run one cycle." } ], "include_flow": true }`. No API key or workspace path in the body (env-only; see §5).
+- **Response (non-streaming):** `{ "reply": "<final_decision text>", "flow": { "proposal", "critique", "synthesis" }, "tool_calls": [] }`. Frontend appends `{ role: "assistant", content: reply }` to the chat and shows `flow` in the sidebar for this turn.
+- **Simplicity:** Request/response are plain JSON; no streaming required for the revamp. Keeping the reply as a single string and `flow` as a separate object makes it easy to add **streaming later** (e.g. `reply` as SSE or WebSocket stream; `flow` can be sent as separate events or at the end).
+- **Future streaming:** If we add streaming, the same endpoint can support `Accept: text/event-stream` and send events such as `flow.proposal`, `flow.critique`, `flow.synthesis`, `reply.chunk`, `reply.done`. The current non-streaming response is a subset (one-shot `reply` + `flow`).
+
+---
+
+#### 4. Env-only config; no secrets in the UI
+
+- **Backend:** All config (API key, workspace path, etc.) is read from **environment only**. Remove any request-body fields for `anthropic_api_key`, `workspace_snippet` (or treat snippet as optional file-based only, e.g. server reads PROJECT_WORKSPACE.md from workspace path). No keys or sensitive snippets in the API contract.
+- **How backend reads env:** Keep using `ANTHROPIC_API_KEY` / `ORCHESTRATOR_LLM_API_KEY`, `WORKSPACE_ROOT` or existing workspace_config. Optional: a small `GET /api/config-status` (or extend `GET /api/status`) that returns **booleans/flags only**, e.g. `{ "api_key_configured": true, "workspace_configured": true, "project_workspace_exists": true }` — no key, no path values.
+- **UI:** Remove API key and snippet inputs. Show a single “Config” or “Status” line: e.g. “Config: API key set, workspace set, PROJECT_WORKSPACE.md found” (green) or “Config: API key missing” (red), driven by the status endpoint. No place in the UI to type or paste secrets.
+
+---
+
+#### 5. Reuse: orchestrator_ui + orchestrator_client
+
+- **Backend (orchestrator_ui):** Keep the existing FastAPI app and static serving. Add **new routes** (e.g. `POST /api/chat`, optional `GET /api/config-status`) alongside the existing `GET /api/status` and `POST /api/run-brain`. Deprecate or keep `POST /api/run-brain` as an internal/legacy endpoint used only by the new chat flow (one cycle = one run_brain_with_flow call). Same server, same process; no second service.
+- **Brain and context:** No change to `orchestrator_client.brain.run_brain_with_flow` or `orchestrator_client.context_loader.load_context`. The new chat endpoint receives the conversation, builds context (see §6), calls `load_context()` and `run_brain_with_flow(...)`, and maps the result to `{ reply, flow, tool_calls }`.
+- **Frontend:** Replace or significantly refactor `static/index.html`: from “form + run brain + show proposal/critique/synthesis” to “chat list + input + sidebar (or panel) for flow/tools”. Same static mount; new structure (e.g. single-page chat with a sidebar component). No change to brain or context_loader.
+
+---
+
+#### 6. MCP / context when the UI runs standalone
+
+- **In scope for revamp:** “Use when available.” The UI server does **not** host or implement MCP. If the UI process can call the same MCP tools as the cycle_runner (e.g. via a shared MCP client or subprocess), then the backend uses them to populate `pending_prompt`, `workspace_status`, `workflow_config` and passes that into the brain. If MCP is not available (e.g. UI run in isolation), backend falls back to **stub context** (as today: stub pending_prompt, workspace_status, workflow_config) and optionally file-based `workspace_snippet` from PROJECT_WORKSPACE.md on disk.
+- **Out of scope:** “Full MCP hosting in the UI server” — we do not add an MCP server inside the UI process. The revamp only consumes context that the backend can obtain (env, files, and optional existing MCP client). Clarification: when the UI runs standalone, “standalone” means “no Cursor”; it can still use a local MCP client if the repo provides one and the env is set; otherwise stub + file context is sufficient.
+
+---
+
+#### Summary
+
+| Requirement | Approach |
+|-------------|----------|
+| Chat-first | Main view = chat (user/assistant messages); reply = final decision (or summary). One cycle per message (MVP). |
+| Where reasoning lives | **Sidebar** (recommended) for Proposal, Critique, Synthesis, tool calls; collapse to panel/modal on narrow screens. |
+| Frontend ↔ backend | Single `POST /api/chat` with `messages` + `include_flow`; response `reply` + `flow` (+ optional `tool_calls`). Design allows adding streaming later. |
+| Env-only config | Backend reads only env; status endpoint returns booleans (e.g. api_key_configured). UI shows “Config: OK / missing” only; no secret inputs. |
+| Reuse | Same FastAPI app and static UI; new routes and new frontend structure; brain and context_loader unchanged. |
+| MCP / context | Use MCP when available (existing client); otherwise stub + file-based workspace snippet. No MCP hosting in the UI server. |
+
+---
+
+### Lead Engineer — research note
+
+**1. Patterns — “Chat + collapsible reasoning”**
+
+- **OSS / docs:** **assistant-ui** (Vercel AI ecosystem) has a dedicated `Reasoning` component (collapsible, auto-expand during streaming, markdown) and `AssistantSidebar` for a resizable two-panel layout (main content + thread). **Bifrost AI**, **AI SDK**, and **prompt-kit** use similar collapsible reasoning boxes for chain-of-thought. Common pattern: main thread shows user/assistant messages; reasoning/tool output lives in a secondary collapsible area (sidebar or below-chat panel).
+- **Cursor-like:** Chat is the primary surface; tool calls run “behind the scenes” and are not inlined in the main thread. Long outputs are managed via dynamic context (e.g. written to files). For our revamp, “main chat = final decision only; reasoning in secondary area” aligns with this.
+- **MCP next to web app:** Our case is “UI server calls brain; MCP when available from env.” No need for the UI to host MCP—backend uses existing MCP client or stubs. Pattern: single backend (FastAPI) serving UI and one chat endpoint; backend optionally calls MCP before `run_brain_with_flow`.
+
+**2. Minimal backend changes (from current orchestrator_ui)**
+
+- **Current:** `GET /api/status`, `POST /api/run-brain` (body: optional `anthropic_api_key`, `workspace_snippet`, stubs). `server.py` ~165 lines; uses `run_brain_with_flow` + `load_context`.
+- **Smallest change set:** (1) **Env-only:** Stop accepting `anthropic_api_key` (and optionally `workspace_snippet`) in request body; read only from env. (2) **One chat endpoint:** Add `POST /api/chat` with body `{ "messages": [{ "role", "content" }], "include_flow": true }`; handler builds context (file-based snippet when no MCP), calls `run_brain_with_flow`, returns `{ "reply", "flow": { "proposal", "critique", "synthesis" }, "tool_calls" }`. (3) **Optional:** `GET /api/config-status` or extend `GET /api/status` to return booleans only (e.g. `api_key_configured`, `workspace_configured`) for UI status line—no secrets. (4) Keep `POST /api/run-brain` as internal/legacy (or deprecate) so the new chat flow is the single entry. No new services; same FastAPI app.
+
+**3. Minimal frontend changes**
+
+- **Current:** Single static page: config form (API key, snippet), “Run brain” button, single results section showing proposal/critique/synthesis/decision in order.
+- **Minimal structure:** **Single page** with (a) **main area:** chat thread (list of user/assistant bubbles) + input (send message); (b) **secondary area:** one collapsible panel (sidebar or below-chat). Secondary shows “Proposal / Critique / Synthesis / Tool calls” for the **selected** (or latest) turn. No second “view”—one layout with two regions. Data: on each `POST /api/chat` response, append `{ role: "assistant", content: reply }` to the thread and store `flow` (+ optional `tool_calls`) keyed by turn/message id; when user selects a message (or defaults to latest), panel renders that turn’s flow. Simplest: sidebar right or bottom drawer; single “Details” or “Reasoning” toggle to show/hide. No framework required for MVP; vanilla JS + CSS grid/flex is enough; optional later: React/Vue + assistant-ui-style components if we want richer reasoning UI.
+
+**4. Risks (short list + one-line mitigation)**
+
+| Risk | Mitigation |
+|------|------------|
+| **Streaming (if added later)** | Keep response shape compatible: same `POST /api/chat` can later support `Accept: text/event-stream` and emit `flow.proposal`, `flow.critique`, `flow.synthesis`, `reply.chunk`, `reply.done`; non-streaming remains default. |
+| **CORS** | Add FastAPI `CORSMiddleware` (e.g. `allow_origins` for dev vs prod); same-origin if UI and API always served from same host. |
+| **Auth** | Out of scope for revamp; if added later: API key or token in header, never in URL; status endpoint returns no secrets. |
+| **Long-running cycle / timeouts** | Set reasonable HTTP timeout on client; backend runs sync `run_brain_with_flow`; if timeouts become an issue, add async job + polling or streaming later. |
+| **Large `flow` payload** | Response is one-shot JSON; if payload size is a concern, cap snippet size (already ~8k chars) or truncate flow in response; streaming later reduces perceived latency. |
+
+**Recommendation:** Proceed with env-only config, single `POST /api/chat` returning `reply` + `flow`, and a minimal frontend: one page with chat thread + collapsible sidebar/panel for reasoning. Aligns with Architect design and keeps backend/frontend change sets small; streaming and richer reasoning UI can be added incrementally.
+
+---
+
+## Agreed plan: Orchestrator UI revamp
+
+(Synthesized from Architect design, PM scope, and Lead Engineer research. Single reference for execution.)
+
+### Design summary
+
+- **Chat-first layout:** Main view is a single conversation thread: user messages and assistant replies only. Each assistant reply is the final decision (e.g. delegation line, ORCHESTRATION_COMPLETE, or user intervention message). Primary action is “send a message”; one cycle per turn (MVP).
+- **Where reasoning lives:** **Sidebar** (recommended) for Proposal, Critique, Synthesis, and tool calls; scoped per message/turn. Fallback for narrow viewports: collapsible panel below chat or “Details” modal. Data per turn: `{ message_id, user_message, assistant_reply, flow: { proposal, critique, synthesis }, tool_calls? }`.
+- **API:** Single **POST /api/chat**: request `{ "messages": [ { "role", "content" } ], "include_flow": true }`; response `{ "reply", "flow": { "proposal", "critique", "synthesis" }, "tool_calls" }`. Non-streaming for revamp; design allows adding streaming later (e.g. SSE with `flow.*`, `reply.chunk`, `reply.done`).
+- **Env-only config:** No API key or workspace path in the UI. Backend reads from environment only. Optional **GET /api/config-status** (or extended **GET /api/status**) returns booleans only (e.g. `api_key_configured`, `workspace_configured`) for a UI status line; no secrets in responses.
+- **Reuse:** Same FastAPI app and static mount (`orchestrator_ui`); new routes and refactored frontend; **orchestrator_client** brain and context_loader unchanged. Deprecate or keep **POST /api/run-brain** as internal/legacy; chat flow is the single user-facing entry.
+- **MCP “when available”:** Backend uses MCP tools/context when the runtime provides them (e.g. Cursor/agent-automation); no MCP hosting in the UI server. When unavailable: stub context + file-based workspace snippet (e.g. PROJECT_WORKSPACE.md).
+
+### Scope summary
+
+**In scope:** Chat-first UX (main thread = user + assistant replies only); reasoning and progress (proposal, critique, synthesis, tool calls) in a secondary area (sidebar/panel/tab); env-only configuration; MCP and context used when available; no regression of brain behavior; clear separation of “chat” vs “details”.
+
+**Out of scope:** Full MCP hosting in the UI server; auth/OAuth/login; multi-user or tenant isolation; replacing or rewriting brain/orchestrator logic; new orchestration features (new phases, new MCP tools) unless added to the Implementation Plan later.
+
+### Acceptance criteria
+
+1. **Chat-first main view:** User can conduct a conversation in the main chat area. Primary thread shows only user messages and assistant replies (final answer/synthesis or high-level response). Raw proposal, critique, and intermediate reasoning do not appear in the main thread.
+2. **Progress/reasoning in secondary area:** Proposal, critique, synthesis, and tool calls (e.g. MCP) are visible in a dedicated secondary area (sidebar, panel, or tab). User can open this area to inspect progress and reasoning without scrolling through the main chat.
+3. **Env-only config:** No UI control for API key or workspace path. Configuration is read from the environment. If the server needs a key, it is supplied via env or server-side config, not via a form in the UI.
+4. **MCP when available:** When MCP is available in the runtime, the UI or its backend can show or use that context (e.g. workspace status, MCP-backed state). When not available, the UI works in brain-only mode without MCP.
+5. **No regression of brain behavior:** Running the brain through the revamped UI produces the same propose → critique → synthesize flow and outputs as the current Orchestrator UI; only the presentation (chat-first + secondary area) changes.
+6. **Clear separation of “chat” vs “details”:** A first-time user can complete a run and see the final decision in the main chat; they can optionally open the secondary area to see how that decision was reached.
+
+### Risks and mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| **Streaming (if added later)** | Keep response shape compatible; same `POST /api/chat` can support `Accept: text/event-stream` and emit `flow.*`, `reply.chunk`, `reply.done`; non-streaming remains default. |
+| **CORS** | Add FastAPI `CORSMiddleware` (e.g. `allow_origins` for dev vs prod); same-origin if UI and API always served from same host. |
+| **Auth** | Out of scope for revamp; if added later: API key or token in header, never in URL; status endpoint returns no secrets. |
+| **Long-running cycle / timeouts** | Set reasonable HTTP timeout on client; backend runs sync `run_brain_with_flow`; if needed, add async job + polling or streaming later. |
+| **Large `flow` payload** | One-shot JSON response; cap snippet size or truncate flow if needed; streaming later reduces perceived latency. |
+
+### Alternatives considered
+
+- **Reasoning placement:** Sidebar (A) recommended for chat + reasoning visible together; collapsible panel below chat (B) as fallback for narrow viewports; tab (C) considered but requires switching views and does not show chat and reasoning together.
+- **Streaming:** Non-streaming first for the revamp; same API and response shape designed so streaming can be added later without breaking the contract.
+
+### Blockers / Escalation
+
+None identified. If any role later flags a blocker (e.g. “MCP cannot be hosted in this stack”), add it here for user decision before execution.
 
 ---
 

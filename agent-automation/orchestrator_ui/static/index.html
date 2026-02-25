@@ -77,12 +77,234 @@
     .status.ok { color: var(--success); }
     .status.err { color: var(--error); }
 
-    /* Main layout: chat-first + collapsible reasoning panel */
+    /* Main layout: tree | chat+editor | reasoning — Phase 4 unified IDE shell */
     .layout {
       display: flex;
       flex-direction: row;
       min-height: calc(100vh - 80px);
+      position: relative;
     }
+
+    /* Resize handles between panels */
+    .resize-handle {
+      flex-shrink: 0;
+      width: 6px;
+      min-width: 6px;
+      background: var(--border);
+      cursor: col-resize;
+      transition: background 0.15s;
+      position: relative;
+      z-index: 10;
+    }
+    .resize-handle:hover,
+    .resize-handle.resizing {
+      background: var(--accent);
+      width: 8px;
+      min-width: 8px;
+    }
+    .resize-handle::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+    .resize-handle.disabled {
+      pointer-events: none;
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    /* Project tree panel (left sidebar) - Phase 4: min 180px, max 400px */
+    .tree-panel {
+      width: 260px;
+      min-width: 180px;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      border-right: 2px solid var(--border);
+      flex-shrink: 0;
+      background: rgba(18, 18, 26, 0.6);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      transition: width 0.25s ease;
+    }
+
+    .tree-panel.collapsed {
+      width: 48px !important;
+      min-width: 48px;
+    }
+
+    .tree-panel.collapsed .tree-header h2,
+    .tree-panel.collapsed .tree-content {
+      display: none !important;
+    }
+
+    .tree-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .tree-header h2 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .tree-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .tree-toggle:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .tree-panel.collapsed .tree-toggle {
+      margin: 0 auto;
+    }
+
+    .tree-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem 0;
+      font-size: 0.8rem;
+    }
+
+    .tree-item {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem 0.25rem 0.75rem;
+      cursor: pointer;
+      border-radius: 4px;
+      margin: 0 0.25rem;
+      transition: background 0.15s, color 0.15s;
+      user-select: none;
+    }
+
+    .tree-item:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .tree-item.selected {
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent);
+      border-left: 2px solid var(--accent);
+      margin-left: 0.5rem;
+      padding-left: 0.5rem;
+    }
+
+    .tree-arrow {
+      width: 16px;
+      flex-shrink: 0;
+      font-size: 0.7rem;
+      color: var(--muted);
+      transition: transform 0.2s ease;
+    }
+
+    .tree-arrow.expanded {
+      transform: rotate(90deg);
+    }
+
+    .tree-arrow.placeholder {
+      visibility: hidden;
+    }
+
+    .tree-icon {
+      flex-shrink: 0;
+      font-size: 0.9rem;
+      width: 1.1em;
+      text-align: center;
+    }
+
+    .tree-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tree-loading,
+    .tree-error {
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .tree-error {
+      color: var(--error);
+    }
+
+    .tree-spinner {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .tree-spinner::before {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: tree-spin 0.8s linear infinite;
+    }
+
+    @keyframes tree-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .tree-error-actions {
+      margin-top: 0.5rem;
+    }
+
+    .tree-error-actions button {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: var(--font-sans);
+    }
+
+    .tree-error-actions button:hover {
+      background: var(--border-hover);
+    }
+
+    /* File-type icon colors */
+    .tree-icon[data-ext="py"] { color: #3776ab; }
+    .tree-icon[data-ext="ts"], .tree-icon[data-ext="tsx"] { color: #3178c6; }
+    .tree-icon[data-ext="js"], .tree-icon[data-ext="jsx"] { color: #f7df1e; }
+    .tree-icon[data-ext="md"] { color: #083fa1; }
+    .tree-icon[data-ext="json"] { color: #cbcb41; }
+    .tree-icon[data-ext="yaml"], .tree-icon[data-ext="yml"] { color: #cb171e; }
+    .tree-icon[data-ext="html"] { color: #e34c26; }
+    .tree-icon[data-ext="css"] { color: #264de4; }
+    .tree-icon[data-ext="svg"] { color: #ffb13b; }
 
     .chat-main {
       flex: 1;
@@ -90,6 +312,133 @@
       display: flex;
       flex-direction: column;
       padding: 1rem 1.5rem;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    /* Phase 3: Code Editor */
+    .editor-section {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      min-height: 200px;
+      margin-bottom: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .editor-section.visible {
+      display: flex;
+    }
+
+    .editor-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-elevated);
+      flex-shrink: 0;
+    }
+
+    .editor-toolbar .path {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .editor-toolbar button {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .editor-toolbar button:hover {
+      background: var(--border-hover);
+    }
+
+    .editor-toolbar button.primary {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+
+    .editor-toolbar button.primary:hover {
+      opacity: 0.95;
+    }
+
+    .editor-container {
+      flex: 1;
+      min-height: 180px;
+      overflow: auto;
+    }
+
+    .editor-container .cm-editor {
+      height: 100%;
+      font-size: 0.9rem;
+    }
+
+    .editor-container .cm-scroller {
+      font-family: var(--font-mono);
+    }
+
+    .editor-toolbar .path.dirty::after {
+      content: ' •';
+      color: var(--warning);
+    }
+
+    .editor-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 120px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      pointer-events: none;
+    }
+
+    .toast {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      pointer-events: auto;
+      animation: toast-in 0.2s ease;
+    }
+
+    .toast.error {
+      border-color: var(--error);
+      color: var(--error);
+    }
+
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .chat-thread {
@@ -200,12 +549,64 @@
     }
     .mode-toggle button:hover:not(.active) { color: var(--text); }
 
+    .streaming-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+    }
+    .streaming-toggle input { cursor: pointer; }
+
+    /* Phase 5: Quick actions (Run cycle, slash commands, skills) */
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .quick-actions-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-right: 0.25rem;
+    }
+    .quick-action-btn {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.78rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .quick-action-btn:hover {
+      background: var(--border-hover);
+      border-color: var(--accent);
+    }
+    .quick-action-btn.run-cycle {
+      background: rgba(63, 185, 80, 0.15);
+      border-color: rgba(63, 185, 80, 0.4);
+      color: var(--success);
+    }
+    .quick-action-btn.run-cycle:hover {
+      background: rgba(63, 185, 80, 0.25);
+    }
+
     /* Input area */
     .chat-input-area {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
       padding: 0.5rem 0;
+    }
+    .chat-input-area .mode-toggle,
+    .chat-input-area .streaming-toggle {
+      flex-shrink: 0;
     }
     .chat-input-row {
       display: flex;
@@ -255,6 +656,19 @@
       opacity: 0.95;
       transform: translateY(-1px);
     }
+    .chat-input-area .run-cycle-btn {
+      flex-shrink: 0;
+      height: 56px;
+      padding: 0 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .chat-input-area .run-cycle-btn:hover:not(:disabled) {
+      background: rgba(88, 166, 255, 0.12);
+      border-color: var(--accent);
+    }
     .chat-input-area button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
@@ -267,19 +681,104 @@
       margin-top: 0.5rem;
     }
 
-    /* Reasoning panel (sidebar) */
+    /* Phase 4: Terminal panel (collapsible, bottom) */
+    .terminal-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 120px;
+      max-height: 40vh;
+      margin-top: 0.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: min-height 0.25s ease, max-height 0.25s ease;
+    }
+
+    .terminal-panel.collapsed {
+      min-height: 40px;
+      max-height: 40px;
+    }
+
+    .terminal-panel.collapsed .terminal-content {
+      display: none !important;
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-elevated);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .terminal-header h2 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .terminal-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .terminal-toggle:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .terminal-content {
+      flex: 1;
+      min-height: 80px;
+      overflow: auto;
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--muted);
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .terminal-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* Reasoning panel (sidebar) - Phase 4: min 280px, max 500px */
     .reasoning-panel {
       width: 360px;
       min-width: 280px;
+      max-width: 500px;
       display: flex;
       flex-direction: column;
-      border-left: 1px solid var(--border);
-      background: var(--bg-elevated);
+      border-left: 2px solid var(--border);
+      flex-shrink: 0;
+      background: rgba(18, 18, 26, 0.6);
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
       transition: transform 0.25s ease, width 0.25s ease;
     }
 
     .reasoning-panel.collapsed {
-      width: 48px;
+      width: 48px !important;
       min-width: 48px;
     }
 
@@ -379,10 +878,59 @@
 
     .muted { font-size: 0.8rem; color: var(--muted); }
 
-    /* Responsive: narrow viewport → bottom drawer */
+    /* Phase 4: Center tabs (Chat | Editor) */
+    .center-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 0.75rem;
+      background: var(--surface);
+      backdrop-filter: blur(var(--blur));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 2px;
+      width: fit-content;
+    }
+    .center-tabs button {
+      padding: 0.4rem 1rem;
+      font-size: 0.85rem;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      transition: color 0.15s, background 0.15s;
+    }
+    .center-tabs button.active {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+    .center-tabs button:hover:not(.active) { color: var(--text); }
+    .center-pane.chat-active .editor-section,
+    .center-pane.chat-active .editor-placeholder { display: none !important; }
+    .center-pane.editor-active .chat-thread,
+    .center-pane.editor-active .chat-input-area,
+    .center-pane.editor-active .chat-error { display: none !important; }
+    .center-pane.editor-active .editor-section { display: flex !important; }
+    .center-pane.editor-active .editor-placeholder { display: flex !important; }
+
+    /* Responsive: narrow viewport → stacked layout */
     @media (max-width: 768px) {
+      .resize-handle { display: none; }
       .layout {
         flex-direction: column;
+      }
+
+      .tree-panel {
+        width: 100%;
+        min-width: 0;
+        max-height: 35vh;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .tree-panel.collapsed {
+        max-height: 48px;
       }
 
       .reasoning-panel {
@@ -418,7 +966,39 @@
   </header>
 
   <div class="layout">
-    <main class="chat-main">
+    <aside class="tree-panel" id="tree-panel">
+      <div class="tree-header">
+        <h2>Project</h2>
+        <button type="button" class="tree-toggle" id="tree-toggle" title="Toggle project tree" aria-label="Toggle project tree">◀</button>
+      </div>
+      <div class="tree-content" id="tree-content">
+        <div class="tree-spinner" id="tree-loading">Loading…</div>
+        <div id="tree-root" style="display: none;"></div>
+        <div class="tree-error" id="tree-error" style="display: none;">
+          <span id="tree-error-msg"></span>
+          <div class="tree-error-actions">
+            <button type="button" id="tree-retry-btn">Retry</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="resize-handle" id="resize-tree" title="Resize project panel"></div>
+
+    <main class="chat-main center-pane chat-active" id="center-pane">
+      <div class="center-tabs" role="tablist">
+        <button type="button" class="center-tab active" data-tab="chat" role="tab">Chat</button>
+        <button type="button" class="center-tab" data-tab="editor" role="tab">Editor</button>
+      </div>
+      <section class="editor-section" id="editor-section">
+        <div class="editor-toolbar">
+          <span class="path" id="editor-path"></span>
+          <button type="button" id="editor-save-btn" class="primary">Save</button>
+          <button type="button" id="editor-revert-btn">Revert</button>
+        </div>
+        <div class="editor-container" id="editor-container"></div>
+      </section>
+      <div class="editor-placeholder" id="editor-placeholder">Click a file in the project tree to open it.</div>
       <div class="chat-thread" id="chat-thread"></div>
       <div class="chat-input-area">
         <div class="mode-toggle" role="group" aria-label="Chat mode">
@@ -426,13 +1006,35 @@
           <button type="button" class="mode-btn" data-mode="chat">Chat</button>
           <button type="button" class="mode-btn" data-mode="orchestration">Orchestrate</button>
         </div>
+        <label class="streaming-toggle" title="Stream responses token-by-token">
+          <input type="checkbox" id="streaming-checkbox" checked>
+          <span>Stream</span>
+        </label>
+        <div class="quick-actions" id="quick-actions">
+          <span class="quick-actions-label" id="slash-label" style="display: none;">Slash:</span>
+          <div id="slash-commands-container" style="display: inline-flex; flex-wrap: wrap; gap: 0.4rem;"></div>
+          <span class="quick-actions-label" id="skills-label" style="display: none;">Skills:</span>
+          <div id="skills-container" style="display: inline-flex; flex-wrap: wrap; gap: 0.4rem;"></div>
+        </div>
         <div class="chat-input-row">
+          <button type="button" id="run-cycle-btn" class="run-cycle-btn" title="Run one orchestration cycle">Run cycle</button>
           <textarea id="chat-input" placeholder="Send a message…" rows="2"></textarea>
           <button id="send-btn">Send</button>
         </div>
       </div>
       <p class="chat-error" id="chat-error" style="display: none;"></p>
+      <section class="terminal-panel" id="terminal-panel">
+        <div class="terminal-header" id="terminal-header">
+          <h2>Terminal</h2>
+          <button type="button" class="terminal-toggle" id="terminal-toggle" title="Toggle terminal" aria-label="Toggle terminal">▼</button>
+        </div>
+        <div class="terminal-content">
+          <div class="terminal-placeholder">Terminal placeholder — xterm.js integration coming soon.</div>
+        </div>
+      </section>
     </main>
+
+    <div class="resize-handle" id="resize-reasoning" title="Resize reasoning panel"></div>
 
     <aside class="reasoning-panel" id="reasoning-panel">
       <div class="reasoning-header">
@@ -446,8 +1048,149 @@
     </aside>
   </div>
 
+  <div class="toast-container" id="toast-container"></div>
+
   <script>
     const API_BASE = '';
+
+    /* Phase 4: Layout persistence (localStorage) — keys: ide_tree_width, ide_reasoning_width */
+    const IDE_TREE_WIDTH_KEY = 'ide_tree_width';
+    const IDE_REASONING_WIDTH_KEY = 'ide_reasoning_width';
+    const LAYOUT_KEY = 'orchestrator-ui-layout'; /* legacy: collapse state */
+    const DEFAULTS = { treeWidth: 260, reasoningWidth: 360, treeCollapsed: false, reasoningCollapsed: false, terminalCollapsed: true };
+    const LIMITS = { treeMin: 180, treeMax: 480, reasoningMin: 280, reasoningMax: 500 };
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function loadLayout() {
+      try {
+        const treeW = localStorage.getItem(IDE_TREE_WIDTH_KEY);
+        const reasoningW = localStorage.getItem(IDE_REASONING_WIDTH_KEY);
+        const treeWidth = clamp(Number(treeW) || DEFAULTS.treeWidth, LIMITS.treeMin, LIMITS.treeMax);
+        const reasoningWidth = clamp(Number(reasoningW) || DEFAULTS.reasoningWidth, LIMITS.reasoningMin, LIMITS.reasoningMax);
+        let collapseState = DEFAULTS;
+        try {
+          const raw = localStorage.getItem(LAYOUT_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            collapseState = {
+              treeCollapsed: Boolean(parsed.treeCollapsed),
+              reasoningCollapsed: Boolean(parsed.reasoningCollapsed),
+              terminalCollapsed: parsed.terminalCollapsed !== undefined ? Boolean(parsed.terminalCollapsed) : DEFAULTS.terminalCollapsed,
+            };
+          }
+        } catch (_) {}
+        return { treeWidth, reasoningWidth, ...collapseState };
+      } catch (_) {
+        return DEFAULTS;
+      }
+    }
+
+    function saveLayout(opts) {
+      try {
+        const layout = loadLayout();
+        if (opts.treeWidth !== undefined) {
+          const w = clamp(opts.treeWidth, LIMITS.treeMin, LIMITS.treeMax);
+          localStorage.setItem(IDE_TREE_WIDTH_KEY, String(w));
+        }
+        if (opts.reasoningWidth !== undefined) {
+          const w = clamp(opts.reasoningWidth, LIMITS.reasoningMin, LIMITS.reasoningMax);
+          localStorage.setItem(IDE_REASONING_WIDTH_KEY, String(w));
+        }
+        const merged = {
+          treeCollapsed: opts.treeCollapsed !== undefined ? opts.treeCollapsed : layout.treeCollapsed,
+          reasoningCollapsed: opts.reasoningCollapsed !== undefined ? opts.reasoningCollapsed : layout.reasoningCollapsed,
+          terminalCollapsed: opts.terminalCollapsed !== undefined ? opts.terminalCollapsed : layout.terminalCollapsed,
+        };
+        localStorage.setItem(LAYOUT_KEY, JSON.stringify(merged));
+      } catch (_) {}
+    }
+
+    function saveLayoutWidths(treeWidth, reasoningWidth) {
+      saveLayout({ treeWidth, reasoningWidth });
+    }
+
+    function setupResize() {
+      const treePanel = document.getElementById('tree-panel');
+      const reasoningPanel = document.getElementById('reasoning-panel');
+      const resizeTree = document.getElementById('resize-tree');
+      const resizeReasoning = document.getElementById('resize-reasoning');
+
+      const layout = loadLayout();
+      treePanel.style.width = layout.treeWidth + 'px';
+      reasoningPanel.style.width = layout.reasoningWidth + 'px';
+
+      function startResize(handle, isLeft, getPanel, min, max, ev) {
+        const panel = getPanel();
+        if (panel.classList.contains('collapsed')) return;
+        handle.classList.add('dragging');
+        document.body.classList.add('resizing');
+        const startX = ev.clientX;
+        const startW = panel.offsetWidth;
+
+        function move(e) {
+          const delta = isLeft ? e.clientX - startX : startX - e.clientX;
+          let w = startW + delta;
+          w = clamp(w, min, max);
+          panel.style.width = w + 'px';
+        }
+        function stop() {
+          handle.classList.remove('dragging');
+          document.body.classList.remove('resizing');
+          document.removeEventListener('mousemove', move);
+          document.removeEventListener('mouseup', stop);
+          const treeW = treePanel.offsetWidth;
+          const reasoningW = reasoningPanel.offsetWidth;
+          saveLayoutWidths(treeW, reasoningW);
+        }
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', stop);
+      }
+
+      resizeTree.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        startResize(resizeTree, true, () => treePanel, LIMITS.treeMin, LIMITS.treeMax, e);
+      });
+      resizeReasoning.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        startResize(resizeReasoning, false, () => reasoningPanel, LIMITS.reasoningMin, LIMITS.reasoningMax, e);
+      });
+    }
+
+    function initLayoutCollapsed() {
+      const layout = loadLayout();
+      reasoningCollapsed = layout.reasoningCollapsed;
+      terminalCollapsed = layout.terminalCollapsed;
+      const rp = document.getElementById('reasoning-panel');
+      const rt = document.getElementById('reasoning-toggle');
+      const tp = document.getElementById('terminal-panel');
+      const tt = document.getElementById('terminal-toggle');
+      if (rp) rp.classList.toggle('collapsed', reasoningCollapsed);
+      if (rt) { rt.textContent = reasoningCollapsed ? '▶' : '◀'; rt.title = reasoningCollapsed ? 'Expand reasoning panel' : 'Collapse reasoning panel'; }
+      if (tp) tp.classList.toggle('collapsed', terminalCollapsed);
+      if (tt) { tt.textContent = terminalCollapsed ? '▲' : '▼'; tt.title = terminalCollapsed ? 'Expand terminal' : 'Collapse terminal'; }
+      if (typeof treeCollapsed !== 'undefined') {
+        treeCollapsed = layout.treeCollapsed;
+        const trp = document.getElementById('tree-panel');
+        const trt = document.getElementById('tree-toggle');
+        if (trp) trp.classList.toggle('collapsed', treeCollapsed);
+        if (trt) { trt.textContent = treeCollapsed ? '▶' : '◀'; trt.title = treeCollapsed ? 'Expand project tree' : 'Collapse project tree'; }
+      }
+    }
+
+    function setupCenterTabs() {
+      const pane = document.getElementById('center-pane');
+      document.querySelectorAll('.center-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.center-tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          pane.classList.remove('chat-active', 'editor-active');
+          pane.classList.add(btn.dataset.tab + '-active');
+        });
+      });
+    }
 
     async function checkConfigStatus() {
       const el = document.getElementById('config-status');
@@ -465,6 +1208,7 @@
 
     let messages = [];
     let reasoningCollapsed = false;
+    let terminalCollapsed = true;
     let selectedMode = 'auto';
     const threadEl = document.getElementById('chat-thread');
     const inputEl = document.getElementById('chat-input');
@@ -509,6 +1253,8 @@
           '<div class="flow-step ' + cls + '"><h3>' + label + '</h3><pre>' + escapeHtml(text || '(empty)') + '</pre></div>'
         ).join('');
         if (!reasoningCollapsed) reasoningPanel.classList.remove('collapsed');
+        const bodyEl = reasoningPanel.querySelector('.reasoning-body');
+        if (bodyEl) bodyEl.scrollTop = bodyEl.scrollHeight;
       } else {
         reasoningContent.style.display = 'none';
         reasoningHint.style.display = 'block';
@@ -525,6 +1271,7 @@
       reasoningPanel.classList.toggle('collapsed', reasoningCollapsed);
       reasoningToggle.textContent = reasoningCollapsed ? '▶' : '◀';
       reasoningToggle.title = reasoningCollapsed ? 'Expand reasoning panel' : 'Collapse reasoning panel';
+      saveLayout({ reasoningCollapsed });
     }
 
     function getUserFriendlyError(status, data) {
@@ -545,6 +1292,118 @@
       return 'Request failed. Please try again.';
     }
 
+    function getOrCreateStreamingMessageEl() {
+      const thinking = threadEl.querySelector('.thinking-indicator');
+      let msgEl = threadEl.querySelector('.chat-msg.assistant.streaming');
+      if (!msgEl) {
+        if (thinking) thinking.remove();
+        msgEl = document.createElement('div');
+        msgEl.className = 'chat-msg assistant streaming';
+        msgEl.innerHTML = '<pre class="content"></pre>';
+        threadEl.appendChild(msgEl);
+      }
+      return msgEl.querySelector('.content');
+    }
+
+    function appendChunkToStreamingMessage(text) {
+      const contentEl = getOrCreateStreamingMessageEl();
+      contentEl.textContent += text;
+      threadEl.scrollTop = threadEl.scrollHeight;
+    }
+
+    function finalizeStreamingMessage(modeUsed) {
+      const msgEl = threadEl.querySelector('.chat-msg.assistant.streaming');
+      if (msgEl) {
+        msgEl.classList.remove('streaming');
+        const badge = modeUsed ? '<div class="mode-badge">' + escapeHtml(modeUsed) + '</div>' : '';
+        const content = msgEl.querySelector('.content');
+        msgEl.innerHTML = badge + '<pre>' + escapeHtml(content ? content.textContent : '') + '</pre>';
+      }
+    }
+
+    function processSSEEvent(data, flow, modeRef, appendChunk, finalize, showReasoning) {
+      const type = data.type || '';
+      const content = (data.content !== undefined && data.content !== null) ? String(data.content) : '';
+      if (type === 'reply.chunk') {
+        appendChunk(content);
+        if (modeRef.mode === 'orchestration') {
+          flow.synthesis += content;
+          showReasoning(flow, modeRef.mode);
+        }
+      } else if (type === 'reply.done') {
+        finalize(modeRef.mode);
+      } else if (type === 'flow.proposal') {
+        modeRef.mode = 'orchestration';
+        flow.proposal = content;
+        showReasoning(flow, modeRef.mode);
+      } else if (type === 'flow.proposal.chunk') {
+        modeRef.mode = 'orchestration';
+        flow.proposal += content;
+        showReasoning(flow, modeRef.mode);
+      } else if (type === 'flow.critique') {
+        modeRef.mode = 'orchestration';
+        flow.critique = content;
+        showReasoning(flow, modeRef.mode);
+      } else if (type === 'flow.critique.chunk') {
+        modeRef.mode = 'orchestration';
+        flow.critique += content;
+        showReasoning(flow, modeRef.mode);
+      } else if (type === 'flow.synthesis') {
+        modeRef.mode = 'orchestration';
+        showReasoning(flow, modeRef.mode);
+      }
+    }
+
+    async function processSSEStream(response) {
+      const flow = { proposal: '', critique: '', synthesis: '' };
+      const modeRef = { mode: 'chat' };
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          // Process complete events one-by-one; consume from buffer to avoid double-processing
+          let idx;
+          while ((idx = buffer.indexOf('\n\n')) !== -1) {
+            const eventStr = buffer.slice(0, idx);
+            buffer = buffer.slice(idx + 2);
+            const dataLine = eventStr.split('\n').find(l => l.startsWith('data: '));
+            if (!dataLine) continue;
+            try {
+              const jsonStr = dataLine.slice(6);
+              if (jsonStr === '[DONE]' || jsonStr.trim() === '') continue;
+              const data = JSON.parse(jsonStr);
+              processSSEEvent(data, flow, modeRef, appendChunkToStreamingMessage, finalizeStreamingMessage, showReasoning);
+            } catch (_) { /* skip malformed event */ }
+          }
+        }
+        // Process any remainder (incomplete final event)
+        if (buffer.trim()) {
+          const dataLine = buffer.split('\n').find(l => l.startsWith('data: '));
+          if (dataLine) {
+            try {
+              const jsonStr = dataLine.slice(6);
+              if (jsonStr !== '[DONE]' && jsonStr.trim() !== '') {
+                const data = JSON.parse(jsonStr);
+                processSSEEvent(data, flow, modeRef, appendChunkToStreamingMessage, finalizeStreamingMessage, showReasoning);
+              }
+            } catch (_) {}
+          }
+        }
+        const lastMsg = threadEl.querySelector('.chat-msg.assistant:last-child');
+        const content = lastMsg ? (lastMsg.querySelector('pre')?.textContent || '') : '';
+        messages.push({ role: 'assistant', content, modeUsed: modeRef.mode || 'chat' });
+        showReasoning(flow, modeRef.mode);
+      } catch (e) {
+        throw e;
+      } finally {
+        reader.releaseLock();
+      }
+    }
+
     async function sendChat() {
       const text = inputEl.value.trim();
       if (!text) return;
@@ -554,34 +1413,74 @@
       chatErrorEl.style.display = 'none';
       chatErrorEl.textContent = '';
       sendBtn.disabled = true;
-      try {
-        const r = await fetch(API_BASE + '/api/chat', {
+      const runCycleBtn = document.getElementById('run-cycle-btn');
+      if (runCycleBtn) runCycleBtn.disabled = true;
+      const streamCb = document.getElementById('streaming-checkbox');
+      const useStreaming = streamCb ? streamCb.checked : true;
+
+      const doFetch = (acceptStreaming) => {
+        const headers = { 'Content-Type': 'application/json' };
+        if (acceptStreaming) headers['Accept'] = 'text/event-stream';
+        return fetch(API_BASE + '/api/chat', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({
             messages: messages,
             mode: selectedMode,
             include_flow: true,
           }),
         });
-        let data = {};
-        try {
-          const responseText = await r.text();
-          data = responseText ? JSON.parse(responseText) : {};
-        } catch (_) {
-          data = {};
-        }
+      };
+
+      try {
+        let r = await doFetch(useStreaming);
+        const contentType = r.headers.get('content-type') || '';
+
         if (!r.ok) {
+          let data = {};
+          try {
+            const responseText = await r.text();
+            data = responseText ? JSON.parse(responseText) : {};
+          } catch (_) {}
           chatErrorEl.textContent = getUserFriendlyError(r.status, data);
           chatErrorEl.style.display = 'block';
           messages.pop();
           renderThread(false);
           return;
         }
-        const modeUsed = data.mode_used || 'orchestration';
-        messages.push({ role: 'assistant', content: data.reply || '', modeUsed });
-        renderThread(false);
-        showReasoning(data.flow, modeUsed);
+
+        if (useStreaming && contentType.includes('text/event-stream') && r.body) {
+          try {
+            await processSSEStream(r);
+          } catch (streamErr) {
+            renderThread(true);
+            r = await doFetch(false);
+            if (!r.ok) {
+              let data = {};
+              try { data = await r.json(); } catch (_) {}
+              chatErrorEl.textContent = getUserFriendlyError(r.status, data);
+              chatErrorEl.style.display = 'block';
+              messages.pop();
+              renderThread(false);
+              return;
+            }
+            const data = await r.json();
+            const modeUsed = data.mode_used || 'orchestration';
+            messages.push({ role: 'assistant', content: data.reply || '', modeUsed });
+            renderThread(false);
+            showReasoning(data.flow, modeUsed);
+          }
+        } else {
+          let data = {};
+          try {
+            const responseText = await r.text();
+            data = responseText ? JSON.parse(responseText) : {};
+          } catch (_) { data = {}; }
+          const modeUsed = data.mode_used || 'orchestration';
+          messages.push({ role: 'assistant', content: data.reply || '', modeUsed });
+          renderThread(false);
+          showReasoning(data.flow, modeUsed);
+        }
       } catch (e) {
         chatErrorEl.textContent = e.message || 'Network error. Please check your connection.';
         chatErrorEl.style.display = 'block';
@@ -589,6 +1488,8 @@
         renderThread(false);
       } finally {
         sendBtn.disabled = false;
+        const runCycleBtn = document.getElementById('run-cycle-btn');
+        if (runCycleBtn) runCycleBtn.disabled = false;
       }
     }
 
@@ -600,14 +1501,596 @@
       });
     });
     reasoningToggle.addEventListener('click', toggleReasoning);
+
+    /* Phase 4: Terminal panel toggle */
+    const terminalPanel = document.getElementById('terminal-panel');
+    const terminalToggle = document.getElementById('terminal-toggle');
+    function toggleTerminal() {
+      terminalCollapsed = !terminalCollapsed;
+      terminalPanel.classList.toggle('collapsed', terminalCollapsed);
+      terminalToggle.textContent = terminalCollapsed ? '▲' : '▼';
+      terminalToggle.title = terminalCollapsed ? 'Expand terminal' : 'Collapse terminal';
+      saveLayout({ terminalCollapsed });
+    }
+    if (terminalToggle) terminalToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleTerminal(); });
+
     document.getElementById('send-btn').addEventListener('click', sendChat);
+
+    /* Phase 5: Run cycle button — POST /api/chat with mode=orchestration */
+    document.getElementById('run-cycle-btn').addEventListener('click', () => {
+      inputEl.value = 'run one cycle';
+      selectedMode = 'orchestration';
+      document.querySelectorAll('.mode-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.mode === 'orchestration');
+      });
+      sendChat();
+    });
+
+    /* Phase 5: Slash commands and skills — fetch and render quick-action buttons */
+    function injectIntoInput(text) {
+      const current = inputEl.value;
+      const suffix = current ? ' ' + current : '';
+      inputEl.value = text + suffix;
+      inputEl.focus();
+    }
+    async function loadQuickActions() {
+      const slashContainer = document.getElementById('slash-commands-container');
+      const skillsContainer = document.getElementById('skills-container');
+      const slashLabel = document.getElementById('slash-label');
+      const skillsLabel = document.getElementById('skills-label');
+      if (!slashContainer || !skillsContainer) return;
+      try {
+        const [slashRes, skillsRes] = await Promise.all([
+          fetch(API_BASE + '/api/slash-commands'),
+          fetch(API_BASE + '/api/skills'),
+        ]);
+        if (slashRes.ok) {
+          const d = await slashRes.json();
+          const commands = d.commands || [];
+          if (commands.length) {
+            slashLabel.style.display = 'inline';
+            slashContainer.innerHTML = commands.map((cmd) =>
+              '<button type="button" class="quick-action-btn" data-cmd="' + escapeHtml(cmd) + '" title="Inject ' + escapeHtml(cmd) + '">' + escapeHtml(cmd) + '</button>'
+            ).join('');
+            slashContainer.querySelectorAll('.quick-action-btn').forEach((btn) => {
+              btn.addEventListener('click', () => injectIntoInput(btn.dataset.cmd + ' '));
+            });
+          }
+        }
+        if (skillsRes.ok) {
+          const d = await skillsRes.json();
+          const skills = d.skills || [];
+          if (skills.length) {
+            skillsLabel.style.display = 'inline';
+            skillsContainer.innerHTML = skills.map((s) =>
+              '<button type="button" class="quick-action-btn" data-skill="' + escapeHtml(s.name) + '" title="Use skill: ' + escapeHtml(s.name) + '">' + escapeHtml(s.name) + '</button>'
+            ).join('');
+            skillsContainer.querySelectorAll('.quick-action-btn').forEach((btn) => {
+              btn.addEventListener('click', () => injectIntoInput('Use skill: ' + btn.dataset.skill + ' '));
+            });
+          }
+        }
+      } catch (_) { /* API may be unavailable */ }
+    }
+    loadQuickActions();
+
     inputEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendChat();
       }
     });
+
+    // --- Project tree (Phase 2) ---
+    let treeCollapsed = false;
+    let selectedFilePath = null;
+    let expandedPaths = new Set(['.']);
+    const treePanel = document.getElementById('tree-panel');
+    const treeToggle = document.getElementById('tree-toggle');
+    const treeRoot = document.getElementById('tree-root');
+    const treeLoading = document.getElementById('tree-loading');
+    const treeError = document.getElementById('tree-error');
+
+    const FILE_ICONS = {
+      '.py': '🐍', '.js': '📜', '.ts': '📘', '.tsx': '⚛️', '.jsx': '⚛️',
+      '.md': '📝', '.json': '📋', '.yaml': '⚙️', '.yml': '⚙️',
+      '.html': '🌐', '.css': '🎨', '.svg': '🖼️', '.png': '🖼️', '.jpg': '🖼️',
+    };
+
+    function getFileIcon(name) {
+      const ext = name.includes('.') ? '.' + name.split('.').pop().toLowerCase() : '';
+      return FILE_ICONS[ext] || '📄';
+    }
+
+    function renderTreeNode(node, depth, expanded) {
+      const indent = depth * 12;
+      const isDir = node.type === 'dir';
+      const hasChildren = isDir && node.children && node.children.length > 0;
+      const isExpanded = expanded.has(node.path || '.');
+      const icon = isDir ? '📁' : getFileIcon(node.name);
+
+      let html = '<div class="tree-item' + (selectedFilePath === node.path && !isDir ? ' selected' : '') + '" data-path="' + escapeHtml(node.path || '.') + '" data-type="' + node.type + '" style="padding-left: ' + (indent + 0.75) + 'rem;">';
+      if (isDir) {
+        html += '<span class="tree-arrow' + (hasChildren ? (isExpanded ? ' expanded' : '') : ' placeholder') + '" data-path="' + escapeHtml(node.path || '.') + '">▶</span>';
+      } else {
+        html += '<span class="tree-arrow placeholder"></span>';
+      }
+      html += '<span class="tree-icon">' + icon + '</span>';
+      html += '<span class="tree-label">' + escapeHtml(node.name) + '</span>';
+      html += '</div>';
+
+      if (isDir && hasChildren && isExpanded) {
+        for (const child of node.children) {
+          html += renderTreeNode(child, depth + 1, expanded);
+        }
+      }
+      return html;
+    }
+
+    function loadTree() {
+      treeLoading.style.display = 'block';
+      treeRoot.style.display = 'none';
+      treeError.style.display = 'none';
+      fetch(API_BASE + '/api/tree')
+        .then(r => {
+          if (!r.ok) throw new Error(r.status === 404 ? 'Workspace not found' : 'Failed to load tree');
+          return r.json();
+        })
+        .then(data => {
+          treeLoading.style.display = 'none';
+          treeError.style.display = 'none';
+          if (expandedPaths.size === 0) expandedPaths.add('.');
+          const root = Array.isArray(data)
+            ? { name: 'Workspace', path: '.', type: 'dir', children: data }
+            : data;
+          treeRoot.innerHTML = renderTreeNode(root, 0, expandedPaths);
+          treeRoot.style.display = 'block';
+          bindTreeEvents();
+        })
+        .catch(e => {
+          treeLoading.style.display = 'none';
+          treeRoot.style.display = 'none';
+          treeError.textContent = e.message || 'Failed to load project tree';
+          treeError.style.display = 'block';
+        });
+    }
+
+    function bindTreeEvents() {
+      treeRoot.querySelectorAll('.tree-arrow:not(.placeholder)').forEach(el => {
+        el.onclick = (e) => {
+          e.stopPropagation();
+          const path = el.dataset.path || '.';
+          if (expandedPaths.has(path)) {
+            expandedPaths.delete(path);
+          } else {
+            expandedPaths.add(path);
+          }
+          loadTree();
+        };
+      });
+      treeRoot.querySelectorAll('.tree-item').forEach(el => {
+        el.onclick = (e) => {
+          if (el.querySelector('.tree-arrow:not(.placeholder)')?.contains(e.target)) return;
+          const path = el.dataset.path || '.';
+          const type = el.dataset.type;
+          if (type === 'file') {
+            selectedFilePath = path;
+            treeRoot.querySelectorAll('.tree-item').forEach(i => i.classList.remove('selected'));
+            el.classList.add('selected');
+            window.dispatchEvent(new CustomEvent('file-selected', { detail: { path } }));
+          } else if (type === 'dir') {
+            if (expandedPaths.has(path)) {
+              expandedPaths.delete(path);
+            } else {
+              expandedPaths.add(path);
+            }
+            loadTree();
+          }
+        };
+      });
+    }
+
+    function toggleTree() {
+      treeCollapsed = !treeCollapsed;
+      treePanel.classList.toggle('collapsed', treeCollapsed);
+      treeToggle.textContent = treeCollapsed ? '▶' : '◀';
+      treeToggle.title = treeCollapsed ? 'Expand project tree' : 'Collapse project tree';
+      saveLayout({ treeCollapsed });
+    }
+
+    treeToggle.addEventListener('click', toggleTree);
+    loadTree();
+
+    setupResize();
+    setupCenterTabs();
     checkConfigStatus();
+
+    // --- Project tree (Phase 2: virtualization via lazy-load, icons, loading, error) ---
+    const treePanel = document.getElementById('tree-panel');
+    const treeContent = document.getElementById('tree-content');
+    const treeLoading = document.getElementById('tree-loading');
+    const treeRoot = document.getElementById('tree-root');
+    const treeError = document.getElementById('tree-error');
+    const treeErrorMsg = document.getElementById('tree-error-msg');
+    const treeRetryBtn = document.getElementById('tree-retry-btn');
+    const treeToggle = document.getElementById('tree-toggle');
+    let treeCollapsed = false;
+
+    function getIconForNode(node) {
+      if (node.type === 'dir') return '📁';
+      const ext = (node.name.split('.').pop() || '').toLowerCase();
+      const icons = {
+        py: '🐍', ts: '📘', tsx: '⚛', js: '📜', jsx: '⚛', md: '📝', json: '📋',
+        yaml: '⚙', yml: '⚙', html: '🌐', css: '🎨', svg: '🖼', txt: '📄',
+      };
+      return icons[ext] || '📄';
+    }
+
+    function getIconExt(node) {
+      if (node.type === 'dir') return 'dir';
+      return (node.name.split('.').pop() || '').toLowerCase();
+    }
+
+    function showTreeLoading() {
+      treeLoading.style.display = 'flex';
+      treeLoading.classList.add('tree-spinner');
+      treeRoot.style.display = 'none';
+      treeError.style.display = 'none';
+    }
+
+    function showTreeError(msg) {
+      treeLoading.style.display = 'none';
+      treeRoot.style.display = 'none';
+      treeError.style.display = 'block';
+      treeErrorMsg.textContent = msg || 'Failed to load project tree.';
+    }
+
+    function showTreeContent() {
+      treeLoading.style.display = 'none';
+      treeError.style.display = 'none';
+      treeRoot.style.display = 'block';
+    }
+
+    async function fetchTree(path, lazy) {
+      const params = new URLSearchParams();
+      if (path) params.set('path', path);
+      if (lazy) params.set('lazy', '1');
+      const r = await fetch(API_BASE + '/api/tree?' + params.toString());
+      if (!r.ok) {
+        let detail = 'Request failed';
+        try {
+          const d = await r.json();
+          detail = d.detail || d.error || detail;
+        } catch (_) {}
+        throw new Error(detail);
+      }
+      return r.json();
+    }
+
+    function renderTreeNode(node, depth, parentPath) {
+      const path = node.path !== undefined && node.path !== '' ? node.path : (parentPath ? parentPath + '/' + node.name : node.name);
+      const isDir = node.type === 'dir';
+      const hasChildren = isDir && (node.children?.length > 0 || node.has_children);
+      const expanded = node._expanded;
+      const children = node.children || [];
+      const indent = depth * 12;
+
+      const arrow = hasChildren
+        ? '<span class="tree-arrow' + (expanded ? ' expanded' : '') + '">▶</span>'
+        : '<span class="tree-arrow placeholder">▶</span>';
+      const iconExt = getIconExt(node);
+      const icon = '<span class="tree-icon" data-ext="' + escapeHtml(iconExt) + '">' + getIconForNode(node) + '</span>';
+      const label = '<span class="tree-label">' + escapeHtml(node.name) + '</span>';
+
+      let html = '<div class="tree-item" data-path="' + escapeHtml(path) + '" data-depth="' + depth + '" data-is-dir="' + isDir + '">';
+      html += '<span style="width:' + indent + 'px;display:inline-block;"></span>';
+      html += arrow + icon + label + '</div>';
+
+      if (expanded && children.length > 0) {
+        children.forEach(c => {
+          html += renderTreeNode(c, depth + 1, path);
+        });
+      } else if (expanded && node.has_children && !children.length) {
+        html += '<div class="tree-item tree-loading-child" data-path="' + escapeHtml(path) + '"><span style="width:' + ((depth + 1) * 12) + 'px;"></span><span class="tree-spinner"></span> Loading…</div>';
+      }
+      return html;
+    }
+
+    function attachTreeItemListeners(container) {
+      container.querySelectorAll('.tree-item[data-path]').forEach(el => {
+        if (el._attached) return;
+        el._attached = true;
+        el.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const path = el.dataset.path;
+          const isDir = el.dataset.isDir === 'true';
+          const depth = parseInt(el.dataset.depth || '0', 10);
+          const arrow = el.querySelector('.tree-arrow:not(.placeholder)');
+          const parent = el.closest('#tree-root');
+          const nodeData = parent._treeData?.get(path);
+          if (!isDir) {
+            container.querySelectorAll('.tree-item').forEach(i => i.classList.remove('selected'));
+            el.classList.add('selected');
+            window.dispatchEvent(new CustomEvent('file-selected', { detail: { path } }));
+            return;
+          }
+          if (isDir && arrow) {
+            if (nodeData?._expanded) {
+              nodeData._expanded = false;
+              arrow.classList.remove('expanded');
+              const escaped = path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              const children = parent.querySelectorAll('[data-path^="' + escaped + '/"]');
+              children.forEach(c => c.remove());
+            } else {
+              nodeData._expanded = true;
+              arrow.classList.add('expanded');
+              if (nodeData.has_children && (!nodeData.children || nodeData.children.length === 0)) {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'tree-item tree-loading-child';
+                loadingDiv.dataset.path = path;
+                loadingDiv.innerHTML = '<span class="tree-spinner"></span> Loading…';
+                el.after(loadingDiv);
+                try {
+                  const childNode = await fetchTree(path, true);
+                  nodeData.children = childNode.children || [];
+                  nodeData.has_children = false;
+                  (childNode.children || []).forEach(c => {
+                    const cPath = path ? path + '/' + c.name : c.name;
+                    parent._treeData.set(cPath, c);
+                  });
+                  loadingDiv.remove();
+                  const frag = document.createDocumentFragment();
+                  const div = document.createElement('div');
+                  (childNode.children || []).forEach(c => {
+                    div.innerHTML += renderTreeNode(c, depth + 1, path);
+                  });
+                  while (div.firstChild) frag.appendChild(div.firstChild);
+                  el.after(frag);
+                  attachTreeItemListeners(parent);
+                } catch (err) {
+                  loadingDiv.remove();
+                  showTreeError(err.message);
+                }
+              } else if (nodeData.children?.length) {
+                const frag = document.createDocumentFragment();
+                const div = document.createElement('div');
+                nodeData.children.forEach(c => {
+                  div.innerHTML += renderTreeNode(c, depth + 1, path);
+                });
+                while (div.firstChild) frag.appendChild(div.firstChild);
+                el.after(frag);
+                attachTreeItemListeners(parent);
+              }
+            }
+          }
+        });
+      });
+    }
+
+    function flattenTree(node, parentPath, list) {
+      const path = node.path !== undefined && node.path !== '' ? node.path : (parentPath ? parentPath + '/' + node.name : node.name);
+      list.push({ node, path });
+      if (node.children) {
+        node.children.forEach(c => flattenTree(c, path, list));
+      }
+    }
+
+    async function loadTree() {
+      showTreeLoading();
+      try {
+        const rootNode = await fetchTree('', true);
+        rootNode._expanded = true;
+        treeRoot._treeData = new Map();
+        const flat = [];
+        flattenTree(rootNode, '', flat);
+        flat.forEach(({ node, path }) => treeRoot._treeData.set(path, node));
+
+        treeRoot.innerHTML = renderTreeNode(rootNode, 0, '');
+        showTreeContent();
+        attachTreeItemListeners(treeRoot);
+      } catch (err) {
+        showTreeError(err.message || 'Failed to load project tree.');
+      }
+    }
+
+    function toggleTree() {
+      treeCollapsed = !treeCollapsed;
+      treePanel.classList.toggle('collapsed', treeCollapsed);
+      treeToggle.textContent = treeCollapsed ? '▶' : '◀';
+      treeToggle.title = treeCollapsed ? 'Expand project panel' : 'Collapse project panel';
+      saveLayout({ treeCollapsed });
+    }
+
+    treeToggle.addEventListener('click', toggleTree);
+    treeRetryBtn.addEventListener('click', loadTree);
+    loadTree();
+    initLayoutCollapsed();
+  </script>
+
+  <script type="module">
+    /* Phase 3: CodeMirror 6 Code Editor */
+    const API_BASE = '';
+
+    const editorSection = document.getElementById('editor-section');
+    const editorPlaceholder = document.getElementById('editor-placeholder');
+    const editorContainer = document.getElementById('editor-container');
+    const editorPathEl = document.getElementById('editor-path');
+    const saveBtn = document.getElementById('editor-save-btn');
+    const revertBtn = document.getElementById('editor-revert-btn');
+
+    let editorView = null;
+    let currentPath = null;
+    let lastSavedContent = '';
+
+    function showToast(message, isError = false) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast' + (isError ? ' error' : '');
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.remove();
+      }, 4000);
+    }
+
+    function updateDirtyIndicator() {
+      if (!editorPathEl || !editorView) return;
+      const content = editorView.state.doc.toString();
+      const dirty = content !== lastSavedContent;
+      editorPathEl.classList.toggle('dirty', dirty);
+    }
+
+    function getLangFromPath(path) {
+      const ext = (path.split('.').pop() || '').toLowerCase();
+      const map = { py: 'python', ts: 'typescript', tsx: 'typescript', js: 'javascript', jsx: 'javascript', mjs: 'javascript', cjs: 'javascript', md: 'markdown', json: 'json', yaml: 'yaml', yml: 'yaml', html: 'html', css: 'css', xml: 'xml' };
+      return map[ext] || null;
+    }
+
+    async function getLanguageExtension(lang) {
+      if (!lang) return [];
+      const urls = {
+        python: 'https://esm.sh/@codemirror/lang-python@6.1.7',
+        javascript: 'https://esm.sh/@codemirror/lang-javascript@6.2.2',
+        typescript: 'https://esm.sh/@codemirror/lang-javascript@6.2.2',
+        json: 'https://esm.sh/@codemirror/lang-json@6.0.1',
+        markdown: 'https://esm.sh/@codemirror/lang-markdown@6.3.0',
+        html: 'https://esm.sh/@codemirror/lang-html@6.4.7',
+        yaml: 'https://esm.sh/@codemirror/lang-yaml@6.0.0',
+        xml: 'https://esm.sh/@codemirror/lang-xml@6.0.2',
+        css: 'https://esm.sh/@codemirror/lang-css@6.0.0',
+      };
+      const url = urls[lang];
+      if (!url) return [];
+      try {
+        if (lang === 'typescript') {
+          const mod = await import(url);
+          return [mod.javascript({ typescript: true })];
+        }
+        const mod = await import(url);
+        const fn = mod[lang] || mod.default;
+        return [typeof fn === 'function' ? fn() : fn];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    async function initEditor(content, path) {
+      const { EditorView, basicSetup } = await import('https://esm.sh/codemirror@6.65.7');
+      const lang = getLangFromPath(path);
+      const langExt = await getLanguageExtension(lang);
+
+      if (editorView) {
+        editorView.destroy();
+        editorView = null;
+      }
+
+      editorView = new EditorView({
+        doc: content,
+        parent: editorContainer,
+        extensions: [
+          basicSetup,
+          ...langExt,
+          EditorView.updateListener.of((update) => {
+            if (update.docChanged) updateDirtyIndicator();
+          }),
+          EditorView.theme({
+            '&': { backgroundColor: 'var(--bg-elevated)' },
+            '.cm-content': { caretColor: 'var(--accent)' },
+            '.cm-gutters': { backgroundColor: 'var(--surface)', borderRight: '1px solid var(--border)' },
+          }),
+        ],
+      });
+
+      editorSection.classList.add('visible');
+      updateDirtyIndicator();
+      editorPlaceholder.style.display = 'none';
+      editorPathEl.textContent = path;
+      currentPath = path;
+      lastSavedContent = content;
+    }
+
+    function closeEditor() {
+      if (editorView) {
+        editorView.destroy();
+        editorView = null;
+      }
+      editorSection.classList.remove('visible');
+      editorPlaceholder.style.display = 'flex';
+      editorPathEl.textContent = '';
+      currentPath = null;
+      lastSavedContent = '';
+    }
+
+    async function openFile(path) {
+      try {
+        const r = await fetch(API_BASE + '/api/file?path=' + encodeURIComponent(path));
+        if (!r.ok) {
+          const d = await r.json().catch(() => ({}));
+          showToast(d.detail || 'Failed to load file', true);
+          return;
+        }
+        const { content } = await r.json();
+        await initEditor(content, path);
+      } catch (e) {
+        showToast('Failed to load file: ' + e.message, true);
+      }
+    }
+
+    async function saveFile() {
+      if (!currentPath || !editorView) return;
+      const content = editorView.state.doc.toString();
+      try {
+        const r = await fetch(API_BASE + '/api/file', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: currentPath, content }),
+        });
+        if (!r.ok) {
+          const d = await r.json().catch(() => ({}));
+          showToast(d.detail || 'Failed to save', true);
+          return;
+        }
+        lastSavedContent = content;
+        updateDirtyIndicator();
+      } catch (e) {
+        showToast('Failed to save: ' + e.message, true);
+      }
+    }
+
+    function revertFile() {
+      if (!currentPath || !editorView) return;
+      editorView.dispatch({
+        changes: { from: 0, to: editorView.state.doc.length, insert: lastSavedContent },
+      });
+      updateDirtyIndicator();
+    }
+
+    window.addEventListener('file-selected', (e) => {
+      const path = e.detail?.path;
+      if (path) {
+        openFile(path);
+        const pane = document.getElementById('center-pane');
+        const editorTab = document.querySelector('.center-tab[data-tab="editor"]');
+        if (pane && editorTab) {
+          pane.classList.remove('chat-active', 'editor-active');
+          pane.classList.add('editor-active');
+          document.querySelectorAll('.center-tab').forEach(b => b.classList.remove('active'));
+          editorTab.classList.add('active');
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        if (editorView && currentPath) {
+          e.preventDefault();
+          saveFile();
+        }
+      }
+    });
+
+    saveBtn.addEventListener('click', saveFile);
+    revertBtn.addEventListener('click', revertFile);
   </script>
 </body>
 </html>

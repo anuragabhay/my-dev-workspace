@@ -95,3 +95,33 @@ def detect_intent(
 def get_slash_commands_for_workspace(workspace_root: Path) -> List[str]:
     """Load slash commands from roles.yml for the given workspace."""
     return _load_slash_commands(workspace_root)
+
+
+def get_slash_commands_list(workspace_root: Path) -> List[dict]:
+    """
+    Load slash commands with role metadata from roles.yml.
+    Returns list of { slash, role, display_name } for roles with slash.
+    """
+    try:
+        import yaml
+    except ImportError:
+        return []
+    roles_path = workspace_root / "agent-automation" / "roles.yml"
+    if not roles_path.exists():
+        return []
+    try:
+        with open(roles_path, "r") as f:
+            data = yaml.safe_load(f)
+        roles = data.get("roles") or {}
+        result = []
+        for rid, r in roles.items():
+            slash = r.get("slash")
+            if slash and isinstance(slash, str) and slash.startswith("/"):
+                result.append({
+                    "slash": slash.strip(),
+                    "role": rid,
+                    "display_name": r.get("display_name") or rid.replace("-", " ").title(),
+                })
+        return result
+    except Exception:
+        return []

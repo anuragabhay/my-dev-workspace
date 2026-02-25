@@ -65,3 +65,52 @@ class TestModeToggle:
         html = INDEX_PATH.read_text()
         assert "mode:" in html and "selectedMode" in html
         assert "/api/chat" in html
+
+
+class TestPhase4TerminalPanel:
+    """Phase 4: Terminal panel collapsible."""
+
+    def test_terminal_panel_exists(self):
+        """Terminal panel and toggle present."""
+        html = INDEX_PATH.read_text()
+        assert "terminal-panel" in html
+        assert "terminal-toggle" in html
+        assert "id=\"terminal-panel\"" in html or 'id="terminal-panel"' in html
+
+    def test_terminal_placeholder_or_content(self):
+        """Terminal has placeholder or content area."""
+        html = INDEX_PATH.read_text()
+        assert "Terminal" in html
+        assert "terminal-content" in html or "terminal-placeholder" in html
+
+
+class TestPhase4LayoutPersistence:
+    """Phase 4: Layout persistence via localStorage."""
+
+    def test_layout_storage_keys_present(self):
+        """Layout persistence uses expected localStorage keys."""
+        html = INDEX_PATH.read_text()
+        assert "orchestrator-ui-layout" in html or "LAYOUT_KEY" in html
+        assert "localStorage" in html
+
+    def test_load_layout_function_exists(self):
+        """loadLayout function for restoring persisted layout."""
+        html = INDEX_PATH.read_text()
+        assert "loadLayout" in html
+
+    def test_save_layout_function_exists(self):
+        """saveLayout function for persisting layout changes."""
+        html = INDEX_PATH.read_text()
+        assert "saveLayout" in html
+
+    def test_init_layout_collapsed_exists(self):
+        """initLayoutCollapsed restores collapsed state on load."""
+        html = INDEX_PATH.read_text()
+        assert "initLayoutCollapsed" in html
+
+    def test_collapsed_state_persisted(self):
+        """Tree, reasoning, terminal collapsed states are persisted."""
+        html = INDEX_PATH.read_text()
+        assert "treeCollapsed" in html
+        assert "reasoningCollapsed" in html
+        assert "terminalCollapsed" in html

@@ -72,21 +72,58 @@ The UI runs at **http://localhost:8765**.
 - **Synthesis**: The Proposer’s revised decision after incorporating the critique.
 - **Final Decision**: The final output (same as synthesis).
 
+## MCP: Stdio vs In-Process
+
+- **Current:** MCP uses **Stdio** transport. The UI backend spawns the `mcp-server` as a subprocess or uses MCP when provided by the environment (e.g. Cursor).
+- **In-process MCP (Phase 4):** Documented for future use. In-process would run the MCP server inside the IDE process (no subprocess). For web-only deployment we keep Stdio; in-process applies if the IDE runs as a single process (e.g. Electron main or Tauri). No implementation change for now — Stdio remains the default.
+- **Stub context**: When PROJECT_WORKSPACE.md is not available or you don’t paste a snippet, the brain uses a minimal stub context. You can paste a snippet in the UI for better results.
+- **Single-user**: API keys passed in the request are used only for that request; they are not persisted.
+
+## Phase 4: Full IDE Shell Features
+
+- **Resizable panels** — Project tree (left) and Reasoning (right) panels can be resized by dragging the handles between them. Widths are persisted.
+- **Layout persistence** — Panel widths and collapsed states (tree, reasoning, terminal) are saved to `localStorage` and restored on reload. Keys: `ide_tree_width`, `ide_reasoning_width`, `orchestrator-ui-layout`.
+- **Terminal panel** — Collapsible terminal section at the bottom (MVP: placeholder "Terminal (coming soon)"; xterm.js integration planned).
+- **MCP Stdio** — Backend connects to MCP server via Stdio subprocess when available; falls back to stub context when MCP is unavailable.
+
 ## Limitations
 
 - **Brain-only mode**: The UI runs the brain with file-based context (orchestrator_rule, patterns, workflow, decisions, roles). It does **not** connect to the MCP server for live `get_pending_orchestrator_prompt`, `get_workspace_status`, or `get_workflow_config`. For a full cycle with MCP, use `orchestrator_client/cycle_runner.py` (requires `context_loader` and `mcp_client`).
-- **Stub context**: When PROJECT_WORKSPACE.md is not available or you don’t paste a snippet, the brain uses a minimal stub context. You can paste a snippet in the UI for better results.
-- **Single-user**: API keys passed in the request are used only for that request; they are not persisted.
 
 ## Dependencies
 
 - **context_loader**: Used to build the orchestrator system message from `orchestrator_rule.md`, `orchestrator_patterns.md`, `workflow.yml`, `decisions.yml`, `roles.yml`.
 - **mcp_client**: Not used by the UI. Full-cycle runs (cycle_runner) require it when MCP is available.
 
+## Phase 5: Lifecycle Hooks
+
+The orchestrator supports **lifecycle hooks** for custom automation. Hooks are configured in `.cursor/hooks.json` and can be extended in `workflow.yml` or a separate hooks config.
+
+### Lifecycle Hook Points
+
+| Hook | When | Description |
+|------|------|-------------|
+| `before_cycle` | Before orchestrator cycle starts | Run scripts or checks before `get_workspace_status` and brain run |
+| `after_cycle` | After orchestrator cycle completes | Run scripts after final decision (e.g. logging, notifications) |
+| `before_delegate` | Before delegating to subagent | Run before invoking `/lead-engineer`, `/junior-engineer-1`, etc. |
+| `after_delegate` | After subagent returns | Run after subagent finishes (e.g. work log, status sync) |
+
+### Cursor Hooks (stop hook)
+
+The **stop** hook in `.cursor/hooks.json` runs when a Cursor chat stops. It reads `PROJECT_WORKSPACE.md`, detects Orchestrator context, and optionally returns a `followup_message` to continue the cycle (e.g. "Run one cycle" or a delegation slash command). This enables automatic loop continuation without user paste.
+
+### API: GET /api/hooks
+
+Returns hooks config from `.cursor/hooks.json` plus lifecycle definitions. Use for UI to show available hooks and their configuration.
+
 ## API
 
 - `GET /` — Serve the UI.
 - `GET /api/status` — Legacy API status.
 - `GET /api/config-status` — Booleans only: `api_key_configured`, `workspace_configured` (no secrets). Use for UI status line.
+- `GET /api/hooks` — Hooks config from `.cursor/hooks.json` and lifecycle definitions (Phase 5).
+- `GET /api/slash-commands` — Slash commands from `roles.yml`: `{ "commands": [{ "slash", "role", "display_name" }] }` (Phase 5).
+- `GET /api/skills` — Skills from `.cursor/skills/*/SKILL.md`: `{ "skills": [{ "name", "path", "description?" }] }` (Phase 5).
+- `GET /api/rules` — Rules from `.cursor/rules/*.mdc`: `{ "rules": [{ "name", "path" }] }` (Phase 5).
 - `POST /api/chat` — Chat endpoint. Body: `{ "messages": [{ "role": "user"|"assistant", "content": "..." }], "include_flow": true }`. API key and workspace from env only. Returns `{ "reply", "flow": { "proposal", "critique", "synthesis" }, "tool_calls"?: [...] }`. 400 if invalid (e.g. empty messages), 500 with `{ "error": "..." }` on failure.
 - `POST /api/run-brain` — Legacy. Body may include `anthropic_api_key`, `workspace_snippet`. Returns `{ "proposal", "critique", "synthesis", "final_decision" }`.

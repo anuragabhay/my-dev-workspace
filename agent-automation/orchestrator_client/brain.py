@@ -9,7 +9,7 @@ message format for consistency and future extensibility.
 
 import json
 import uuid
-from typing import Any, Optional
+from typing import Any, AsyncIterator, Optional
 
 from orchestrator_client.a2a import (
     A2AMessage,
@@ -240,3 +240,100 @@ def run_brain_with_flow(
         "synthesis": synthesis_msg.payload.get("final_decision", final_decision),
         "final_decision": synthesis_msg.payload.get("final_decision", final_decision),
     }
+
+
+def _extract_text_from_stream_event(event) -> str:
+    """Extract text from Anthropic stream event (content_block_delta or text)."""
+    text = ""
+    if getattr(event, "type", None) == "content_block_delta":
+        delta = getattr(event, "delta", None)
+        if delta and getattr(delta, "type", None) == "text_delta":
+            text = getattr(delta, "text", "") or ""
+    elif getattr(event, "type", None) == "text":
+        text = getattr(event, "text", "") or ""
+    return text
+
+
+async def run_brain_with_flow_stream(
+    system_message: str,
+    context: dict[str, Any],
+    api_key_override: Optional[str] = None,
+) -> AsyncIterator[tuple[str, str]]:
+    """
+    Run the orchestrator brain and yield SSE-style (event_type, content) pairs.
+    Phases 1–2 stream flow.proposal.chunk, flow.critique.chunk; Phase 3 streams
+    reply.chunk token-by-token, then reply.done.
+    """
+    api_key = api_key_override or get_anthropic_api_key()
+    if not api_key:
+        raise RuntimeError(
+            "ANTHROPIC_API_KEY or ORCHESTRATOR_LLM_API_KEY not set. "
+            "Set one of these env vars to run the orchestrator brain."
+        )
+
+    from anthropic import AsyncAnthropic
+
+    client = AsyncAnthropic(api_key=api_key)
+    task_id = f"brain-{uuid.uuid4().hex[:8]}"
+    proposer_model = get_proposer_model()
+    critic_model = get_critic_model()
+
+    # Phase 1: Proposer — stream token-by-token
+    proposer_user = _proposer_prompt(context)
+    proposal_text = ""
+    async with client.messages.stream(
+        model=proposer_model,
+        max_tokens=2048,
+        system=system_message,
+        messages=[{"role": "user", "content": proposer_user}],
+    ) as stream:
+        async for event in stream:
+            text = _extract_text_from_stream_event(event)
+            if text:
+                proposal_text += text
+                yield ("flow.proposal.chunk", text)
+    proposal_text = proposal_text.strip()
+
+    proposal_msg = create_proposal(
+        task_id=task_id,
+        proposed_action=proposal_text,
+        rationale="",
+        correlation_id=task_id,
+    )
+
+    # Phase 2: Critic — stream token-by-token
+    critic_user = _critic_prompt(proposal_msg, context)
+    critique_text = ""
+    async with client.messages.stream(
+        model=critic_model,
+        max_tokens=2048,
+        system=system_message,
+        messages=[{"role": "user", "content": critic_user}],
+    ) as stream:
+        async for event in stream:
+            text = _extract_text_from_stream_event(event)
+            if text:
+                critique_text += text
+                yield ("flow.critique.chunk", text)
+    critique_text = critique_text.strip()
+
+    critique_msg = create_critique(
+        task_id=task_id,
+        critique_text=critique_text,
+        correlation_id=task_id,
+    )
+
+    # Phase 3: Synthesizer — stream token-by-token
+    yield ("flow.synthesis", "")  # phase marker
+    synthesizer_user = _synthesizer_prompt(proposal_msg, critique_msg, context)
+    async with client.messages.stream(
+        model=proposer_model,
+        max_tokens=2048,
+        system=system_message,
+        messages=[{"role": "user", "content": synthesizer_user}],
+    ) as stream:
+        async for event in stream:
+            text = _extract_text_from_stream_event(event)
+            if text:
+                yield ("reply.chunk", text)
+    yield ("reply.done", "")

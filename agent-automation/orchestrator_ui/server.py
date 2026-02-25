@@ -8,9 +8,13 @@ import os
 import sys
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # Add agent-automation to path for orchestrator_client
 _ui_dir = Path(__file__).resolve().parent
 _agent_automation = _ui_dir.parent
+load_dotenv(_ui_dir / ".env")
+load_dotenv(_agent_automation / ".env")
 if str(_agent_automation) not in sys.path:
     sys.path.insert(0, str(_agent_automation))
 

@@ -7,6 +7,7 @@ The unified Orchestrator UI enforces local-only at startup; these branches are n
 in normal operation.
 """
 
+import os
 from typing import AsyncIterator, List, Optional
 
 
@@ -33,11 +34,15 @@ def _resolve_model(
             return ANTHROPIC_DEFAULT_MODEL
         if provider == "openai":
             return _safe_openai_fallback()
+        if provider == "local":
+            return os.environ.get("ORCHESTRATOR_LLM_MODEL", "mistral-nemo")
         return model or ""
     m = str(model).strip().lower()
-    if m in ("anthropic", "openai"):
+    if m in ("anthropic", "openai", "local"):
         if provider == "anthropic":
             return ANTHROPIC_DEFAULT_MODEL
+        if provider == "local":
+            return os.environ.get("ORCHESTRATOR_LLM_MODEL", "mistral-nemo")
         if provider == "openai":
             return _safe_openai_fallback()
     return model
@@ -108,11 +113,12 @@ def _call_openai_sync(
     api_key: str,
     max_tokens: int = 2048,
     messages: Optional[List[dict]] = None,
+    base_url: Optional[str] = None,
 ) -> str:
     """Call OpenAI API synchronously. Returns full reply text."""
     from openai import OpenAI
 
-    client = OpenAI(api_key=api_key)
+    client = OpenAI(api_key=api_key, **({"base_url": base_url} if base_url else {}))
     if messages is not None:
         openai_messages = [{"role": "system", "content": system}] + [
             {"role": m.get("role", "user"), "content": m.get("content", "")}
@@ -141,11 +147,12 @@ async def _call_openai_stream(
     model: str,
     api_key: str,
     max_tokens: int = 2048,
+    base_url: Optional[str] = None,
 ) -> AsyncIterator[str]:
     """Stream OpenAI API. Yields text chunks."""
     from openai import AsyncOpenAI
 
-    client = AsyncOpenAI(api_key=api_key)
+    client = AsyncOpenAI(api_key=api_key, **({"base_url": base_url} if base_url else {}))
     openai_messages = [{"role": "system", "content": system}] + [
         {"role": m.get("role", "user"), "content": m.get("content", "")}
         for m in messages
@@ -213,6 +220,18 @@ def chat_sync(
         model = _resolve_model(model, provider, openai_fallback_model)
         resolved_model = _resolve_openai_model(model, openai_fallback_model)
         return _call_openai_sync(system, user, resolved_model, openai_key, messages=messages)
+    if provider == "local":
+        if not openai_key:
+            openai_key = "ollama"
+        base_url = os.environ.get("ORCHESTRATOR_LLM_BASE_URL", "http://localhost:11434/v1")
+        model = _resolve_model(model, provider, openai_fallback_model)
+        if not model or str(model).strip().lower() in ("local",):
+            model = os.environ.get("ORCHESTRATOR_LLM_MODEL", "mistral-nemo")
+        resolved_model = _resolve_openai_model(model, openai_fallback_model)
+        return _call_openai_sync(
+            system, user, resolved_model, openai_key,
+            messages=messages, base_url=base_url
+        )
     raise ValueError(f"Unknown provider: {provider}. Use 'anthropic' or 'openai'.")
 
 
@@ -263,6 +282,19 @@ async def chat_stream(
         model = _resolve_model(model, provider, openai_fallback_model)
         resolved_model = _resolve_openai_model(model, openai_fallback_model)
         async for chunk in _call_openai_stream(system, messages, resolved_model, openai_key):
+            yield chunk
+        return
+    if provider == "local":
+        if not openai_key:
+            openai_key = "ollama"
+        base_url = os.environ.get("ORCHESTRATOR_LLM_BASE_URL", "http://localhost:11434/v1")
+        model = _resolve_model(model, provider, openai_fallback_model)
+        if not model or str(model).strip().lower() in ("local",):
+            model = os.environ.get("ORCHESTRATOR_LLM_MODEL", "mistral-nemo")
+        resolved_model = _resolve_openai_model(model, openai_fallback_model)
+        async for chunk in _call_openai_stream(
+            system, messages, resolved_model, openai_key, base_url=base_url
+        ):
             yield chunk
         return
     raise ValueError(f"Unknown provider: {provider}. Use 'anthropic' or 'openai'.")

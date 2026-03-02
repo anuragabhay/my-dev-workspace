@@ -16,8 +16,8 @@ from dotenv import load_dotenv
 # Add agent-automation to path for orchestrator_client
 _ui_dir = Path(__file__).resolve().parent
 _agent_automation = _ui_dir.parent
-load_dotenv(_ui_dir / ".env", override=True)
-load_dotenv(_agent_automation / ".env", override=True)
+load_dotenv(_ui_dir / ".env", override=False)
+load_dotenv(_agent_automation / ".env", override=False)
 
 # Diagnostic: log if active provider's API key unset after load_dotenv (remove after verification)
 _env_ui = _ui_dir / ".env"
@@ -622,6 +622,23 @@ def _wants_sse(accept: str | None) -> bool:
     return "text/event-stream" in accept.lower()
 
 
+def _is_connection_error(exc: BaseException) -> bool:
+    """Return True if exc indicates the local LLM server is unreachable."""
+    try:
+        import openai
+        if isinstance(exc, openai.APIConnectionError):
+            return True
+    except ImportError:
+        pass
+    try:
+        import httpx
+        if isinstance(exc, httpx.ConnectError):
+            return True
+    except ImportError:
+        pass
+    return False
+
+
 @app.post("/api/chat")
 async def chat(req: ChatRequest, request: Request):
     """
@@ -659,31 +676,36 @@ async def chat(req: ChatRequest, request: Request):
 
     stream_sse = _wants_sse(request.headers.get("Accept"))
 
-    if stream_sse and mode == "chat":
-        return StreamingResponse(
-            _chat_handler_stream(req.messages, anthropic_key, openai_key, provider),
-            media_type="text/event-stream",
-            headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
-        )
-
-    if stream_sse and mode != "chat":
-        return StreamingResponse(
-            _orchestration_handler_stream(req.messages, anthropic_key, openai_key, provider),
-            media_type="text/event-stream",
-            headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
-        )
-
     try:
+        if stream_sse and mode == "chat":
+            return StreamingResponse(
+                _chat_handler_stream(req.messages, anthropic_key, openai_key, provider),
+                media_type="text/event-stream",
+                headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
+            )
+
+        if stream_sse and mode != "chat":
+            return StreamingResponse(
+                _orchestration_handler_stream(req.messages, anthropic_key, openai_key, provider),
+                media_type="text/event-stream",
+                headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
+            )
+
         if mode == "chat":
             out = _chat_handler(req.messages, anthropic_key, openai_key, provider)
         else:
             out = await _orchestration_handler(
                 req.messages, anthropic_key, openai_key, provider, req.include_flow
             )
-    except Exception as e:
+    except Exception as exc:
+        if get_llm_provider() == "local" and _is_connection_error(exc):
+            raise HTTPException(
+                status_code=503,
+                detail="Local LLM unavailable. Run: ollama serve && ollama pull mistral-nemo",
+            )
         return JSONResponse(
             status_code=500,
-            content={"error": str(e)},
+            content={"error": str(exc)},
         )
     return out
 

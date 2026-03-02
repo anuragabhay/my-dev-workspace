@@ -2,6 +2,13 @@
   {
     "timestamp": "2026-03-02 14:00 UTC",
     "role": "Junior Engineer 1",
+    "task": "Fix local LLM model resolution: claude-* no longer maps to gpt-4o-mini for Ollama",
+    "status": "✅ COMPLETED",
+    "content": "In llm_provider.py local branch: removed _resolve_openai_model call; when model is claude-*, use ORCHESTRATOR_LLM_MODEL (mistral-nemo) instead of gpt-4o-mini. Prevents 404 when get_proposer_model returns claude-sonnet-4-20250514. 80 tests pass. Architect validated."
+  },
+  {
+    "timestamp": "2026-03-02 14:00 UTC",
+    "role": "Junior Engineer 1",
     "task": "Security review updates: local-only startup guard, ARCHITECTURE.md + PROJECT_PLAN.md Phase G and C11",
     "status": "✅ COMPLETED",
     "content": "- All 71 tests passed (pytest orchestrator_ui/tests/)\n- Committed: server.py (local-only startup guard), llm_provider.py, .env.example, test_server_api.py (TestLocalOnlyStartupGuard), docs/ARCHITECTURE.md (Phase G, C11 security review updates), docs/PROJECT_PLAN.md (Phase G security requirements)\n- .env confirmed gitignored; client_secrets.json/youtube_token.json not staged\n- Pushed to origin/feature/orchestrator-openai-abstraction\n- Next: User review of ARCHITECTURE.md and PROJECT_PLAN.md in agent-automation/docs/"
@@ -607,5 +614,12 @@
     "task": "Technology Stack Decisions",
     "status": "✅ COMPLETED",
     "content": "- Reviewed all technology decision matrices\n- Approved final technology stack\n- **Output**: Technology decisions in Part 2\n- **Approval**: None needed (within CTO authority for MVP)"
+  },
+  {
+    "timestamp": "2026-03-02 06:54 UTC",
+    "role": "Junior Engineer 2",
+    "task": "Phase A: local Ollama LLM provider, 503 handler, test_local_llm.py, ORCHESTRATOR_SETUP.md",
+    "status": "✅ COMPLETED",
+    "content": "79 tests pass. local branch in llm_provider.py (chat_sync + chat_stream). base_url from ORCHESTRATOR_LLM_BASE_URL. 503 on Ollama unreachable. Architect validated. Committed and pushed."
   }
 ]

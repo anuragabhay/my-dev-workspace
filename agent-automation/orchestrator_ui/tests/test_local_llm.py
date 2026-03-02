@@ -166,3 +166,14 @@ class TestModelResolution:
                       anthropic_key=None, openai_key=None, provider="local")
         model_arg = mock.call_args.args[2] if len(mock.call_args.args) > 2 else None
         assert model_arg == "phi4-mini"
+
+    def test_claude_model_maps_to_orchestrator_llm_model_not_gpt4o_mini(self, local_env):
+        """When provider=local and model=claude-*, mock receives ORCHESTRATOR_LLM_MODEL (mistral-nemo), NOT gpt-4o-mini."""
+        with patch.dict(os.environ, {"ORCHESTRATOR_LLM_MODEL": "mistral-nemo"}):
+            with patch("orchestrator_client.llm_provider._call_openai_sync", return_value="ok") as mock:
+                from orchestrator_client.llm_provider import chat_sync
+                chat_sync(system="s", user="u", model="claude-sonnet-4-20250514",
+                          anthropic_key=None, openai_key=None, provider="local",
+                          openai_fallback_model="gpt-4o-mini")
+            model_arg = mock.call_args.args[2] if len(mock.call_args.args) > 2 else None
+            assert model_arg == "mistral-nemo", "claude-* must map to ORCHESTRATOR_LLM_MODEL, not gpt-4o-mini"

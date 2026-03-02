@@ -227,9 +227,12 @@ def chat_sync(
         model = _resolve_model(model, provider, openai_fallback_model)
         if not model or str(model).strip().lower() in ("local",):
             model = os.environ.get("ORCHESTRATOR_LLM_MODEL", "mistral-nemo")
-        resolved_model = _resolve_openai_model(model, openai_fallback_model)
+        # For local provider: claude-* models are not valid; use ORCHESTRATOR_LLM_MODEL instead
+        if model and model.strip().lower().startswith("claude-"):
+            model = os.environ.get("ORCHESTRATOR_LLM_MODEL", "mistral-nemo")
+        # Do NOT call _resolve_openai_model — it would map claude-* to gpt-4o-mini, which Ollama doesn't have
         return _call_openai_sync(
-            system, user, resolved_model, openai_key,
+            system, user, model, openai_key,
             messages=messages, base_url=base_url
         )
     raise ValueError(f"Unknown provider: {provider}. Use 'anthropic' or 'openai'.")
@@ -291,9 +294,12 @@ async def chat_stream(
         model = _resolve_model(model, provider, openai_fallback_model)
         if not model or str(model).strip().lower() in ("local",):
             model = os.environ.get("ORCHESTRATOR_LLM_MODEL", "mistral-nemo")
-        resolved_model = _resolve_openai_model(model, openai_fallback_model)
+        # For local provider: claude-* models are not valid; use ORCHESTRATOR_LLM_MODEL instead
+        if model and model.strip().lower().startswith("claude-"):
+            model = os.environ.get("ORCHESTRATOR_LLM_MODEL", "mistral-nemo")
+        # Do NOT call _resolve_openai_model — it would map claude-* to gpt-4o-mini, which Ollama doesn't have
         async for chunk in _call_openai_stream(
-            system, messages, resolved_model, openai_key, base_url=base_url
+            system, messages, model, openai_key, base_url=base_url
         ):
             yield chunk
         return

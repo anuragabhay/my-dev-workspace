@@ -53,7 +53,7 @@ class TestChatEndpointErrors:
             "ORCHESTRATOR_LLM_API_KEY": "",
             "OPENAI_API_KEY": "",
             "ORCHESTRATOR_OPENAI_API_KEY": "",
-            "ORCHESTRATOR_LLM_PROVIDER": "anthropic",  # Use anthropic so we get API key error (not import error)
+            "ORCHESTRATOR_LLM_PROVIDER": "local",
         }
         with patch.dict(os.environ, env_patch, clear=False):
             r = _chat_request([{"role": "user", "content": "hello"}])
@@ -69,9 +69,9 @@ class TestChatEndpointModeRouting:
 
     @pytest.fixture(autouse=True)
     def ensure_api_key(self):
-        """Ensure API key is set so handlers run (provider=anthropic to use ANTHROPIC_API_KEY)."""
-        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "anthropic"
-        os.environ["ANTHROPIC_API_KEY"] = "sk-test-fake-key-for-testing"
+        """Ensure API key is set so handlers run (provider=local, openai key satisfies active_key check)."""
+        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "local"
+        os.environ["OPENAI_API_KEY"] = "sk-test-fake-key-for-testing"
         yield
         # Don't clear - other tests may need it
 
@@ -163,7 +163,7 @@ class TestConfigStatus:
         """When both configured, values are True."""
         with patch.dict(
             os.environ,
-            {"ORCHESTRATOR_LLM_PROVIDER": "anthropic", "ANTHROPIC_API_KEY": "sk-test"},
+            {"ORCHESTRATOR_LLM_PROVIDER": "local", "ANTHROPIC_API_KEY": "sk-test"},
             clear=False,
         ):
             with patch("orchestrator_ui.server.get_workspace_root") as mock_root:
@@ -195,8 +195,8 @@ class TestServerErrorPropagation:
 
     @pytest.fixture(autouse=True)
     def ensure_api_key(self):
-        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "anthropic"
-        os.environ["ANTHROPIC_API_KEY"] = "sk-test-fake-key"
+        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "local"
+        os.environ["OPENAI_API_KEY"] = "sk-test-fake-key"
         yield
 
     def test_500_when_chat_handler_raises(self):
@@ -225,8 +225,8 @@ class TestIncludeFlow:
 
     @pytest.fixture(autouse=True)
     def ensure_api_key(self):
-        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "anthropic"
-        os.environ["ANTHROPIC_API_KEY"] = "sk-test-fake-key"
+        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "local"
+        os.environ["OPENAI_API_KEY"] = "sk-test-fake-key"
         yield
 
     def test_include_flow_false_omits_flow(self):
@@ -252,8 +252,8 @@ class TestStreamingSSE:
 
     @pytest.fixture(autouse=True)
     def ensure_api_key(self):
-        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "anthropic"
-        os.environ["ANTHROPIC_API_KEY"] = "sk-test-fake-key"
+        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "local"
+        os.environ["OPENAI_API_KEY"] = "sk-test-fake-key"
         yield
 
     async def _fake_chat_stream(self, *args, **kwargs):
@@ -616,8 +616,8 @@ class TestMCPFallback:
 
     @pytest.fixture(autouse=True)
     def ensure_api_key(self):
-        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "anthropic"
-        os.environ["ANTHROPIC_API_KEY"] = "sk-test-fake-key"
+        os.environ["ORCHESTRATOR_LLM_PROVIDER"] = "local"
+        os.environ["OPENAI_API_KEY"] = "sk-test-fake-key"
         yield
 
     def test_orchestration_handler_falls_back_to_stub_when_mcp_fails(self):
@@ -762,3 +762,48 @@ class TestSSENoDoubleProcess:
 
         sse_single = 'data: {"type": "reply.chunk", "content": "only"}\n\n'
         assert _parse_sse_stream_reply_chunks(sse_single) == ["only"]
+
+
+class TestLocalOnlyStartupGuard:
+    """Verify server.py exits immediately when a non-local provider is configured.
+
+    server.py uses load_dotenv(..., override=True) which overwrites process env vars with
+    the .env file value.  To make the startup guard see a non-local provider we temporarily
+    write the .env file, run the subprocess, then restore the original content.
+    """
+
+    _UI_ENV_FILE = Path(__file__).resolve().parent.parent / ".env"
+    _PYTHONPATH = str(Path(__file__).resolve().parent.parent.parent)
+
+    def _run_server_import_with_provider(self, provider: str):
+        """Write .env with given provider, import server in subprocess, restore .env."""
+        import subprocess
+
+        env_file = self._UI_ENV_FILE
+        original = env_file.read_text(encoding="utf-8") if env_file.exists() else None
+        env_file.write_text(f"ORCHESTRATOR_LLM_PROVIDER={provider}\n", encoding="utf-8")
+        try:
+            # Remove provider from shell env so load_dotenv (override=True) drives the value
+            proc_env = {k: v for k, v in os.environ.items() if k != "ORCHESTRATOR_LLM_PROVIDER"}
+            proc_env["PYTHONPATH"] = self._PYTHONPATH
+            return subprocess.run(
+                [sys.executable, "-c", "import orchestrator_ui.server"],
+                capture_output=True, text=True, env=proc_env,
+            )
+        finally:
+            if original is not None:
+                env_file.write_text(original, encoding="utf-8")
+            elif env_file.exists():
+                env_file.unlink()
+
+    def test_startup_exits_if_provider_is_anthropic(self):
+        """server.py exits with SystemExit if ORCHESTRATOR_LLM_PROVIDER=anthropic."""
+        result = self._run_server_import_with_provider("anthropic")
+        assert result.returncode != 0
+        assert "local-only" in result.stderr
+
+    def test_startup_exits_if_provider_is_openai(self):
+        """server.py exits with SystemExit if ORCHESTRATOR_LLM_PROVIDER=openai."""
+        result = self._run_server_import_with_provider("openai")
+        assert result.returncode != 0
+        assert "local-only" in result.stderr

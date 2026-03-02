@@ -22,7 +22,7 @@ load_dotenv(_agent_automation / ".env", override=True)
 # Diagnostic: log if active provider's API key unset after load_dotenv (remove after verification)
 _env_ui = _ui_dir / ".env"
 _env_aa = _agent_automation / ".env"
-_provider = os.environ.get("ORCHESTRATOR_LLM_PROVIDER", "openai").lower()
+_provider = os.environ.get("ORCHESTRATOR_LLM_PROVIDER", "anthropic").lower()
 _has_key = (
     (os.environ.get("OPENAI_API_KEY") or os.environ.get("ORCHESTRATOR_OPENAI_API_KEY"))
     if _provider == "openai"
@@ -37,6 +37,16 @@ if not _has_key:
     )
 if str(_agent_automation) not in sys.path:
     sys.path.insert(0, str(_agent_automation))
+
+provider = os.environ.get("ORCHESTRATOR_LLM_PROVIDER", "local").lower()
+if provider != "local":
+    print(
+        f"[Unified App] FATAL: ORCHESTRATOR_LLM_PROVIDER='{provider}' is not allowed. "
+        "This app is local-only. Set ORCHESTRATOR_LLM_PROVIDER=local (Ollama). "
+        "No cloud AI providers are supported.",
+        file=sys.stderr,
+    )
+    sys.exit(1)
 
 import json as _json
 from typing import Literal, Optional

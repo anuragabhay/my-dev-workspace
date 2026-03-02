@@ -1,9 +1,46 @@
 """
 LLM provider abstraction: Anthropic and OpenAI backends.
 Exposes chat_sync and chat_stream; brain and server integrate via this module.
+
+Anthropic and OpenAI branches are preserved for open-source use and future extensibility.
+The unified Orchestrator UI enforces local-only at startup; these branches are not reachable
+in normal operation.
 """
 
 from typing import AsyncIterator, List, Optional
+
+
+ANTHROPIC_DEFAULT_MODEL = "claude-sonnet-4-20250514"
+
+
+def _resolve_model(
+    model: str,
+    provider: str,
+    openai_fallback_model: str,
+) -> str:
+    """
+    Resolve model when it is missing, empty, or equals provider name (anthropic/openai).
+    Ensures the API never receives "anthropic" or "openai" as the model.
+    """
+    # model param must be a valid model ID (see chat_completions.md)
+    def _safe_openai_fallback() -> str:
+        if openai_fallback_model.strip().lower() in ("anthropic", "openai"):
+            return "gpt-4o-mini"
+        return openai_fallback_model
+
+    if not model or not str(model).strip():
+        if provider == "anthropic":
+            return ANTHROPIC_DEFAULT_MODEL
+        if provider == "openai":
+            return _safe_openai_fallback()
+        return model or ""
+    m = str(model).strip().lower()
+    if m in ("anthropic", "openai"):
+        if provider == "anthropic":
+            return ANTHROPIC_DEFAULT_MODEL
+        if provider == "openai":
+            return _safe_openai_fallback()
+    return model
 
 
 def _resolve_openai_model(model: str, openai_fallback: str) -> str:
@@ -165,6 +202,7 @@ def chat_sync(
                 "ANTHROPIC_API_KEY or ORCHESTRATOR_LLM_API_KEY required when provider=anthropic. "
                 "Set one of these env vars."
             )
+        model = _resolve_model(model, provider, openai_fallback_model)
         return _call_anthropic_sync(system, user, model, anthropic_key, messages=messages)
     if provider == "openai":
         if not openai_key:
@@ -172,6 +210,7 @@ def chat_sync(
                 "OPENAI_API_KEY or ORCHESTRATOR_OPENAI_API_KEY required when provider=openai. "
                 "Set one of these env vars."
             )
+        model = _resolve_model(model, provider, openai_fallback_model)
         resolved_model = _resolve_openai_model(model, openai_fallback_model)
         return _call_openai_sync(system, user, resolved_model, openai_key, messages=messages)
     raise ValueError(f"Unknown provider: {provider}. Use 'anthropic' or 'openai'.")
@@ -211,6 +250,7 @@ async def chat_stream(
                 "ANTHROPIC_API_KEY or ORCHESTRATOR_LLM_API_KEY required when provider=anthropic. "
                 "Set one of these env vars."
             )
+        model = _resolve_model(model, provider, openai_fallback_model)
         async for chunk in _call_anthropic_stream(system, messages, model, anthropic_key):
             yield chunk
         return
@@ -220,6 +260,7 @@ async def chat_stream(
                 "OPENAI_API_KEY or ORCHESTRATOR_OPENAI_API_KEY required when provider=openai. "
                 "Set one of these env vars."
             )
+        model = _resolve_model(model, provider, openai_fallback_model)
         resolved_model = _resolve_openai_model(model, openai_fallback_model)
         async for chunk in _call_openai_stream(system, messages, resolved_model, openai_key):
             yield chunk

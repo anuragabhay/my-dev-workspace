@@ -1,5 +1,26 @@
 [
   {
+    "timestamp": "2026-03-02 14:00 UTC",
+    "role": "Junior Engineer 1",
+    "task": "Security review updates: local-only startup guard, ARCHITECTURE.md + PROJECT_PLAN.md Phase G and C11",
+    "status": "✅ COMPLETED",
+    "content": "- All 71 tests passed (pytest orchestrator_ui/tests/)\n- Committed: server.py (local-only startup guard), llm_provider.py, .env.example, test_server_api.py (TestLocalOnlyStartupGuard), docs/ARCHITECTURE.md (Phase G, C11 security review updates), docs/PROJECT_PLAN.md (Phase G security requirements)\n- .env confirmed gitignored; client_secrets.json/youtube_token.json not staged\n- Pushed to origin/feature/orchestrator-openai-abstraction\n- Next: User review of ARCHITECTURE.md and PROJECT_PLAN.md in agent-automation/docs/"
+  },
+  {
+    "timestamp": "2026-02-27 06:52 UTC",
+    "role": "Junior Engineer 1",
+    "task": "Defensive hardening in llm_provider._resolve_model",
+    "status": "✅ COMPLETED",
+    "content": "- When provider=openai and openai_fallback_model is misconfigured as 'anthropic' or 'openai', return gpt-4o-mini instead\\n- Added comment referencing chat_completions.md: model param must be a valid model ID"
+  },
+  {
+    "timestamp": "2026-02-27 12:00 UTC",
+    "role": "Junior Engineer 1",
+    "task": "Orchestrator config: treat provider names as default model",
+    "status": "✅ COMPLETED",
+    "content": "- In config.py: get_llm_model/get_proposer_model/get_critic_model now treat env values 'anthropic' or 'openai' as 'use default', return claude-sonnet-4-20250514\\n- Updated .env.example and .env: ORCHESTRATOR_LLM_PROVIDER=anthropic, comment says anthropic is default (openai later)"
+  },
+  {
     "timestamp": "2026-02-25",
     "role": "Orchestrator",
     "task": "OpenAI provider abstraction feature",

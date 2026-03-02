@@ -12,12 +12,12 @@
 
 **Overall Status**: 🟡 In Progress  
 **Current Phase**: Phase 1 - Project Setup & Foundation (In Progress)  
-**Last Updated**: 2026-02-20 by Orchestrator  
+**Last Updated**: 2026-03-02 by Junior Engineer 1  
 **Active Agents**: Lead Engineer, Junior Engineer 1, Junior Engineer 2, Reviewer, Tester, Architect, PM, CTO, CFO  
 **Pending Approvals**: 0  
 **Blockers**: None  
-**Next Actions**: Custom Vibe Coding IDE Phases 1–5 complete. User: Create PR for feature/orchestrator-ui-redesign → staging; merge when ready. User Intervention Required for PR merge.  
-**User Intervention Required**: Yes (PR merge for feature/orchestrator-ui-redesign)
+**Next Actions**: User: Review updated ARCHITECTURE.md and PROJECT_PLAN.md in agent-automation/docs/. Approve for development start (Phase A) or request further changes. User Intervention Required = Yes.  
+**User Intervention Required**: Yes (Review and approve updated ARCHITECTURE.md + PROJECT_PLAN.md in agent-automation/docs/ before any development begins on Phases A–F)
 
 ---
 
@@ -151,6 +151,20 @@ The Orchestrator UI revamp is in scope for: a **chat-first UX** where the user�
 
 ## 📝 Recent Work Log (last 10)
 
+### [2026-03-01 UTC] [PM] [Produced PROJECT_PLAN.md for Unified App / Custom Vibe Coding IDE] [✅ COMPLETED]
+- Created `agent-automation/docs/PROJECT_PLAN.md` covering Phases A–F with per-phase goals, deliverable checklists, dependencies, effort estimates, owner roles, and acceptance criteria.
+- Embedded all four CTO conditions (CTO-1 iframe sandbox, CTO-2 session truncation strategy, CTO-3 WORKSPACE_ROOT explicit env, CTO-4 jsonschema>=4.0) in the relevant phases.
+- Locked all CTO Q1–Q6 decisions (default provider=local, jsonschema>=4.0, both inline+Canvas, PWA only, SESSION_DB_PATH, ghost text excluded).
+- Defined session message truncation strategy (sliding window, SESSION_CONTEXT_WINDOW=20, SESSION_MAX_TOKENS=8000) to satisfy CTO-2 before Phase C.
+- Produced parallelization map, module dependency graph, single-branch strategy, and risk register.
+- Next: User review and approval of ARCHITECTURE.md + PROJECT_PLAN.md before any development begins.
+
+### [2026-02-27 06:52 UTC] [Junior Engineer 1] [Defensive hardening in llm_provider._resolve_model] [✅ COMPLETED]
+- When provider=openai and openai_fallback_model is misconfigured as 'anthropic' or 'openai', return gpt-4o-mini instead\n- Added comment referencing chat_completions.md: model param must be a valid model ID
+
+### [2026-02-27 12:00 UTC] [Junior Engineer 1] [Orchestrator config: treat provider names as default model] [✅ COMPLETED]
+- In config.py: get_llm_model/get_proposer_model/get_critic_model now treat env values 'anthropic' or 'openai' as 'use default', return claude-sonnet-4-20250514\n- Updated .env.example and .env: ORCHESTRATOR_LLM_PROVIDER=anthropic, comment says anthropic is default (openai later)
+
 ### [2026-02-25] [Orchestrator] [OpenAI provider abstraction feature] [✅ COMPLETED]
 - Architect: validated llm_provider design (interface, default openai, Anthropic kept)
 - Lead Engineer: implemented llm_provider.py, config (get_openai_api_key, get_llm_provider default openai), requirements (openai>=1.0.0)
@@ -179,16 +193,6 @@ Added agent-automation/orchestrator_ui/intent.py with CHAT_KEYWORDS, ORCHESTRATI
 
 ### [2026-02-25] [Lead Engineer] [Orchestrator UI revamp (chat-first, env-only, POST /api/chat, reasoning panel)] [✅ COMPLETED]
 - Backend: env-only config, GET /api/config-status, POST /api/chat (400/500 with { "error": "..." })\n- Frontend: chat thread + input, reasoning sidebar (Proposal/Critique/Synthesis), no key/snippet fields\n- Added orchestrator_ui/.env.example (ANTHROPIC_API_KEY, optional WORKSPACE_PATH/WORKSPACE_ROOT)\n- Branch feature/orchestrator-ui-revamp pushed; PR link: https://github.com/anuragabhay/my-dev-workspace/compare/staging...feature/orchestrator-ui-revamp
-
-### [2026-02-24] [Lead Engineer] [Task A: Flow steps section (YouTube Shorts Generator)] [✅ COMPLETED]
-- Backend: extended progress payload (model, action_summary), AgentResult, pipeline progress_callback, app.py WebSocket msg\n- Frontend: ProgressEvent extended, Flow steps section on Generate page (index, agent, model, status, expandable action_summary)\n- 75 tests pass; branch feature/flow-steps committed and pushed
-
-### [2026-02-24 19:00 UTC] [Junior Engineer 1] [Task B: Orchestrator UI (platform-agnostic A2A brain)] [✅ COMPLETED]
-- Added run_brain_with_flow to brain.py returning proposal, critique, synthesis, final_decision; api_key_override support
-- Created context_loader.py for system message from orchestrator_rule, patterns, workflow, decisions, roles
-- Created orchestrator_ui: FastAPI backend + minimal frontend (API key config, run brain, view A2A flow)
-- Documented in orchestrator_ui/README.md and ORCHESTRATOR_SETUP.md §9
-- Branch feature/orchestrator-ui pushed; brain-only mode (no MCP)
 
 Full log: agent-automation/work_log.json
 
@@ -602,6 +606,65 @@ From scope, acceptance criteria, and ease of implementation/maintenance:
 
 ---
 
+### ✅ Approved with Conditions — Approval #002
+- **Requested By**: Architect
+- **Requested From**: CTO
+- **Date**: 2026-03-01 UTC
+- **Type**: Technical Decision (Architecture Approval — Unified App / Local LLM / Dynamic UI)
+- **Document**: `agent-automation/docs/ARCHITECTURE.md` v1.0
+- **Priority**: High (blocks PM planning and all implementation phases)
+- **Status**: ✅ Approved with Conditions by CTO
+- **Decision Date**: 2026-03-01 UTC
+- **Escalation**: None (within CTO authority); Q4 Capacitor APK scoping deferred to User if desired.
+
+**CTO Review:**
+
+**1. Technology Choices — APPROVED**
+All technology choices are sound for the stated constraints.
+- *Ollama + local LLM*: De-facto standard for local inference. Reusing the OpenAI SDK with a `base_url` override is the correct zero-code-change approach. Recommended models (mistral-nemo 12B Apache 2.0, phi4-mini 3.8B MIT) are well-chosen. Model exclusion list (DeepSeek, Qwen, Yi, Baichuan — data sovereignty; Codestral — non-commercial) is approved and must be maintained.
+- *SQLite sessions*: Zero-dependency stdlib choice is correct for a single-user local app. Appropriate for scope.
+- *CodeMirror 6*: Already present; extending it is the right call. `@codemirror/merge` for diff view is the correct extension.
+- *Vanilla JS renderer (no eval, no innerHTML)*: The registered-component pattern with `textContent`-only content injection is the correct security architecture. No framework dependency is appropriate given the no-build-step constraint.
+- *Capacitor/PWA*: PWA-first, Capacitor APK as Phase 1 optional, on-device llama.cpp NDK as Phase 2 speculative — phasing is correct.
+
+**2. Privacy Constraint — CONFIRMED LOCAL-ONLY**
+The architecture genuinely enforces the local-only constraint (P2/C1) in the default path. Ollama at localhost:11434, SQLite at local file path, no telemetry, default `ORCHESTRATOR_LLM_PROVIDER=local`, explicit 503 with setup instructions on Ollama unavailability — no cloud fallback by default. Confirmed: no data leaves the machine in the default configuration. The provider abstraction correctly gates cloud paths behind explicit env var override, which is the user's intentional choice.
+
+**3. Integration Integrity — APPROVED**
+The additive migration strategy is sound. YouTube Shorts at port 8766 is proxy-only, never imported. MCP server, brain.py, context_loader.py, all Cursor automation files are explicitly untouched. Existing `/api/chat` backward compatibility preserved via optional new params. Clean rollback path (remove new files, revert 3 files, no DB migrations). No breaking changes identified.
+
+**4. Scalability and Risk — ACCEPTABLE with noted items**
+- *Local LLM cold start*: Ollama model load time (10–30s for 12B models) should be documented in ORCHESTRATOR_SETUP.md and mitigated with a "pre-load on server start" option. Acceptable for local dev use case.
+- *Structured output (ui_spec) reliability*: LLMs may produce malformed JSON or hallucinate component types. `ui_validator.py` strip-on-failure fallback to plain text is the correct mitigation. No further action needed in architecture.
+- *Intent classifier ambiguity*: Keyword triggers may over-match (minor UX issue, not security). Confidence threshold (< 0.6 → chat) is the correct safety valve. Acceptable.
+- *File write scope*: Path traversal prevention via `pathlib.Path.resolve()` + prefix check is correct.
+
+**5. Open Questions — CTO Decisions**
+- *Q1 Default provider*: **`local` (Ollama)**. Launching with `anthropic` default contradicts P2 and the entire design intent. Clear 503 with setup instructions handles onboarding.
+- *Q2 jsonschema dependency*: **Add `jsonschema>=4.0` explicitly to `requirements.txt`**. C6 explicitly permits it. Pin version for predictability.
+- *Q3 Canvas tab vs inline-only*: **Both in scope** — inline artifact cards + Canvas tab. Inline maintains conversation context; Canvas enables deep inspection. Limiting to inline-only reduces the value of the dynamic UI subsystem.
+- *Q4 Capacitor APK*: **Phase F = PWA manifest + service worker only**. Capacitor APK is deferred — not in scope for initial implementation. Revisit as a separate user-approved initiative.
+- *Q5 Session DB location*: **`orchestrator_ui/sessions.db` as default**. Add `SESSION_DB_PATH` env var support from the start (no-cost flexibility, avoids a later breaking change).
+- *Q6 Ghost text (L3)*: **Excluded from Phase E scope**. Phase E = L1 (multi-file tabs) + L2 (diff view) only. `@marimo-team/codemirror-ai` deferred; npm dependency review required when revisited.
+
+**Conditions (MUST be addressed before or during implementation):**
+1. **`<iframe sandbox>` attribute required**: All `video_embed` iframes in `renderer.js` must include `sandbox="allow-scripts allow-same-origin"` (minimum) to prevent top-frame navigation and unintended API access. This is a security requirement, not optional.
+2. **Session message truncation/windowing**: Before Phase C implementation, define and document a strategy for truncating or summarizing session history when it approaches the model's context window limit. This is not addressed in the architecture and must not be left to the implementation phase to discover.
+3. **`WORKSPACE_ROOT` must be explicitly configured**: The `/api/file` endpoints must require `WORKSPACE_ROOT` to be set as an explicit env var (not auto-detected from runtime `__file__` paths). Document this requirement in `.env.example` and `ORCHESTRATOR_SETUP.md`. Auto-detection creates unpredictable write permissions.
+4. **`jsonschema>=4.0` in requirements.txt**: Add before Phase D implementation.
+
+**Architecture Summary:**
+- Unified FastAPI app evolving `orchestrator_ui/` (port 8765)
+- Ollama local LLM as default provider via OpenAI SDK `base_url` override
+- 5-mode intent router (chat, orchestration, video, coding, health) with hybrid rule+LLM classifier
+- Dynamic UI subsystem: 13-component `ui_spec` JSON rendered via vanilla JS (no eval, no innerHTML)
+- SQLite session persistence (stdlib, zero deps) with localStorage fallback
+- YouTube Shorts integration via HTTP proxy only (port 8766 untouched)
+- CodeMirror 6 multi-file tabs + diff view for coding mode
+- PWA manifest + service worker for Android home screen
+
+---
+
 ## 🔄 Agent Communication Protocol (MANDATORY)
 
 ### Communication Method
@@ -879,8 +942,8 @@ Junior Engineer (Implementation, Documentation, Testing)
 
 ## 🏗️ CTO Status
 
-**Current Status**: ✅ Architecture Approved | ✅ Automation System Operational  
-**Last Updated**: 2026-02-14 15:48 UTC  
+**Current Status**: ✅ Architecture Approved | ✅ Automation System Operational | ✅ Unified App Architecture Approved  
+**Last Updated**: 2026-03-01 UTC  
 **Senior**: CEO (for phase transitions), User (for all budget decisions)  
 **Junior**: Architect (reviews architecture)
 
@@ -890,9 +953,11 @@ Junior Engineer (Implementation, Documentation, Testing)
 - [x] Review and setup automation system (✅ 2026-02-14 21:15)
 - [x] Review architecture design (✅ 2026-02-14 15:48) - Approval #001
 - [x] Approve architecture (✅ 2026-02-14 15:48) - Approval #001
+- [x] Review Unified App Architecture (✅ 2026-03-01) - Approval #002
+- [x] Respond to Q1–Q6 open questions from ARCHITECTURE.md (✅ 2026-03-01) - Approval #002
 
 **Approval Requests I Need to Respond To:**
-- None (Approval #001 completed)
+- None (Approval #002 completed)
 
 **Approval Requests I Made:**
 - None (all technology decisions within authority)
@@ -903,9 +968,11 @@ Junior Engineer (Implementation, Documentation, Testing)
 - All decisions within budget authority
 - Approved automation system for agent workflow automation
 - Approved system architecture design (Approval #001) - Simple Agent Orchestration pattern approved for implementation
+- Approved Unified App Architecture (Approval #002) with 4 conditions: iframe sandbox, session truncation strategy, explicit WORKSPACE_ROOT, jsonschema pinned
+- Q1: default provider = `local` (Ollama); Q2: add jsonschema>=4.0 to requirements.txt; Q3: both inline cards + Canvas tab in scope; Q4: Capacitor APK deferred (PWA only); Q5: sessions.db default + SESSION_DB_PATH env var; Q6: ghost text deferred (Phase E = L1+L2 only)
 
 **Blockers**: None  
-**Next Action**: Support Lead Engineer during implementation phase
+**Next Action**: PM to produce PROJECT_PLAN.md based on approved architecture
 
 ---
 

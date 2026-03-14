@@ -16,20 +16,37 @@ from dotenv import load_dotenv
 # Add agent-automation to path for orchestrator_client
 _ui_dir = Path(__file__).resolve().parent
 _agent_automation = _ui_dir.parent
-load_dotenv(_ui_dir / ".env", override=True)
-load_dotenv(_agent_automation / ".env", override=True)
+load_dotenv(_ui_dir / ".env", override=False)
+load_dotenv(_agent_automation / ".env", override=False)
 
-# Diagnostic: log if API key still unset after load_dotenv (remove after verification)
+# Diagnostic: log if active provider's API key unset after load_dotenv (remove after verification)
 _env_ui = _ui_dir / ".env"
 _env_aa = _agent_automation / ".env"
-if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ORCHESTRATOR_LLM_API_KEY")):
+_provider = os.environ.get("ORCHESTRATOR_LLM_PROVIDER", "anthropic").lower()
+_has_key = (
+    (os.environ.get("OPENAI_API_KEY") or os.environ.get("ORCHESTRATOR_OPENAI_API_KEY"))
+    if _provider == "openai"
+    else (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ORCHESTRATOR_LLM_API_KEY"))
+)
+if not _has_key:
     print(
-        "[Orchestrator UI] ANTHROPIC_API_KEY/ORCHESTRATOR_LLM_API_KEY unset after load_dotenv. "
+        f"[Orchestrator UI] API key unset for provider={_provider}. "
+        f"Set OPENAI_API_KEY or ANTHROPIC_API_KEY (or ORCHESTRATOR_* variants). "
         f"orchestrator_ui/.env exists={_env_ui.exists()}, agent-automation/.env exists={_env_aa.exists()}",
         file=sys.stderr,
     )
 if str(_agent_automation) not in sys.path:
     sys.path.insert(0, str(_agent_automation))
+
+provider = os.environ.get("ORCHESTRATOR_LLM_PROVIDER", "local").lower()
+if provider != "local":
+    print(
+        f"[Unified App] FATAL: ORCHESTRATOR_LLM_PROVIDER='{provider}' is not allowed. "
+        "This app is local-only. Set ORCHESTRATOR_LLM_PROVIDER=local (Ollama). "
+        "No cloud AI providers are supported.",
+        file=sys.stderr,
+    )
+    sys.exit(1)
 
 import json as _json
 from typing import Literal, Optional
@@ -40,7 +57,16 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from orchestrator_client.brain import run_brain_with_flow, run_brain_with_flow_stream
+from orchestrator_client.config import (
+    get_anthropic_api_key,
+    get_openai_api_key,
+    get_openai_model,
+    get_llm_provider,
+    get_proposer_model,
+)
 from orchestrator_client.context_loader import load_context
+from orchestrator_client.llm_provider import chat_sync as llm_chat_sync
+from orchestrator_client.llm_provider import chat_stream as llm_chat_stream
 from workspace_config import get_workspace_root
 
 from orchestrator_ui.intent import detect_intent, get_slash_commands_for_workspace, get_slash_commands_list
@@ -80,11 +106,15 @@ if _static_dir.exists():
 
 
 class RunBrainRequest(BaseModel):
-    """Request body for /api/run-brain. API key is optional if set via env."""
+    """Request body for /api/run-brain. API keys optional if set via env."""
 
     anthropic_api_key: Optional[str] = Field(
         default=None,
         description="Anthropic API key (optional if ANTHROPIC_API_KEY or ORCHESTRATOR_LLM_API_KEY is set)",
+    )
+    openai_api_key: Optional[str] = Field(
+        default=None,
+        description="OpenAI API key (optional if OPENAI_API_KEY or ORCHESTRATOR_OPENAI_API_KEY is set)",
     )
     workspace_snippet: Optional[str] = Field(
         default=None,
@@ -119,7 +149,7 @@ class FileWriteRequest(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    """Request for POST /api/chat. API key and workspace read only from env."""
+    """Request for POST /api/chat. API keys optional if set via env."""
 
     messages: list[ChatMessage] = Field(..., description="Conversation history")
     mode: Literal["auto", "chat", "orchestration"] = Field(
@@ -127,6 +157,14 @@ class ChatRequest(BaseModel):
         description="Force mode or let server infer (auto)",
     )
     include_flow: bool = Field(default=True, description="Include proposal, critique, synthesis in response")
+    anthropic_api_key: Optional[str] = Field(
+        default=None,
+        description="Anthropic API key override (optional if set via env)",
+    )
+    openai_api_key: Optional[str] = Field(
+        default=None,
+        description="OpenAI API key override (optional if set via env)",
+    )
 
 
 def _stub_context() -> dict:
@@ -158,46 +196,69 @@ def _get_project_workspace_snippet(max_chars: int = 8000) -> str:
 CHAT_SYSTEM_PROMPT = """You are the Orchestrator assistant. Reply briefly to greetings, thanks, and simple questions. For task-related requests, suggest the user say 'run one cycle' or use a slash command like /lead-engineer to get started. Do not delegate or run cycles yourself; suggest the user do so."""
 
 
-def _chat_handler(messages: list, api_key: str) -> dict:
-    """Single LLM call for chat mode. Returns { reply, mode_used: "chat" }."""
-    from anthropic import Anthropic
+def _resolve_chat_keys(
+    anthropic_key_req: Optional[str],
+    openai_key_req: Optional[str],
+) -> tuple[Optional[str], Optional[str], str]:
+    """
+    Resolve API keys and provider: request body > env.
+    Returns (anthropic_key, openai_key, provider).
+    """
+    anthropic_key = anthropic_key_req or get_anthropic_api_key()
+    openai_key = openai_key_req or get_openai_api_key()
+    provider = get_llm_provider()
+    return anthropic_key, openai_key, provider
 
-    from orchestrator_client.config import get_proposer_model
 
-    client = Anthropic(api_key=api_key)
-    response = client.messages.create(
-        model=get_proposer_model(),
-        max_tokens=1024,
+def _chat_handler(
+    messages: list,
+    anthropic_key: Optional[str],
+    openai_key: Optional[str],
+    provider: str,
+) -> dict:
+    """Single LLM call for chat mode via llm_provider. Returns { reply, mode_used: "chat" }."""
+    msg_list = [{"role": m.role, "content": m.content} for m in messages]
+    reply = llm_chat_sync(
         system=CHAT_SYSTEM_PROMPT,
-        messages=[{"role": m.role, "content": m.content} for m in messages],
+        user=msg_list[-1]["content"] if msg_list else "",
+        model=get_proposer_model(),
+        anthropic_key=anthropic_key,
+        openai_key=openai_key,
+        provider=provider,
+        openai_fallback_model=get_openai_model(),
+        messages=msg_list,
     )
-    reply = ""
-    if response.content:
-        parts = [b.text for b in response.content if hasattr(b, "text")]
-        reply = "\n".join(parts) if parts else ""
     return {"reply": reply, "mode_used": "chat"}
 
 
-async def _chat_handler_stream(messages: list, api_key: str):
-    """Stream chat reply token-by-token. Yields SSE events: reply.chunk, reply.done."""
-    from anthropic import AsyncAnthropic
-
-    from orchestrator_client.config import get_proposer_model
-
-    client = AsyncAnthropic(api_key=api_key)
-    async with client.messages.stream(
-        model=get_proposer_model(),
-        max_tokens=1024,
+async def _chat_handler_stream(
+    messages: list,
+    anthropic_key: Optional[str],
+    openai_key: Optional[str],
+    provider: str,
+):
+    """Stream chat reply token-by-token via llm_provider. Yields SSE events: reply.chunk, reply.done."""
+    msg_list = [{"role": m.role, "content": m.content} for m in messages]
+    async for text in llm_chat_stream(
         system=CHAT_SYSTEM_PROMPT,
-        messages=[{"role": m.role, "content": m.content} for m in messages],
-    ) as stream:
-        async for text in stream.text_stream:
-            if text:
-                yield f"data: {_json.dumps({'type': 'reply.chunk', 'content': text})}\n\n"
+        messages=msg_list,
+        model=get_proposer_model(),
+        anthropic_key=anthropic_key,
+        openai_key=openai_key,
+        provider=provider,
+        openai_fallback_model=get_openai_model(),
+    ):
+        if text:
+            yield f"data: {_json.dumps({'type': 'reply.chunk', 'content': text})}\n\n"
     yield f"data: {_json.dumps({'type': 'reply.done'})}\n\n"
 
 
-async def _orchestration_handler_stream(messages: list, api_key: str):
+async def _orchestration_handler_stream(
+    messages: list,
+    anthropic_key: Optional[str],
+    openai_key: Optional[str],
+    provider: str,
+):
     """Stream orchestration flow: flow.proposal, flow.critique, flow.synthesis, reply.chunk, reply.done."""
     context = _stub_context()
     root = get_workspace_root()
@@ -217,16 +278,19 @@ async def _orchestration_handler_stream(messages: list, api_key: str):
     except Exception:
         pass
 
+    api_key_override = anthropic_key if provider == "anthropic" else openai_key
     ctx = load_context()
     async for event_type, content in run_brain_with_flow_stream(
-        ctx.system_message, context, api_key_override=api_key
+        ctx.system_message, context, api_key_override=api_key_override
     ):
         yield f"data: {_json.dumps({'type': event_type, 'content': content})}\n\n"
 
 
 async def _orchestration_handler(
     messages: list,
-    api_key: str,
+    anthropic_key: Optional[str],
+    openai_key: Optional[str],
+    provider: str,
     include_flow: bool,
 ) -> dict:
     """Build context, inject user_message, call run_brain_with_flow. Returns { reply, mode_used, flow }."""
@@ -250,12 +314,13 @@ async def _orchestration_handler(
         # MCP unavailable: subprocess fail, timeout, or mcp not installed — keep stub
         pass
 
+    api_key_override = anthropic_key if provider == "anthropic" else openai_key
     try:
         ctx = load_context()
     except Exception as e:
         raise RuntimeError(f"Failed to load context: {e!s}") from e
     result = run_brain_with_flow(
-        ctx.system_message, context, api_key_override=api_key
+        ctx.system_message, context, api_key_override=api_key_override
     )
     reply = result.get("final_decision", "")
     out = {
@@ -279,14 +344,16 @@ async def index():
         return FileResponse(index_path)
     return HTMLResponse(
         "<h1>Orchestrator UI</h1><p>API running. Add static/index.html for UI.</p>"
-        "<p>POST /api/run-brain with optional anthropic_api_key, workspace_snippet.</p>"
+        "<p>POST /api/run-brain with optional anthropic_api_key, openai_api_key, workspace_snippet.</p>"
     )
 
 
 def _api_key_configured() -> bool:
-    return bool(
-        os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ORCHESTRATOR_LLM_API_KEY")
-    )
+    """True if the active provider's API key is set in env."""
+    provider = get_llm_provider()
+    if provider == "openai":
+        return bool(get_openai_api_key())
+    return bool(get_anthropic_api_key())
 
 
 def _workspace_configured() -> bool:
@@ -555,6 +622,23 @@ def _wants_sse(accept: str | None) -> bool:
     return "text/event-stream" in accept.lower()
 
 
+def _is_connection_error(exc: BaseException) -> bool:
+    """Return True if exc indicates the local LLM server is unreachable."""
+    try:
+        import openai
+        if isinstance(exc, openai.APIConnectionError):
+            return True
+    except ImportError:
+        pass
+    try:
+        import httpx
+        if isinstance(exc, httpx.ConnectError):
+            return True
+    except ImportError:
+        pass
+    return False
+
+
 @app.post("/api/chat")
 async def chat(req: ChatRequest, request: Request):
     """
@@ -568,11 +652,19 @@ async def chat(req: ChatRequest, request: Request):
             status_code=400,
             content={"error": "At least one message is required."},
         )
-    api_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ORCHESTRATOR_LLM_API_KEY")
-    if not api_key:
+    anthropic_key, openai_key, provider = _resolve_chat_keys(
+        req.anthropic_api_key, req.openai_api_key
+    )
+    active_key = anthropic_key if provider == "anthropic" else openai_key
+    if not active_key:
+        key_hint = (
+            "OPENAI_API_KEY (or ORCHESTRATOR_OPENAI_API_KEY)"
+            if provider == "openai"
+            else "ANTHROPIC_API_KEY (or ORCHESTRATOR_LLM_API_KEY)"
+        )
         return JSONResponse(
             status_code=500,
-            content={"error": "API key not configured. Set ANTHROPIC_API_KEY (or ORCHESTRATOR_LLM_API_KEY) in the environment."},
+            content={"error": f"API key not configured. Set {key_hint} in the environment or request body."},
         )
 
     mode = req.mode
@@ -584,29 +676,36 @@ async def chat(req: ChatRequest, request: Request):
 
     stream_sse = _wants_sse(request.headers.get("Accept"))
 
-    if stream_sse and mode == "chat":
-        return StreamingResponse(
-            _chat_handler_stream(req.messages, api_key),
-            media_type="text/event-stream",
-            headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
-        )
-
-    if stream_sse and mode != "chat":
-        return StreamingResponse(
-            _orchestration_handler_stream(req.messages, api_key),
-            media_type="text/event-stream",
-            headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
-        )
-
     try:
+        if stream_sse and mode == "chat":
+            return StreamingResponse(
+                _chat_handler_stream(req.messages, anthropic_key, openai_key, provider),
+                media_type="text/event-stream",
+                headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
+            )
+
+        if stream_sse and mode != "chat":
+            return StreamingResponse(
+                _orchestration_handler_stream(req.messages, anthropic_key, openai_key, provider),
+                media_type="text/event-stream",
+                headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
+            )
+
         if mode == "chat":
-            out = _chat_handler(req.messages, api_key)
+            out = _chat_handler(req.messages, anthropic_key, openai_key, provider)
         else:
-            out = await _orchestration_handler(req.messages, api_key, req.include_flow)
-    except Exception as e:
+            out = await _orchestration_handler(
+                req.messages, anthropic_key, openai_key, provider, req.include_flow
+            )
+    except Exception as exc:
+        if get_llm_provider() == "local" and _is_connection_error(exc):
+            raise HTTPException(
+                status_code=503,
+                detail="Local LLM unavailable. Run: ollama serve && ollama pull mistral-nemo",
+            )
         return JSONResponse(
             status_code=500,
-            content={"error": str(e)},
+            content={"error": str(exc)},
         )
     return out
 
@@ -616,18 +715,22 @@ async def run_brain_endpoint(req: RunBrainRequest):
     """
     Run the orchestrator brain: propose → critique → synthesize.
     Returns proposal, critique, synthesis, final_decision as structured JSON.
-    API key: from request body or env (ANTHROPIC_API_KEY, ORCHESTRATOR_LLM_API_KEY).
-    Never logged.
+    API key: from request body or env. Uses ORCHESTRATOR_LLM_PROVIDER to pick
+    openai vs anthropic. Never logged.
     """
-    api_key = req.anthropic_api_key
-    if not api_key:
-        api_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get(
-            "ORCHESTRATOR_LLM_API_KEY"
-        )
-    if not api_key:
+    anthropic_key, openai_key, provider = _resolve_chat_keys(
+        req.anthropic_api_key, req.openai_api_key
+    )
+    api_key_override = anthropic_key if provider == "anthropic" else openai_key
+    if not api_key_override:
         raise HTTPException(
-            status_code=400,
-            detail="API key required. Set anthropic_api_key in request body or ANTHROPIC_API_KEY / ORCHESTRATOR_LLM_API_KEY in env.",
+            status_code=500,
+            detail=(
+                "API key not configured. For provider=openai set OPENAI_API_KEY or "
+                "ORCHESTRATOR_OPENAI_API_KEY (or openai_api_key in request body). "
+                "For provider=anthropic set ANTHROPIC_API_KEY or ORCHESTRATOR_LLM_API_KEY "
+                "(or anthropic_api_key in request body)."
+            ),
         )
 
     # Build context from request or stubs
@@ -646,7 +749,7 @@ async def run_brain_endpoint(req: RunBrainRequest):
     try:
         ctx = load_context()
         result = run_brain_with_flow(
-            ctx.system_message, context, api_key_override=api_key
+            ctx.system_message, context, api_key_override=api_key_override
         )
         return result
     except Exception as e:

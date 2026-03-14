@@ -140,15 +140,24 @@ When running the orchestrator client (`agent-automation/orchestrator_client/cycl
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `ANTHROPIC_API_KEY` | Anthropic API key (or use `ORCHESTRATOR_LLM_API_KEY`) | — |
-| `ORCHESTRATOR_LLM_MODEL` | Fallback model for Proposer and Critic | `claude-sonnet-4-20250514` |
+| `ORCHESTRATOR_LLM_MODEL` | Fallback model for Proposer and Critic (must be a model ID, e.g. `claude-sonnet-4-20250514`, not the provider name "anthropic") | `claude-sonnet-4-20250514` |
 | `ORCHESTRATOR_PROPOSER_MODEL` | Model for Proposer (Phase 1 and 3) | `ORCHESTRATOR_LLM_MODEL` |
 | `ORCHESTRATOR_CRITIC_MODEL` | Model for Critic (Phase 2) | `ORCHESTRATOR_LLM_MODEL` |
+| `ORCHESTRATOR_OPENAI_MODEL` | When provider=openai: must be a **valid OpenAI model ID** (e.g. `gpt-4o`, `gpt-4o-mini`, `gpt-4.1-mini`), **not** the provider name `anthropic` | `gpt-4o-mini` |
 
 For MVP, both Proposer and Critic use the same model. Set different models to use a dedicated critic (e.g. a smaller/faster model for critique).
+
+**Troubleshooting**: `404 model anthropic does not exist` means `ORCHESTRATOR_OPENAI_MODEL` was set to a provider name; use a real OpenAI model ID.
 
 ---
 
 ## 9. Orchestrator UI (brain-only, outside Cursor)
+
+**Environment variables** (see `orchestrator_ui/.env.example`):
+
+- `ORCHESTRATOR_OPENAI_MODEL`: When using OpenAI provider, must be a **valid OpenAI model ID** (e.g. `gpt-4o`, `gpt-4o-mini`, `gpt-4.1-mini`), **not** the provider name `anthropic`. See `chat_completions.md` for supported model IDs.
+
+**Troubleshooting**: If you see `404 model anthropic does not exist`, `ORCHESTRATOR_OPENAI_MODEL` was set to a provider name instead of a real model ID. Use a valid OpenAI model ID such as `gpt-4o-mini`.
 
 A web UI to run the A2A brain without Cursor:
 
@@ -162,7 +171,72 @@ Open http://localhost:8765. Set API key via env or in the UI, click "Run brain",
 
 ---
 
-## 10. Summary
+## 10. Local LLM Setup (Ollama)
+
+The Orchestrator enforces `ORCHESTRATOR_LLM_PROVIDER=local` at startup. All LLM calls route to a locally running Ollama instance. No cloud AI API is used.
+
+### Install Ollama
+
+**macOS:**
+```bash
+brew install ollama
+```
+
+**Linux:**
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+See https://ollama.com for Windows and other platforms.
+
+### Start Ollama
+
+```bash
+ollama serve   # runs on http://localhost:11434 by default
+```
+
+Ollama starts automatically at login on macOS after `brew install`.
+
+### Pull a model
+
+```bash
+# Recommended (12B, Apache 2.0, ~7 GB)
+ollama pull mistral-nemo
+
+# Lightweight option (3.8B, MIT, ~3 GB, fast on limited hardware)
+ollama pull phi4-mini
+```
+
+**Cold-start note:** The first request after a model pull may take 10–30 seconds while the model loads into RAM/VRAM. Subsequent requests are fast.
+
+### Verify Ollama is running
+
+```bash
+curl http://localhost:11434/api/tags
+```
+
+Returns a JSON list of available models. If it returns `Connection refused`, run `ollama serve` first.
+
+### Environment variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `ORCHESTRATOR_LLM_PROVIDER` | `local` | Must be `local`. Server exits if set to anything else. |
+| `ORCHESTRATOR_LLM_BASE_URL` | `http://localhost:11434/v1` | Ollama API endpoint. Change if Ollama runs on a non-default port or a remote LAN server. |
+| `ORCHESTRATOR_LLM_MODEL` | `mistral-nemo` | Model tag as pulled via `ollama pull`. Use exact tag names (e.g. `mistral-nemo`, `phi4-mini`, `phi4`). |
+
+### Troubleshooting
+
+| Error | Cause | Fix |
+|---|---|---|
+| `"Local LLM unavailable"` (HTTP 503) | Ollama is not running | Run `ollama serve` |
+| `"model not found"` (HTTP 500) | Model not pulled | Run `ollama pull <model>` |
+| `FATAL: ORCHESTRATOR_LLM_PROVIDER='anthropic' is not allowed` | Wrong provider in `.env` | Set `ORCHESTRATOR_LLM_PROVIDER=local` |
+| Slow first response | Model loading into memory | Normal; wait 10–30s; subsequent requests are fast |
+
+---
+
+## 11. Summary
 
 - **Orchestrator**: `.cursor/rules/orchestrator.mdc` — one parent agent in one chat.
 - **Subagents**: `.cursor/agents/{lead-engineer,junior-engineer-1,junior-engineer-2,architect,cto,reviewer,tester,cfo,pm}.md` — invoked via `/lead-engineer`, `/junior-engineer-1`, `/junior-engineer-2`, etc.

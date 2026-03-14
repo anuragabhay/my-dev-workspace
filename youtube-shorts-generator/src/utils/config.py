@@ -36,7 +36,7 @@ def load_env(env_path: Optional[Path] = None) -> None:
     root = _project_root()
     path = env_path or root / DEFAULT_ENV_NAME
     if path.exists():
-        load_dotenv(path)
+        load_dotenv(path, override=True)
 
 
 def load_config(config_path: Optional[Path] = None) -> dict[str, Any]:
